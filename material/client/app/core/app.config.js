@@ -24,8 +24,8 @@
         var date = new Date();
         var year = date.getFullYear();
         var main = {
-            brand: 'Material',
-            name: 'Lisa',
+            brand: 'Classbook',
+            name: 'Joana Almeida',
             year: year,
             layout: 'wide',                                 // 'boxed', 'wide'
             menu: 'vertical',                               // 'horizontal', 'vertical', 'collapsed'

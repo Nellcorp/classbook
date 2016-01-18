@@ -15,16 +15,20 @@
 
     function InputCtrl ($scope) {
         $scope.user = {
-            title: 'Developer',
-            email: 'ipsum@lorem.com',
-            firstName: '',
-            lastName: '',
-            company: 'Google',
-            address: '1600 Amphitheatre Pkwy',
-            city: 'Mountain View',
-            state: 'CA',
-            biography: 'Loves kittens, snowboarding, and can type at 130 WPM.\n\nAnd rumor has it she bouldered up Castle Craig!',
-            postalCode: '94043'
+            title: 'Professor',
+            email: 'joao.almeida@isutic.co.ao',
+            firstName: 'João',
+            lastName: 'Almeida',
+            company: 'ISUTIC',
+            address: 'Rua dos CTTs',
+            city: 'Luanda',
+            state: 'Luanda',
+            biography: 'Ullamcorper a ullamcorper a facilisi ac malesuada donec litora parturient vestibulum mauris hac adipiscing.',
+            postalCode: '94043',
+            phone: '923123123',
+            discipline: 'Matemática',
+            supervisor: 'Armando Sebastião',
+            supervisor_phone: '555555555'
         };
         $scope.states = ('AL AK AZ AR CA CO CT DE FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS ' +
             'MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI ' +

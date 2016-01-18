@@ -28,9 +28,13 @@
 
     function ListCtrl ($scope, $mdDialog) {
         $scope.toppings = [
-            { name: 'Pepperoni', wanted: true },
-            { name: 'Sausage', wanted: false },
-            { name: 'Black Olives', wanted: true }
+            { name: 'Ignacia Rowlands', wanted: true },
+            { name: 'Travis Shur', wanted: false },
+            { name: 'Lynne Damewood', wanted: true },
+            { name: 'Soraya Backstrom', wanted: true },
+            { name: 'Derek Dolby', wanted: true },
+            { name: 'Lynna Hamlin', wanted: false },
+            { name: 'Gwen Delman', wanted: true }
         ];
         $scope.settings = [
             { name: 'Wi-Fi', extraScreen: 'Wi-fi menu', icon: 'zmdi zmdi-wifi-alt', enabled: true },
