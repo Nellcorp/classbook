@@ -1,0 +1,73 @@
+
+<section class="page-form-ele page" ng-controller="FormCtrl">
+
+
+    <div class="row ui-section" ng-controller="InputCtrl" >
+        <div class="col-lg-8 clearfix"> <h2 class="section-header">Editar o meu Perfil</h2> </div>
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-8 col-lg-offset-2">
+
+                            <div layout="column" ng-cloak class="md-inline-form inputdemoBasicUsage">
+                                <md-content layout-padding>
+                                    <form name="userForm">
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Escola (Desabilitado)</label>
+                                                <input ng-model="user.company" disabled>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>First name</label>
+                                                <input ng-model="user.firstName">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Last Name</label>
+                                                <input ng-model="user.lastName">
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Endereço</label>
+                                                <input ng-model="user.address">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Cidade</label>
+                                                <input ng-model="user.city">
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Telefone</label>
+                                                <input name="telephone" ng-model="user.phone" placeholder="123456789"
+                                                             required ng-pattern="/^[0-9]{9}$/" md-maxlength="9">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Disciplina</label>
+                                                <input ng-model="user.discipline">
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Supervisor</label>
+                                                <input ng-model="user.supervisor">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Telefone</label>
+                                                <input ng-model="user.supervisor_phone">
+                                            </md-input-container>
+                                        </div>
+                                    </form>
+                                </md-content>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>    
+        </div>
+    </div>
+</section>
