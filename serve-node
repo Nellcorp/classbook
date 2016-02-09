@@ -1,0 +1,2 @@
+export PORT=3002
+cd ~/classbook/node && nodemon

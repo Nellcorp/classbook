@@ -17,6 +17,7 @@
         ,'ui.tree'
         ,'ngMap'
         ,'textAngular'
+        ,'ngResource'
     ]);
 
 })();

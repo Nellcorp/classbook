@@ -10,7 +10,8 @@
                 'map/maps',
                 'table/static', 'table/dynamic', 'table/responsive',
                 'form/elements', 'form/validation', 'form/wizard',
-                'page/404', 'page/500', 'page/forgot-password','page/change-password', 'page/lock-screen', 'page/edit-profile','page/profile', 'page/signin', 'page/signup','page/class',
+                'page/404', 'page/500', 'page/forgot-password','page/change-password', 'page/lock-screen',
+                'page/edit-profile','page/profile', 'page/signin', 'page/signup','page/class','page/manager/new',
                 'app/calendar'
             ]
 

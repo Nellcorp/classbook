@@ -2,19 +2,19 @@ var express = require('express');
 var router = express.Router();
 
 var mongoose = require('mongoose');
-var Todo = require('../models/Todo.js');
+var Course = require('../models/Course.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
-  Todo.find(function (err, todos) {
+  Course.find(function (err, courses) {
     if (err) return next(err);
-    res.json(todos);
+    res.json(courses);
   });
 });
 
 /* POST /todos */
 router.post('/', function(req, res, next) {
-  Todo.create(req.body, function (err, post) {
+  Course.create(req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
@@ -22,7 +22,7 @@ router.post('/', function(req, res, next) {
 
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
-  Todo.findById(req.params.id, function (err, post) {
+  Course.findById(req.params.id, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
@@ -30,7 +30,7 @@ router.get('/:id', function(req, res, next) {
 
 /* PUT /todos/:id */
 router.put('/:id', function(req, res, next) {
-  Todo.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+  Course.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
@@ -38,10 +38,11 @@ router.put('/:id', function(req, res, next) {
 
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
-  Todo.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+  Course.findByIdAndRemove(req.params.id, req.body, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });
 })
 
 module.exports = router;
+

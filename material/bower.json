@@ -24,7 +24,7 @@
     "ngmap": "~1.15.0",
     "echarts": "~2.2.7",
     "ngECharts": "ngecharts#~0.1.1",
-    "angular-resource": "~1.5.0"
+    "angular-resource": "^1.5.0"
   },
   "devDependencies": {
     "bourbon": "~4.2.0",
