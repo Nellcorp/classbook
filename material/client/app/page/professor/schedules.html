@@ -1,0 +1,40 @@
+
+<div class="page page-profile">
+
+<div class="row ui-section" ng-controller="profScheduleCtrl">
+    <div class="col-lg-8 clearfix">
+        <h2 class="section-header">Horário de Aulas</h2>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+        <div class="panel-body">
+            <section class="table-flip-scroll">
+            <table class="table table-striped cf no-margin">
+                <thead class="cf">
+                <tr>
+                    <th class="numeric">Disciplina</th>
+                    <th class="numeric">Segunda-Feira</th>
+                    <th class="numeric">Terça-Feira</th>
+                    <th class="numeric">Quarta-Feira</th>
+                    <th class="numeric">Quinta-Feira</th>
+                    <th class="numeric">Sexta-Feira</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="schedule in schedules">
+                    <td class="numeric">{{schedule.subject_name}}</td>
+                    <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
+                    <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>
+                    <td class="numeric">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</td>
+                    <td class="numeric">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</td>
+                    <td class="numeric">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</td>
+                </tr>
+                </tbody>
+            </table>
+            </section>
+        </div>
+        </div>
+    </div>
+    </div>
+
+</div>

@@ -1,24 +1,19 @@
 var mongoose = require('mongoose');
+var uniqueValidator = require('mongoose-unique-validator');
 
 var SchoolSchema = new mongoose.Schema({
-  name: String,
-  country: String,
-  city: String,
-  address: String,
-  phone: String,
-  account_manager: String,
-  director: {
-    firstname: { type: String, lowercase: true, trim: true },
-    lastname: { type: String, lowercase: true, trim: true },
-    email: { type: String, lowercase: true, trim: true },
-    phone: { type: String, lowercase: true, trim: true }
-  },
-  periods: {
+  name: { type: String, required: true, lowercase: true, trim: true, unique: true },
+  //name: String,
+  country: { type: String, required: true, lowercase: true, trim: true},
+  city: { type: String, required: true, lowercase: true, trim: true},
+  address: { type: String, required: true, lowercase: true, trim: true},
+  phone: { type: String, required: true, lowercase: true, trim: true},
+  semesters: {
     first: {start: Date,end: Date},
     second: {start: Date,end: Date},
-    third: {start: Date,end: Date}
   },
   updated_at: { type: Date, default: Date.now }
 });
 
+SchoolSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('School', SchoolSchema);

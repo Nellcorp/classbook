@@ -11,6 +11,15 @@
         ,'app.ui.form'
         ,'app.ui.form.validation'
         ,'app.page'
+        ,'app.manager'
+        ,'app.student'
+        ,'app.professor'
+        ,'app.school'
+        ,'app.course'
+        ,'app.subject'
+        ,'app.schedule'
+        ,'app.session'
+        ,'app.admin'
         ,'app.table'
         
         // 3rd party feature modules

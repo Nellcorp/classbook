@@ -6,9 +6,9 @@ var Subject = require('../models/Subject.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
-  Subject.find(function (err, subjects) {
+  Subject.find(req.query,function (err, post) {
     if (err) return next(err);
-    res.json(subjects);
+    res.json(post);
   });
 });
 
@@ -17,7 +17,7 @@ router.post('/', function(req, res, next) {
   Subject.create(req.body, function (err, post) {
     if (err) return next(err);
     
-    res.json(req.body);
+    res.json(post);
   });
 });
 

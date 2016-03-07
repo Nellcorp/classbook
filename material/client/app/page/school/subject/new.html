@@ -1,0 +1,50 @@
+
+<section class="page-form-ele page" >
+
+
+    <div class="row ui-section" ng-controller="createSubjectCtrl" >
+        <div class="col-lg-8 clearfix"> <h2 class="section-header">Adicionar uma cadeira</h2> </div>
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-8 col-lg-offset-2">
+
+                            <div layout="column" ng-cloak class="md-inline-form inputdemoBasicUsage">
+                                <md-content layout-padding>
+                                    <form name="userForm" data-ng-submit="submitForm()">
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Cadeira</label>
+                                                <input name="firstname" ng-model="subject.name">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Ano (1 - 5)</label>
+                                                <input name="lastname" ng-model="subject.year">
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Curso</label>
+                                                <md-select ng-model="subject.course">
+                                                    <md-option ng-repeat="course in courses" value="{{course._id}}">
+                                                        {{course.name}}
+                                                    </md-option>
+                                                </md-select>
+                                            </md-input-container>
+                                        </div>
+                                        <md-input-container class="md-block">
+                                            <md-button type="submit"
+                                               class="md-raised btn-w-md md-primary btn-block btn-lg"
+                                               data-ng-disabled="!canSubmit()">Adicionar</md-button>
+                                        </md-input-container>
+
+                                    </form>
+                                </md-content>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>    
+        </div>
+    </div>
+</section>

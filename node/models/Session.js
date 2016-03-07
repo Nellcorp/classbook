@@ -1,20 +1,13 @@
 var mongoose = require('mongoose');
 
 var SessionSchema = new mongoose.Schema({
-  title: String,
-  school: String,
-  course: String,
-  subject: String,
-  lecture: String,
-  professor: String,
-  summary: String,
+  title: { type: String, required: false, lowercase: true, trim: true},
+  schedule: { type: String, required: true, lowercase: true, trim: true},
+  summary: { type: String, required: true, trim: true},
   start: Date,
+  started: Date,
   end: Date,
-  year_level: { type: Number, min: 1, max: 6 },
-  year: { type: Number, min: 2016, max: 2050 },
-  completed: { type: Boolean, default: false },
-  missing_professor: { type: Boolean, default: false },
-  missing_students: [String],
+  missing: [String],
   updated_at: { type: Date, default: Date.now }
 });
 

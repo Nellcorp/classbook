@@ -6,9 +6,9 @@ var Session = require('../models/Session.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
-  Session.find(function (err, sessions) {
+  Session.find(req.query,function (err, post) {
     if (err) return next(err);
-    res.json(sessions);
+    res.json(post);
   });
 });
 
@@ -17,7 +17,7 @@ router.post('/', function(req, res, next) {
   Session.create(req.body, function (err, post) {
     if (err) return next(err);
     
-    res.json(req.body);
+    res.json(post);
   });
 });
 

@@ -6,21 +6,20 @@ var School = require('../models/School.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
-  School.find(function (err, schools) {
+  School.find(req.query,function (err, post) {
     if (err) return next(err);
-    res.json(schools);
+    res.json(post);
   });
 });
 
 /* POST /todos */
 router.post('/', function(req, res, next) {
 
-  req.body.director = {firstname: req.body.director_firstname, lastname: req.body.director_lastname, email: req.body.director_email, phone: req.body.director_phone};
-
+  
   School.create(req.body, function (err, post) {
     if (err) return next(err);
     
-    res.json(req.body);
+    res.json(post);
   });
 });
 

@@ -6,9 +6,9 @@ var Course = require('../models/Course.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
-  Course.find(function (err, courses) {
+  Course.find(req.query,function (err, post) {
     if (err) return next(err);
-    res.json(courses);
+    res.json(post);
   });
 });
 
