@@ -23,7 +23,7 @@
         <span class="icon-bar"></span>
     </div>
 
-    <div class="top-nav">
+    <div class="top-nav" ng-controller="authCtrl">
         <ul class="nav-right pull-right list-unstyled">
 
             <li class="dropdown text-normal nav-profile"    uib-dropdown is-open="status.isopenProfile">
@@ -47,13 +47,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#/page/change-password">
+                        <a href ng-click="reset();">
                             <i class="zmdi zmdi-home"></i>
                             <span data-translate="Alterar Senha"></span>
                         </a>
                     </li>
                     <li>
-                        <a href="#/page/signin">
+                        <a href ng-click="logout();">
                             <i class="zmdi zmdi-forward"></i>
                             <span data-translate="LOG_OUT"></span>
                         </a>

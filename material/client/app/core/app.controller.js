@@ -2,9 +2,9 @@
     'use strict';
 
     angular.module('app')
-    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', AppCtrl]) // overall control
+    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService', AppCtrl]) // overall control
     
-    function AppCtrl($scope, $rootScope, $state, $document, appConfig) {
+    function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService) {
 
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
@@ -35,7 +35,15 @@
             $scope.main.fixedSidebar = false;
             }
         }, true);
-
+    
+        $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            if (toState.authenticate && !AuthService.isAuthenticated()){
+      
+                // User isn’t authenticated
+                $state.transitionTo('page/signin');
+                event.preventDefault(); 
+            }
+        });
 
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
             $document.scrollTo(0, 0);

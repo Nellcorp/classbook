@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app')
-        .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+        .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider,$httpProvider) {
             var routes, setRoutes;
 
             routes = [
@@ -80,10 +80,19 @@
                 var config, url;
                 url = '/' + route;
                 route = route.split("/:")[0];
+                var auth = true;
+
+                var open = ['page/404','page/500','page/signin','page/signup'];
+
+                if(open.indexOf(route) > -1){ auth = false; }
+
+
                 config = {
                     url: url,
-                    templateUrl: 'app/' + route + '.html'
+                    templateUrl: 'app/' + route + '.html',
+                    authenticate: auth
                 };
+
                 $stateProvider.state(route, config);
                 return $stateProvider;
             };
@@ -93,14 +102,16 @@
             });
 
             $urlRouterProvider
-                .when('/', '/page/signin')
-                .otherwise('/page/signin');
+                .when('/', '/page/signin') //send root path to login page
+                .otherwise('/page/signin');//send invalid routes to login page
 
 
             $stateProvider.state('profile', {
                 url: '/page/profile',
                 templateUrl: 'app/page/profile.html'
             });
+
+            $httpProvider.defaults.withCredentials = true;
 
         }]
     );

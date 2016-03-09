@@ -21,13 +21,14 @@
         ,'app.session'
         ,'app.admin'
         ,'app.table'
+        ,'app.service'
         
         // 3rd party feature modules
         ,'ui.tree'
         ,'ngMap'
         ,'textAngular'
         ,'ngResource'
+        ,'ngCookies'
     ]);
 
 })();
-
