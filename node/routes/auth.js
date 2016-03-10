@@ -15,6 +15,17 @@ router.post('/register', function(req, res, next) {
 });
 
 router.post('/login', passport.authenticate('local'), function(req, res) {
+  var sanitized = {
+    _id: req.user._id,
+    email: req.user.email,
+    firstname: req.user.firstname,
+    lastname: req.user.lastname,
+    school: req.user.school,
+    phone: req.user.phone,
+    type: req.user.type
+  };
+  
+  //res.status(200).send(sanitized);
   res.status(200).send(req.user);
 });
 

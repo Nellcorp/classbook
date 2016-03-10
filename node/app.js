@@ -4,6 +4,10 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
+//var bcrypt = require('bcrypt-nodejs');
+//var async = require('async');
+//var crypto = require('crypto');
 
 var mongoose = require('mongoose');
 var passport = require('passport');
@@ -68,10 +72,6 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-
-
-
 var session = require('express-session');
 
 app.use(session({secret: 'mycroft acia',resave: false,saveUninitialized: false}));

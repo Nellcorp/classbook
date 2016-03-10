@@ -6,9 +6,10 @@
         'ScheduleService', 'SessionService', 'AuthService', '$state','$stateParams', sidebarCtrl]);
     
     function sidebarCtrl($scope, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, $state, $stateParams) {
-            console.log($cookies.get('auth'));
-            $scope.user = $cookies.getObject('user');
-            $scope.auth = $cookies.get('auth');
+            $scope.user = { id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' };
+            
+            if(AuthService.isAuthenticated()){ $scope.user = $cookies.getObject('user'); }
+            
             $scope.state = $state;
             $scope.params = $stateParams;
             
@@ -90,10 +91,12 @@
                 ]
             };
 
+            if(AuthService.isAuthenticated()){ $scope.items = $scope.roles[$scope.user.type]; }
+
             $scope.init =  function() {
-                if(!!$cookies.get('auth')){
-                    $scope.items = $scope.roles[$scope.user.type];
-                }
+                //console.log(AuthService.isAuthenticated());
+                //console.log($scope.user);
+                if(AuthService.isAuthenticated()){ $scope.items = $scope.roles[$scope.user.type]; }
             };
 
             //$state.current.name

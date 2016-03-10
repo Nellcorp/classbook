@@ -2,9 +2,9 @@
     'use strict';
 
     angular.module('app')
-    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService', AppCtrl]) // overall control
+    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService','$cookies', AppCtrl]) // overall control
     
-    function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService) {
+    function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService, $cookies) {
 
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
@@ -37,19 +37,34 @@
         }, true);
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
-            AuthService.checkSession();
-            
-            if (toState.authenticate && !AuthService.isAuthenticated()){
-      
-                // User isn’t authenticated
-                $state.transitionTo('page/signin');
-                event.preventDefault(); 
-            }
+                //console.log(fromState);
+                //console.log(toState);
+                //console.log(AuthService.isAuthenticated());
+
+                AuthService.auth.get(function(user) {
+                    
+                    $cookies.putObject('user',{
+                        id: user._id,
+                        email: user.email,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        school: user.school,
+                        phone: user.phone,
+                        type: user.type
+                    }, {'expires': $scope.exp});
+
+                    $cookies.put('auth','true', {'expires': $scope.exp});
+                }, function(error) {
+                    AuthService.clear();
+                    $state.transitionTo('page/signin');
+                    event.preventDefault(); 
+                });
         });
 
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
 
             if (currentRoute.authenticate && !AuthService.isAuthenticated()){
+                AuthService.clear();
                 $state.transitionTo('page/signin');
                 event.preventDefault(); 
             }else{

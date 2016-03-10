@@ -25,22 +25,49 @@
             $scope.credentials = { phone: '', password: '' };
             $scope.login_error = false;
             $scope.logout_error = false;
+            $scope.change_error = false;
             $scope.exp = new Date();
             $scope.exp.setDate($scope.exp.getDate() + 1);
             $scope.reset_login = angular.copy($scope.credentials);
+            $scope.password = { password: '', confirm: '' };
+            $scope.reset_pass = angular.copy($scope.password);
 
 
             //LOGIN
             $scope.initLogin = function () {
 
                 //$cookies.remove('auth'); $cookies.remove('user');
+
+
+                AuthService.auth.get(function(user) {
+                    
+                    $cookies.putObject('user',{
+                        id: user._id,
+                        email: user.email,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        school: user.school,
+                        phone: user.phone,
+                        type: user.type
+                    }, {'expires': $scope.exp});
+
+                    $cookies.put('auth','true', {'expires': $scope.exp});
+                    
+                    $location.url('/page/profile/'+user._id);
+
+                }, function(error) {
+                    AuthService.clear();
+                });
+
+                /*
                 if($cookies.get('auth') === 'true' && typeof $cookies.getObject('user') != 'undefined'){
                     $location.url('/page/profile/' + $cookies.getObject('user').id);
                 }else{
 
                     $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
                     $cookies.put('auth','false');
-                }   
+                }
+                */
             };
             
             $scope.login = function() {
@@ -67,8 +94,8 @@
             }
 
 
-            $scope.canLogin = function() { return $scope.loginForm.$valid && !angular.equals($scope.credentials, $scope.reset_login);}
-            $location.url('/')
+            $scope.canLogin = function() { return !!$scope.loginForm && $scope.loginForm.$valid && !angular.equals($scope.credentials, $scope.reset_login);}
+            //$location.url('/')
 
             //LOGOUT
             $scope.logout = function() {
@@ -81,8 +108,7 @@
                     console.log(error);
                     $scope.logout_error = true;
                     if(error.status == 403){
-                        $cookies.remove('auth');
-                        $cookies.remove('user');
+                        AuthService.clear();
                     }
                 });
             }
@@ -92,6 +118,23 @@
 
             //RESET PASSWORD
             $scope.reset =    function() { $location.url('/') }
+
+            //CHANGE PASSWORD
+            $scope.change = function() {
+            
+                AuthService.password.save({password: $scope.password.password},function(user) {
+                    
+                    $location.url('/page/profile/'+user._id);
+
+                }, function(error) {
+                    //$location.url('/page/404');
+                    $scope.change_error = true;
+                });
+            }
+
+            $scope.confirmPassword =    function() {
+                return !!$scope.pwdForm && $scope.pwdForm.$valid && !angular.equals($scope.password, $scope.reset_pass) && $scope.password.password === $scope.password.confirm;
+            }
 
             //Unlock APP
             $scope.unlock =    function() { $location.url('/') }     

@@ -30,6 +30,7 @@ user.use('logout', function (req) {if (req.isAuthenticated()) return true;});
 user.use('check login', function (req) {return true;});
 user.use('list users', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('create users', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('change password', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('list user', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete user', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
@@ -89,6 +90,7 @@ app.get('/auth/valid', user.can('check login'), function (req, res, next) {next(
 
 app.get('/users', user.can('list users'), function (req, res, next) {next();});
 app.post('/users', user.can('create users'), function (req, res, next) {next();});
+app.post('/users/password', user.can('change password'), function (req, res, next) {next();});
 app.get('/users/:id', user.can('list user'), function (req, res, next) {next();});
 app.put('/users/:id', user.can('update user'), function (req, res, next) {next();});
 app.delete('/users/:id', user.can('delete user'), function (req, res, next) {next();});

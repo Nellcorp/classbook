@@ -56,8 +56,11 @@
                 $scope.professor = response[0];
                 $scope.schedule.professor = response[0]._id;
 
-                console.log($scope.schedule);
-                ScheduleService.save($scope.schedule,function(response){ console.log(response); $location.url('/page/subject/schedules/'+$scope.id);});
+                //console.log($scope.schedule);
+                ScheduleService.save($scope.schedule,function(response){
+                    //console.log(response);
+                    $location.url('/page/subject/schedules/'+$scope.id);
+                });
 
             });
         };           
@@ -83,7 +86,9 @@
             //$scope.showInfoOnSubmit = true;
 
             CourseService.update({id:$scope.id},$scope.course,function(course){
-                CourseNameService.save($scope.course.name,function(response){console.log(response);});
+                CourseNameService.save($scope.course.name,function(response){
+                    //console.log(response);
+                });
             });
         };           
     }
@@ -97,7 +102,10 @@
         CourseService.get({id: $scope.id},function(course) {
             $scope.course = course;
 
-            SubjectService.query({course: $scope.id},function(subjects) {$scope.subjects = subjects; console.log($scope.subjects);});
+            SubjectService.query({course: $scope.id},function(subjects) {
+                $scope.subjects = subjects;
+                //console.log($scope.subjects);
+            });
             UserService.query({school: $scope.course.school, type: 'professor'},function(professors) {$scope.professors = professors;});
         });
         
@@ -117,7 +125,7 @@
             for( var i = 0; i < schedules.length; i++ ) {
 
                 temp = schedules[i].split( "," );
-                console.log(temp);
+                //console.log(temp);
 
                 if( temp.length == 12 && email.test(temp[1]) != false &&
                     time.test(temp[2]) != false && time.test(temp[3]) != false &&
@@ -145,7 +153,9 @@
                     }
                     for( var j = 0; j < $scope.professors.length; j++ ) {if($scope.professors[j].email == temp[1]){ schedule.professor = $scope.professors[j]._id;}}
                 
-                    ScheduleService.save(schedule,function(response){console.log(response);});
+                    ScheduleService.save(schedule,function(response){
+                        //console.log(response);
+                    });
                 }
             }
 
@@ -183,7 +193,9 @@
 
             SubjectService.save($scope.subject,function(response){
                 console.log(response);
-                SubjectNameService.save({name: $scope.subject.name},function(response){console.log(response);});
+                SubjectNameService.save({name: $scope.subject.name},function(response){
+                    //console.log(response);
+                });
                 $location.url('/page/course/subjects/'+$scope.id);
             });
         };
@@ -254,7 +266,7 @@
         var hours = $scope.d.getHours();
         var min = $scope.d.getMinutes();
         $scope.weekday = $scope.weekdays[$scope.d.getDay()];
-        console.log($scope.weekday);
+        //console.log($scope.weekday);
 
         
         $scope.late = 1200;
@@ -287,17 +299,17 @@
                             if($scope.weekday == 'monday'){
                                 var start_str = schedules[i].schedule.monday.start.split( ":" );
                                 var start = new Date(year,month,day,start_str[0],start_str[1]);
-                                console.log(start_str);
-                                console.log(start);
-                                console.log($scope.d);
-                                console.log(start.getTime());
-                                console.log($scope.d.getTime());
+                                //console.log(start_str);
+                                //console.log(start);
+                                //console.log($scope.d);
+                                //console.log(start.getTime());
+                                //console.log($scope.d.getTime());
                                 
                                 if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
                                     schedules[i].schedule.monday.show = true;
                                     schedules[i].schedule.monday.hide = false;
                                 }
-                                console.log($scope.d.getTime() - start.getTime());
+                                //console.log($scope.d.getTime() - start.getTime());
                             
                             }
                             if($scope.weekday == 'tuesday'){
@@ -338,7 +350,7 @@
                             }
                         };
                         $scope.schedules = schedules;
-                        console.log($scope.schedules);
+                        //console.log($scope.schedules);
                     });
                     
 

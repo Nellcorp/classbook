@@ -30,4 +30,5 @@ UserSchema.plugin(passportLocalMongoose,{
     interval: 100
   });
 
+
 module.exports = mongoose.model('User', UserSchema);

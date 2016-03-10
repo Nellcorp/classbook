@@ -13,10 +13,14 @@
   			authService.login = $resource("http://classbook.nellcorp.com:3002/auth/login");
   			authService.logout = $resource("http://classbook.nellcorp.com:3002/auth/logout");
   			authService.auth = $resource("http://classbook.nellcorp.com:3002/auth/valid");
+        authService.password = $resource("http://classbook.nellcorp.com:3002/users/password");
  
-  			authService.isAuthenticated = function () {
-  				return (!!$cookies.get('auth') && !!$cookies.getObject('user'));
-  			};
+  			authService.isAuthenticated = function () { return (!!$cookies.get('auth')); };
+
+        authService.clear = function () {
+          $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
+          $cookies.put('auth','false');
+        };
 
   			authService.checkSession = function () {
   				var exp = new Date();
@@ -36,8 +40,7 @@
 
                 }, function(error) {
                 
-                $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
-					      $cookies.put('auth','false');
+                authService.clear();
                 $location.url('/page/signin');
             });
 		};

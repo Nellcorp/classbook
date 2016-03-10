@@ -21,6 +21,19 @@ router.post('/', function(req, res, next) {
   });
 });
 
+
+router.post('/password', function(req, res, next) {
+
+  User.findById(req.user.id, function (err, user) {
+    if (err) return next(err);
+
+    user.setPassword(req.body.password, function(){
+            user.save();
+            return res.status(200).json(user);
+        });
+  });
+});
+
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
 
