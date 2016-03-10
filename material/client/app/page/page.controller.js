@@ -2,10 +2,8 @@
     'use strict';
 
     angular.module('app.page',['app.service','ngCookies'])
-    //angular.module('app.page',[])
     .controller('invoiceCtrl', ['$scope', '$window', invoiceCtrl])
     .controller('authCtrl', ['$scope', '$window', '$location', '$cookies', 'UserService', 'AuthService', '$stateParams', authCtrl]);
-    //.controller('authCtrl', ['$scope', '$window', '$location', authCtrl]);
 
     function invoiceCtrl($scope, $window) {
         var printContents, originalContents, popupWin;
@@ -23,6 +21,7 @@
 
     function authCtrl($scope, $window, $location, $cookies, UserService, AuthService, $stateParams) {
             
+
             $scope.credentials = { phone: '', password: '' };
             $scope.login_error = false;
             $scope.logout_error = false;
@@ -33,10 +32,15 @@
 
             //LOGIN
             $scope.initLogin = function () {
-                $cookies.remove('auth'); $cookies.remove('user');
+
+                //$cookies.remove('auth'); $cookies.remove('user');
                 if($cookies.get('auth') === 'true' && typeof $cookies.getObject('user') != 'undefined'){
-                    //$location.url('/page/profile/' + $cookies.getObject('user').id);
-                }    
+                    $location.url('/page/profile/' + $cookies.getObject('user').id);
+                }else{
+
+                    $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
+                    $cookies.put('auth','false');
+                }   
             };
             
             $scope.login = function() {

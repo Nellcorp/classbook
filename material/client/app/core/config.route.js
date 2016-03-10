@@ -4,7 +4,7 @@
     angular.module('app')
         .config(['$stateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $urlRouterProvider,$httpProvider) {
             var routes, setRoutes;
-
+            
             routes = [
                 'app/calendar',
                 'form/elements',
@@ -82,7 +82,7 @@
                 route = route.split("/:")[0];
                 var auth = true;
 
-                var open = ['page/404','page/500','page/signin','page/signup'];
+                var open = ['page/404','page/500','page/signin','page/signup','page/profile/:id'];
 
                 if(open.indexOf(route) > -1){ auth = false; }
 

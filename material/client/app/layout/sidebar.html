@@ -1,13 +1,14 @@
-
-<div class="nav-wrapper">
+<div class="nav-wrapper" ng-controller="sidebarCtrl" ng-init="init()">
     <ul id="nav"
     class="nav"
     data-slim-scroll
     data-collapse-nav
     data-highlight-active>
         <li class="nav-title"> <span data-translate="Classbook"></span> </li>
-        <li>
-            <a md-button aria-label="meanu" href="#/page/class"><i class="fa fa-circle"></i><span data-translate="Aula"></span></a>
+        <li ng-repeat="item in items"><a md-button aria-label="meanu" href="#"><i class="fa fa-circle"></i><span data-translate={{item.name}}></span></a>
+            <ul style="display: block;">
+                <li ng-repeat="link in item.items"><a md-button aria-label="meanu" href={{link.route}}><i class="fa fa-circle"></i><span data-translate={{link.name}}></span></a></li>
+            </ul>
         </li>
     </ul>
 </div>

@@ -21,25 +21,6 @@ router.post('/', function(req, res, next) {
   });
 });
 
-router.post('/register', function(req, res, next) {
-  var password = req.body.password;
-  delete req.body.password;
-  User.register(req.body, password, function (err, post) {
-    if (err) return next(err);
-    res.json(post);
-  });
-});
-
-router.post('/login', passport.authenticate('local'), function(req, res) {
-  res.status(200).send(req.user);
-});
-
-router.get('/logout', function(req, res) {
-    req.logout();
-    res.status(200).send("success");
-});
-
-
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
 

@@ -34,6 +34,7 @@ var corsOptions = {
 var routes = require('./routes/index');
 var User = require('./models/User');
 var users = require('./routes/users');
+var auth = require('./routes/auth');
 var schools = require('./routes/schools');
 var courses = require('./routes/courses');
 var subjects = require('./routes/subjects');
@@ -84,19 +85,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-app.use(ConnectRoles);
 
 var restrict = function (req, res, next) {
   
-  if (req.user || req.url === '/users/login') {
+  if (req.user || req.url === '/auth/login' || req.url === '/auth/valid' || req.url === '/auth/register') {
     next();
-  } else {res.sendStatus(403);}
+  } else {res.sendStatus(401);}
 };
 
 app.use(restrict);
 
+app.use(ConnectRoles);
 
 app.use('/', routes);
+app.use('/auth', auth);
 app.use('/users', users);
 app.use('/schools', schools);
 app.use('/courses', courses);

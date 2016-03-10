@@ -37,6 +37,8 @@
         }, true);
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            AuthService.checkSession();
+            
             if (toState.authenticate && !AuthService.isAuthenticated()){
       
                 // User isn’t authenticated
@@ -46,7 +48,18 @@
         });
 
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-            $document.scrollTo(0, 0);
+
+            if (currentRoute.authenticate && !AuthService.isAuthenticated()){
+                $state.transitionTo('page/signin');
+                event.preventDefault(); 
+            }else{
+                $document.scrollTo(0, 0);
+            }
+        });
+
+        $rootScope.$on('$stateChangeError', function(event) {
+            $state.transitionTo('page/404');
+            event.preventDefault(); 
         });
     }
 

@@ -22,6 +22,7 @@
         ,'app.admin'
         ,'app.table'
         ,'app.service'
+        ,'app.sidebar'
         
         // 3rd party feature modules
         ,'ui.tree'
