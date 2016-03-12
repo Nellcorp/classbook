@@ -17,17 +17,18 @@ var user = new ConnectRoles({
   }
 });
 
-user.use(function (req, action) {
-    var open = ['access public page','check login'];
-    console.log(action);
-    if (!req.isAuthenticated()){ return open.indexOf(action) > -1;}
-});
+user.use(function (req, action) { if (!req.isAuthenticated()) return action === 'access public page';});
 
 
-user.use('logout', function (req) {if (req.isAuthenticated()) return true;});
+user.use('logout', function (req) { return req.isAuthenticated();});
+user.use('access public page', function (req) { return req.isAuthenticated();});
+
+
+//Auth
+user.use('check login', function (req) {return true;});
+user.use('list token', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 
 //Users
-user.use('check login', function (req) {return true;});
 user.use('list users', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('create users', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 user.use('change password', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
@@ -87,10 +88,13 @@ app.get('/auth/register', user.can('access public page'), function (req, res, ne
 app.post('/auth/login', user.can('access public page'), function (req, res, next) {next();});
 app.get('/auth/logout', user.can('logout'), function (req, res, next) {next();});
 app.get('/auth/valid', user.can('check login'), function (req, res, next) {next();});
+app.post('/auth/password', user.can('change password'), function (req, res, next) {next();});
+app.post('/auth/reset', user.can('access public page'), function (req, res, next) {next();});
+app.post('/auth/restore', user.can('access public page'), function (req, res, next) {next();});
+app.get('/auth/tokens/:id', user.can('list token'), function (req, res, next) {next();});
 
 app.get('/users', user.can('list users'), function (req, res, next) {next();});
 app.post('/users', user.can('create users'), function (req, res, next) {next();});
-app.post('/users/password', user.can('change password'), function (req, res, next) {next();});
 app.get('/users/:id', user.can('list user'), function (req, res, next) {next();});
 app.put('/users/:id', user.can('update user'), function (req, res, next) {next();});
 app.delete('/users/:id', user.can('delete user'), function (req, res, next) {next();});

@@ -17,6 +17,7 @@
     "express-session": "^1.13.0",
     "jade": "~1.11.0",
     "kerberos": "0.0.18",
+    "mandrill-api": "^1.0.45",
     "mongodb": ">= 0.9.6-7",
     "mongoose": "^4.4.2",
     "mongoose-unique-validator": "^1.0.0",

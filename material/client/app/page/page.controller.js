@@ -23,14 +23,15 @@
             
 
             $scope.credentials = { phone: '', password: '' };
-            $scope.login_error = false;
-            $scope.logout_error = false;
-            $scope.change_error = false;
+            $scope.form_error = false;
             $scope.exp = new Date();
             $scope.exp.setDate($scope.exp.getDate() + 1);
             $scope.reset_login = angular.copy($scope.credentials);
             $scope.password = { password: '', confirm: '' };
             $scope.reset_pass = angular.copy($scope.password);
+            $scope.reset_phone = '';
+            $scope.url_404 = '/page/signin';
+            $scope.token = false;
 
 
             //LOGIN
@@ -59,15 +60,6 @@
                     AuthService.clear();
                 });
 
-                /*
-                if($cookies.get('auth') === 'true' && typeof $cookies.getObject('user') != 'undefined'){
-                    $location.url('/page/profile/' + $cookies.getObject('user').id);
-                }else{
-
-                    $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
-                    $cookies.put('auth','false');
-                }
-                */
             };
             
             $scope.login = function() {
@@ -87,9 +79,10 @@
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     
                     $location.url('/page/profile/'+user._id);
+                    //$location.url('/page/profile');
 
                 }, function(error) {
-                    $scope.login_error = true;
+                    $scope.form_error = true;
                 });
             }
 
@@ -106,7 +99,7 @@
 
                 }, function(error) {
                     console.log(error);
-                    $scope.logout_error = true;
+                    $scope.form_error = true;
                     if(error.status == 403){
                         AuthService.clear();
                     }
@@ -117,8 +110,55 @@
             $scope.signup = function() { $location.url('/')}
 
             //RESET PASSWORD
-            $scope.reset =    function() { $location.url('/') }
 
+            $scope.canReset = function() { return !!$scope.resetForm && $scope.resetForm.$valid && $scope.reset_phone != '' && $scope.reset_phone.length == 9;}
+
+            $scope.reset = function() {
+            
+                AuthService.reset.save({phone: $scope.reset_phone},function(token) {
+                    
+                    $location.url('/page/reset_success');
+
+                }, function(error) {
+                    //$location.url('/page/404');
+                    $scope.form_error = true;
+                });
+            }
+
+
+            //RESTORE PASSWORD
+            $scope.initRestore = function () {
+
+                //$cookies.remove('auth'); $cookies.remove('user');
+
+
+                AuthService.token.get({id: $stateParams.id},function(token) {
+                    $scope.token = token;
+
+                }, function(error) {
+                    //$location.url('/page/profile/'+user._id);
+                    $scope.form_error = true;
+                });
+
+            };
+
+
+            $scope.restore = function() {
+            
+                AuthService.restore.save({token: $scope.token._id, password: $scope.password.password},function(user) {
+                    
+                    $location.url('/page/sigin');
+
+                }, function(error) {
+                    //$location.url('/page/404');
+                    $scope.form_error = true;
+                });
+            }
+
+
+            $scope.canRestore = function() { return !!$scope.restoreForm && $scope.restoreForm.$valid && $scope.password.password != '' && !!$scope.token;}
+
+            
             //CHANGE PASSWORD
             $scope.change = function() {
             
@@ -128,7 +168,7 @@
 
                 }, function(error) {
                     //$location.url('/page/404');
-                    $scope.change_error = true;
+                    $scope.form_error = true;
                 });
             }
 
@@ -137,7 +177,35 @@
             }
 
             //Unlock APP
-            $scope.unlock =    function() { $location.url('/') }     
+            $scope.unlock =    function() { $location.url('/') }
+
+
+            $scope.nfound = function () {
+
+                //$cookies.remove('auth'); $cookies.remove('user');
+
+
+                AuthService.auth.get(function(user) {
+                    
+                    $cookies.putObject('user',{
+                        id: user._id,
+                        email: user.email,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        school: user.school,
+                        phone: user.phone,
+                        type: user.type
+                    }, {'expires': $scope.exp});
+
+                    $cookies.put('auth','true', {'expires': $scope.exp});
+                    
+                    $scope.url_404 = '/page/profile/' + user._id;
+
+                }, function(error) {
+                    AuthService.clear();
+                });
+
+            };     
     }
 
 

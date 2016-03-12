@@ -2,7 +2,7 @@
 <section class="page-form-ele page" >
 
 
-    <div class="row ui-section" ng-controller="managerCtrl" >
+    <div class="row ui-section" ng-controller="adminCtrl" >
         <div class="col-lg-8 clearfix"> <h2 class="section-header">{{user.firstname}} {{user.lastname}}</h2> </div>
         <div class="col-md-12">
             <section class="panel panel-default">
@@ -32,23 +32,6 @@
                                             <md-input-container flex>
                                                 <label>Email</label>
                                                 <input name="email" ng-model="user.email">
-                                            </md-input-container>
-                                        </div>
-                                        <div layout layout-sm="column">
-                                            <md-input-container flex>
-                                                <label>Escola</label>
-                                                <input name="school" ng-model="user.school" disabled>
-                                            </md-input-container>
-                                        </div>
-                                        
-                                        <div layout layout-sm="column">
-                                            <md-input-container flex>
-                                                <label>Endereço da Escola</label>
-                                                <input name="address" ng-model="school.address">
-                                            </md-input-container>
-                                            <md-input-container flex>
-                                                <label>Cidade</label>
-                                                <input name="city" ng-model="school.city">
                                             </md-input-container>
                                         </div>
                                         <md-input-container class="md-block">

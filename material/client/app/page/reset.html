@@ -1,4 +1,4 @@
-<div class="page-forgot" ng-controller="authCtrl">
+<div class="page-forgot" ng-controller="authCtrl" ng-init="initRestore()">
     <div class="wrapper">
         <div class="main-body">
             <div class="body-inner">
@@ -7,16 +7,16 @@
                         <section class="logo text-center">
                             <h1><a href="#/">{{main.brand}}</a></h1>
                         </section>                    
-                        <form name="resetForm" data-ng-submit="reset()">
+                        <form name="restoreForm" data-ng-submit="restore()">
                             <fieldset>
                                 <div class="form-group">
                                     <div class="ui-input-group">        
-                                        <input type="text" required class="form-control" ng-model="reset_phone">
+                                        <input type="password" required class="form-control" ng-model="password.password">
                                         <span class="input-bar"></span>
-                                        <label>Telefone</label>
+                                        <label>Palavra Passe</label>
                                     </div>
                                     <div class="additional-info text-center text-small">
-                                       Insira o seu número de telefone para confirmar a sua identidade.
+                                       Insira a sua nova palavra passe.
                                    </div>
                                </div>
                            </fieldset>
@@ -24,11 +24,11 @@
                                     <div class="ui-input-group">        
                                         <md-input-container class="md-block">
                                             <md-button type="submit" class="md-raised btn-w-md md-primary btn-block btn-lg"
-                                               data-ng-disabled="!canReset()">RESTAURAR</md-button>
+                                               data-ng-disabled="!canRestore()">RESTAURAR</md-button>
                                             </md-input-container>
                                     </div>
                            </div>
-                           <div class="callout callout-info" ng-hide="!login_error">
+                           <div class="callout callout-info" ng-hide="!form_error">
                                     <span>Houve um erro ao restaurar a senha. Tente novamente.</span>
                                 </div>
                        </form>

@@ -9,41 +9,41 @@
     function customPage() {
         var directive = {
             restrict: 'A',
-            controller: ['$scope', '$element', '$location', customPageCtrl]
+            controller: ['$scope', '$element', '$location', '$state', customPageCtrl]
         };
 
         return directive;
 
-        function customPageCtrl($scope, $element, $location) {
+        function customPageCtrl($scope, $element, $location, $state) {
             var addBg, path;
 
-            path = function() {
-                return $location.path();
-            };
+            path = function() { return $state.current.name; };
 
             addBg = function(path) {
                 $element.removeClass('body-wide body-err body-lock body-auth');
+                
                 switch (path) {
-                    case '/404':
-                    case '/page/404':
-                    case '/page/500':
+                    case '404':
+                    case 'page/404':
+                    case 'page/500':
                         return $element.addClass('body-wide body-err');
-                    case '/page/signin':
-                    case '/page/signup':
-                    case '/page/forgot-password':
+                    case 'page/signin':
+                    case 'page/signup':
+                    case 'page/reset':
+                    case 'page/forgot-password':
                         return $element.addClass('body-wide body-auth');
-                    case '/page/lock-screen':
+                    case 'page/lock-screen':
                         return $element.addClass('body-wide body-lock');
                 }
             };
 
-            addBg($location.path());
+            addBg(path());
 
             $scope.$watch(path, function(newVal, oldVal) {
                 if (newVal === oldVal) {
                     return;
                 }
-                return addBg($location.path());
+                return addBg(path());
             });
         }        
     }

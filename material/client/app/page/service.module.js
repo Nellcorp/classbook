@@ -10,10 +10,14 @@
         .factory("SessionService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/sessions/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory('AuthService', function ($resource, $cookies, $location) {
   			var authService = {};
+        authService.register = $resource("http://classbook.nellcorp.com:3002/auth/register");
   			authService.login = $resource("http://classbook.nellcorp.com:3002/auth/login");
   			authService.logout = $resource("http://classbook.nellcorp.com:3002/auth/logout");
   			authService.auth = $resource("http://classbook.nellcorp.com:3002/auth/valid");
-        authService.password = $resource("http://classbook.nellcorp.com:3002/users/password");
+        authService.password = $resource("http://classbook.nellcorp.com:3002/auth/password");
+        authService.reset = $resource("http://classbook.nellcorp.com:3002/auth/reset");
+        authService.restore = $resource("http://classbook.nellcorp.com:3002/auth/restore");
+        authService.token = $resource("http://classbook.nellcorp.com:3002/auth/tokens/:id",{Id: "@id" });
  
   			authService.isAuthenticated = function () { return (!!$cookies.get('auth')); };
 

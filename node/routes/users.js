@@ -22,23 +22,12 @@ router.post('/', function(req, res, next) {
 });
 
 
-router.post('/password', function(req, res, next) {
-
-  User.findById(req.user.id, function (err, user) {
-    if (err) return next(err);
-
-    user.setPassword(req.body.password, function(){
-            user.save();
-            return res.status(200).json(user);
-        });
-  });
-});
-
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
 
   User.findById(req.params.id, function (err, post) {
     if (err) return next(err);
+    if (post == null) return res.status(404).json({ error: "User Not found." });
     res.json(post);
   });
 });
@@ -54,7 +43,7 @@ router.put('/:id', function(req, res, next) {
 
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
-  User.findByIdAndRemove(req.params.id, req.body, function (err, post) {
+  User.findByIdAndRemove(req.params.id, function (err, post) {
     if (err) return next(err);
     res.json(post);
   });

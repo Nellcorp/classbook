@@ -13,6 +13,9 @@
                 'map/maps',
                 'page/404',
                 'page/500',
+                'page/admin/list',
+                'page/admin/new',
+                'page/admin/profile/:id',
                 'page/change-password',
                 'page/class',
                 'page/schedule/profile/:id',
@@ -33,6 +36,7 @@
                 'page/professor/profile/:id',
                 'page/professor/schedules/:id',
                 'page/professor/absences/:id',
+                'page/reset/:id',
                 'page/school/course/batch/:id',
                 'page/school/course/new/:id',
                 'page/school/courses/:id',
@@ -82,7 +86,7 @@
                 route = route.split("/:")[0];
                 var auth = true;
 
-                var open = ['page/404','page/500','page/signin','page/signup','page/profile/:id'];
+                var open = ['page/404','page/500','page/signin','page/signup','page/reset/:id'];
 
                 if(open.indexOf(route) > -1){ auth = false; }
 
@@ -103,7 +107,7 @@
 
             $urlRouterProvider
                 .when('/', '/page/signin') //send root path to login page
-                .otherwise('/page/signin');//send invalid routes to login page
+                .otherwise('/page/404');//send invalid routes to login page
 
 
             $stateProvider.state('profile', {

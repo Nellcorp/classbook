@@ -27,6 +27,7 @@ router.post('/', function(req, res, next) {
 router.get('/:id', function(req, res, next) {
   School.findById(req.params.id, function (err, post) {
     if (err) return next(err);
+    if (post == null) return res.status(404).json({ error: "Resource Not found." });
     res.json(post);
   });
 });

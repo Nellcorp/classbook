@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
+var mandrill = require('mandrill-api/mandrill');
 //var bcrypt = require('bcrypt-nodejs');
 //var async = require('async');
 //var crypto = require('crypto');

@@ -2,8 +2,8 @@
 <section class="page-form-ele page" >
 
 
-    <div class="row ui-section" ng-controller="createManagerCtrl" >
-        <div class="col-lg-8 clearfix"> <h2 class="section-header">Criar Escola</h2> </div>
+    <div class="row ui-section" ng-controller="createAdminCtrl" >
+        <div class="col-lg-8 clearfix"> <h2 class="section-header">Novo Administrador</h2> </div>
         <div class="col-md-12">
             <section class="panel panel-default">
                 <div class="panel-body">
@@ -36,47 +36,14 @@
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
-                                                <label>Escola</label>
-                                                <input name="school" ng-model="user.school">
-                                            </md-input-container>
-                                            <md-input-container flex>
-                                                <label>Telefone da Escola</label>
-                                                <input name="telephone" ng-model="school.phone" placeholder="123456789"
-                                                             required ng-pattern="/^[0-9]{9}$/" md-maxlength="9">
+                                                <label>Password</label>
+                                                <input name="password" type="password" ng-model="user.password">
                                             </md-input-container>
                                         </div>
-                                        
-                                        <div layout layout-sm="column">
-                                            <md-input-container flex>
-                                                <label>Endereço da Escola</label>
-                                                <input name="address" ng-model="school.address">
-                                            </md-input-container>
-                                            <md-input-container flex>
-                                                <label>Cidade</label>
-                                                <input name="city" ng-model="school.city">
-                                            </md-input-container>
-                                        </div>
-                                        <div layout layout-sm="column">
-                                            <md-input-container flex>
-                                                <label>Primeiro Semestre</label>
-                                                <input disabled>
-                                            </md-input-container>
-                                            <md-datepicker ng-model="school.semesters.first.start" md-placeholder="Início"></md-datepicker>
-                                            <md-datepicker ng-model="school.semesters.first.end" md-placeholder="Fim"></md-datepicker>
-                                        </div>
-                                        <div layout layout-sm="column">
-                                            <md-input-container flex>
-                                                <label>Segundo Semestre</label>
-                                                <input disabled>
-                                            </md-input-container>
-                                            <md-datepicker ng-model="school.semesters.second.start" md-placeholder="Início"></md-datepicker>
-                                            <md-datepicker ng-model="school.semesters.second.end" md-placeholder="Fim"></md-datepicker>
-                                        </div>
-
                                         <md-input-container class="md-block">
                                             <md-button type="submit"
                                                class="md-raised btn-w-md md-primary btn-block btn-lg"
-                                               data-ng-disabled="!canSubmit()">Invite Manager</md-button>
+                                               data-ng-disabled="!canSubmit()">Criar Conta</md-button>
                                         </md-input-container>
 
                                     </form>
