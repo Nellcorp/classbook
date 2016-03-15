@@ -31,6 +31,7 @@
                     case 'page/signup':
                     case 'page/reset':
                     case 'page/forgot-password':
+                    case 'page/activate-account':
                         return $element.addClass('body-wide body-auth');
                     case 'page/lock-screen':
                         return $element.addClass('body-wide body-lock');

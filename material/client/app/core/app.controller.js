@@ -9,7 +9,7 @@
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
         $scope.color = appConfig.color;
-
+        
         $scope.$watch('main', function(newVal, oldVal) {
             // if (newVal.menu !== oldVal.menu || newVal.layout !== oldVal.layout) {
             //     $rootScope.$broadcast('layout:changed');
@@ -38,8 +38,33 @@
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
                 //console.log(fromState);
-                //console.log(toState);
+                console.log(toState);
                 //console.log(AuthService.isAuthenticated());
+                var school = /^\/page\/school(\/([A-Za-z]*)){0,1}\/:id$/.test(toState.url);
+                var profile = /\/page\/profile\/:id$/.test(toState.url);
+
+                //console.log(profile);
+                //console.log($cookies.getObject('user').id);
+
+                
+                if(toState.authenticate){
+
+                if(school && $cookies.getObject('user').type != 'admin' && toParams.id != $cookies.getObject('user').school){
+                    //$state.go('page/profile', { id: $cookies.getObject('user').id });
+                    var params = toParams;
+                    params.id = $cookies.getObject('user').school;
+                    $state.transitionTo(toState.name, params, {resume: true});
+                    //event.preventDefault();
+                }
+
+                if(profile && $cookies.getObject('user').type != 'admin' && toParams.id != $cookies.getObject('user').id){
+                    var params = toParams;
+                    params.id = $cookies.getObject('user').id;
+                    $state.transitionTo(toState.name, params, {resume: true});
+                    //$state.go('page/profile', { id: $cookies.getObject('user').id });  
+                    //event.preventDefault();
+                }
+
 
                 AuthService.auth.get(function(user) {
                     
@@ -56,13 +81,15 @@
                     $cookies.put('auth','true', {'expires': $scope.exp});
                 }, function(error) {
                     AuthService.clear();
+                    
                     $state.transitionTo('page/signin');
                     event.preventDefault(); 
                 });
+            }
         });
 
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-
+            $cookies.putObject('state',currentRoute);
             if (currentRoute.authenticate && !AuthService.isAuthenticated()){
                 AuthService.clear();
                 $state.transitionTo('page/signin');

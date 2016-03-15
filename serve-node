@@ -1,2 +1,6 @@
 export PORT=3002
+
+source $(dirname $0)/api.keys
+
+
 cd ~/classbook/node && nodemon

@@ -11,6 +11,7 @@
         ,'app.ui.form'
         ,'app.ui.form.validation'
         ,'app.page'
+        ,'app.delete'
         ,'app.manager'
         ,'app.student'
         ,'app.professor'
@@ -22,6 +23,7 @@
         ,'app.admin'
         ,'app.table'
         ,'app.service'
+        ,'app.context'
         ,'app.sidebar'
         
         // 3rd party feature modules

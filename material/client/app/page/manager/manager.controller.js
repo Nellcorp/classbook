@@ -1,14 +1,12 @@
 (function () {
     'use strict';
 
-    angular.module('app.manager', ['ngResource','validation.match','angularRandomString'])
-        .factory("UserService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SchoolService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService',createManagerCtrl])
-        .controller('managerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','$stateParams',managerCtrl]);
+    angular.module('app.manager', ['app.service','validation.match','angularRandomString'])
+        .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', createManagerCtrl])
+        .controller('managerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', '$stateParams',managerCtrl]);
 
 
-    function createManagerCtrl ($scope, $location, randomString, UserService, SchoolService) {
+    function createManagerCtrl ($scope, $location, randomString, UserService, SchoolService, AuthService) {
         
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
         
@@ -45,20 +43,20 @@
         };    
         
         $scope.submitForm = function() {
-            
+            //console.log($scope.school);    
             SchoolService.save($scope.school,function(school){ 
-                console.log(school);    
+        
                 $scope.user.school = school._id;
-                
-                UserService.save($scope.user,function(user){ 
-                console.log(user);    
+        
+                AuthService.register.save($scope.user,function(user){ 
+                $scope.user = user;
                 $location.url('/page/manager/profile/'+$scope.user._id);});
                 
         });
         };           
     }
 
-    function managerCtrl ($scope, $location, randomString, UserService, SchoolService, $stateParams) {
+    function managerCtrl ($scope, $location, randomString, UserService, SchoolService, AuthService, $stateParams) {
         $scope.id = $stateParams.id;
         
         UserService.get({id: $scope.id},function(user) {

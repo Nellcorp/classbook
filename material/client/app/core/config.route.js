@@ -13,13 +13,16 @@
                 'map/maps',
                 'page/404',
                 'page/500',
+                'page/activate-account',
                 'page/admin/list',
                 'page/admin/new',
                 'page/admin/profile/:id',
                 'page/change-password',
                 'page/class',
                 'page/schedule/profile/:id',
+                'page/schedule/delete/:id',
                 'page/course/profile/:id',
+                'page/course/delete/:id',
                 'page/course/subject/batch/:id',
                 'page/course/schedule/batch/:id',
                 'page/course/subject/new/:id',
@@ -45,6 +48,7 @@
                 'page/school/professor/new/:id',
                 'page/school/professors/:id',
                 'page/school/profile/:id',
+                'page/school/delete/:id',
                 'page/school/student/batch/:id',
                 'page/school/student/new/:id',
                 'page/school/students/:id',
@@ -54,9 +58,11 @@
                 'page/signin',
                 'page/signup',
                 'page/session/profile/:id',
+                'page/session/delete/:id',
                 'page/student/profile/:id',
                 'page/student/absences/:id',
                 'page/subject/profile/:id',
+                'page/subject/delete/:id',
                 'page/subject/schedule/new/:id',
                 'page/subject/schedule/batch/:id',
                 'page/subject/schedules/:id',
@@ -65,6 +71,7 @@
                 'page/schedule/sessions/:id',
                 'page/schedule/students/:id',
                 'page/schedule/session/new/:id/:user',
+                'page/user/delete/:id',
                 'table/dynamic',
                 'table/responsive',
                 'table/static',
@@ -86,10 +93,10 @@
                 route = route.split("/:")[0];
                 var auth = true;
 
-                var open = ['page/404','page/500','page/signin','page/signup','page/reset/:id'];
+                var open = ['page/404','page/500','page/signin','page/signup','page/reset','page/forgot-password','page/activate-account'];
 
                 if(open.indexOf(route) > -1){ auth = false; }
-
+                //console.log(route + ': ' + auth);
 
                 config = {
                     url: url,
@@ -110,12 +117,13 @@
                 .otherwise('/page/404');//send invalid routes to login page
 
 
-            $stateProvider.state('profile', {
-                url: '/page/profile',
-                templateUrl: 'app/page/profile.html'
-            });
+            //$stateProvider.state('profile', { url: '/page/profile', templateUrl: 'app/page/profile.html' });
 
             $httpProvider.defaults.withCredentials = true;
+            //$httpProvider.defaults.headers.common = {};
+            //$httpProvider.defaults.headers.post = {};
+            //$httpProvider.defaults.headers.put = {};
+            //$httpProvider.defaults.headers.patch = {};
 
         }]
     );

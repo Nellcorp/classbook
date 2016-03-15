@@ -1,13 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.course', ['ngResource','validation.match','angularRandomString'])
-        .factory("UserService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SchoolService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("CourseService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SubjectService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("CourseNameService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/coursenames/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SubjectNameService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/subjectnames/:id",{Id: "@id" },{"update": {method: "PUT"}});})
+    angular.module('app.course', ['app.service','validation.match','angularRandomString'])
         .controller('createCourseCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','CourseNameService','SubjectService','SubjectNameService','$stateParams',createCourseCtrl])
         .controller('courseSubjectCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',courseSubjectCtrl])
         .controller('createCourseSubjectCtrl', ['$scope','$location','SchoolService','CourseService','SubjectService','SubjectNameService','$stateParams',createCourseSubjectCtrl])

@@ -1,15 +1,13 @@
 (function () {
     'use strict';
 
-    angular.module('app.professor', ['ngResource','validation.match','angularRandomString'])
-        .factory("UserService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SchoolService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .controller('createProfCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','$stateParams',createProfCtrl])
+    angular.module('app.professor', ['app.service','validation.match','angularRandomString'])
+        .controller('createProfCtrl', ['$scope','$location','randomString', 'UserService','AuthService', 'SchoolService','$stateParams',createProfCtrl])
         .controller('batchProfCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','$stateParams',batchProfCtrl])
-        .controller('profCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','$stateParams',profCtrl]);
+        .controller('profCtrl', ['$scope','$location','randomString', 'UserService', 'SchoolService','$stateParams',profCtrl]);
 
 
-    function createProfCtrl ($scope, $location, randomString, UserService, SchoolService, $stateParams) {
+    function createProfCtrl ($scope, $location, randomString, UserService, AuthService, SchoolService, $stateParams) {
         $scope.id = $stateParams.id;
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
 
@@ -40,7 +38,7 @@
         
         $scope.submitForm = function() {
             //$scope.showInfoOnSubmit = true;
-            UserService.save($scope.user,function(response){ 
+            AuthService.register.save($scope.user,function(response){ 
                 console.log(response);    
                 $location.url('/page/school/professors/'+$scope.school._id);
                 

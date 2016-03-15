@@ -91,7 +91,7 @@ app.get('/auth/valid', user.can('check login'), function (req, res, next) {next(
 app.post('/auth/password', user.can('change password'), function (req, res, next) {next();});
 app.post('/auth/reset', user.can('access public page'), function (req, res, next) {next();});
 app.post('/auth/restore', user.can('access public page'), function (req, res, next) {next();});
-app.get('/auth/tokens/:id', user.can('list token'), function (req, res, next) {next();});
+app.get('/auth/tokens/:id', user.can('access public page'), function (req, res, next) {next();});
 
 app.get('/users', user.can('list users'), function (req, res, next) {next();});
 app.post('/users', user.can('create users'), function (req, res, next) {next();});

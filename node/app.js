@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 var mandrill = require('mandrill-api/mandrill');
+var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
+
 //var bcrypt = require('bcrypt-nodejs');
 //var async = require('async');
 //var crypto = require('crypto');
@@ -39,6 +41,7 @@ var corsOptions = {
 var routes = require('./routes/index');
 var User = require('./models/User');
 var users = require('./routes/users');
+var absences = require('./routes/absences');
 var auth = require('./routes/auth');
 var schools = require('./routes/schools');
 var courses = require('./routes/courses');
@@ -58,9 +61,11 @@ app.use(function(req, res, next) {
   //res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   // intercept OPTIONS method
-  if ('OPTIONS' == req.method) {res.sendStatus(200);}
-
-  next();
+  if ('OPTIONS' == req.method) {
+    res.sendStatus(200);
+  }else{
+    next();
+  }
 });
 
 // view engine setup
@@ -88,8 +93,13 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 var restrict = function (req, res, next) {
-  
-  if (req.user || req.url === '/auth/login' || req.url === '/auth/valid' || req.url === '/auth/register') {
+  var url = req.url;
+  var parts = url.split('/');
+  if(parts.length == 4){url = '/'+parts[1]+'/'+parts[2];}
+
+  var open = ['/auth/login','/auth/valid','/auth/register','/auth/reset','/auth/restore','/auth/tokens'];
+
+  if (req.user || open.indexOf(url) > -1) {
     next();
   } else {res.sendStatus(401);}
 };
@@ -101,6 +111,7 @@ app.use(ConnectRoles);
 app.use('/', routes);
 app.use('/auth', auth);
 app.use('/users', users);
+app.use('/absences', absences);
 app.use('/schools', schools);
 app.use('/courses', courses);
 app.use('/subjects', subjects);

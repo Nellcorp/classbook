@@ -95,13 +95,14 @@
                 AuthService.logout.get(function(success) {
                     $cookies.remove('auth');
                     $cookies.remove('user');
-                    $location.url('/page/signin')
+                    $location.url('/page/signin');
 
                 }, function(error) {
                     console.log(error);
                     $scope.form_error = true;
-                    if(error.status == 403){
+                    if(error.status == 403 || error.status == 401){
                         AuthService.clear();
+                        $location.url('/page/signin');
                     }
                 });
             }
@@ -117,7 +118,7 @@
             
                 AuthService.reset.save({phone: $scope.reset_phone},function(token) {
                     
-                    $location.url('/page/reset_success');
+                    $location.url('/page/signin');
 
                 }, function(error) {
                     //$location.url('/page/404');
@@ -147,7 +148,7 @@
             
                 AuthService.restore.save({token: $scope.token._id, password: $scope.password.password},function(user) {
                     
-                    $location.url('/page/sigin');
+                    $location.url('/page/signin');
 
                 }, function(error) {
                     //$location.url('/page/404');

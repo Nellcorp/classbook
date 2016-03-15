@@ -1,6 +1,25 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
+var mandrill = require('mandrill-api/mandrill');
+var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
+
+
+var message = {
+    "html": "<p>Classbook.com</p>",
+    "text": "Example text content",
+    "subject": "Notificação Classbook",
+    "from_email": "info@classbook.com",
+    "from_name": "Classbook.com",
+    "to": [{
+            "email": '',
+            "name": '',
+            "type": "to"
+        }],
+    "headers": {
+        "Reply-To": "info@classbook.com"
+    }
+};
 
 var mongoose = require('mongoose');
 var User = require('../models/User.js');
@@ -67,7 +86,20 @@ router.post('/reset', function(req, res, next) {
     
     Token.create({ user: user._id }, function (err, token) {
       if (err) return next(err);
-      res.json(token);
+      message.html = 'Clique no link abaixo para restaurar a sua senha: <br/><a href="http://classbook.nellcorp.com:3000/#/page/reset/'+token._id+'">Restaurar Senha</a>';
+      message.text = 'Clique no link para restaurar a sua senha: http://classbook.nellcorp.com:3000/#/page/reset/'+token._id;
+      message.to[0].email = user.email;
+      message.to[0].name = user.firstname +' '+ user.lastname;
+      console.log(message);
+      
+
+      mandrill_client.messages.send({"message": message, "async": false, "ip_pool": "Main Pool", "send_at": ''}, function(result) {
+        console.log(result);
+        res.json(token);
+      }, function(e) {
+        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+      });
+
   });
 
   });
