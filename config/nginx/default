@@ -1,22 +1,24 @@
 server {
-	listen 80 default_server;
-	listen [::]:80 default_server ipv6only=on;
+        listen 80;
+        server_name home.classbook.co;
 
-	root /home/app/classbook/dist;
-	index index.html index.htm;
+        root /home/app/classbook/landing;
+        index index.html index.htm;
 
-	# Make site accessible from http://localhost/
-	server_name classbook.nellcorp.com;
-
-	location / {
-		# First attempt to serve request as file, then
-		# as directory, then fall back to displaying a 404.
-		try_files $uri $uri/ =404;
-		# Uncomment to enable naxsi on this location
-		# include /etc/nginx/naxsi.rules
-	}
-
+        location / { try_files $uri $uri/ =404; }
 }
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+        server_name classbook.nellcorp.com;
+
+        root /home/app/classbook/material/dist;
+        index index.html index.htm;
+
+        location / { try_files $uri $uri/ =404; }
+}
+
 
 # HTTPS server
 #
