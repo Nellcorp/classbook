@@ -32,5 +32,10 @@
   },
   "devDependencies": {
     "debug": "^2.2.0"
-  }
+  },
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
