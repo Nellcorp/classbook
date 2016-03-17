@@ -12,10 +12,13 @@
     function createCourseCtrl ($scope, $location, randomString, UserService, SchoolService, CourseService, CourseNameService, SubjectService, SubjectNameService, $stateParams) {
         $scope.id = $stateParams.id;
         
+        //$scope.user = $cookies.getObject('user');
+        //console.log($stateParams.id);
+
         $scope.course = {
             name: '',
-            school: '',
-            school_course: '',
+            school: $scope.id,
+            description: '',
             supervisor: {
                 firstname: '',
                 lastname: '',
@@ -41,7 +44,7 @@
         var orig_course = angular.copy($scope.course);
     
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid && !angular.equals($scope.course, orig_course);
+            return $scope.userForm.$valid && !angular.equals($scope.course, orig_course) && !!$scope.course.school;
         };    
         
         $scope.submitForm = function() {
@@ -102,7 +105,7 @@
             //$scope.showInfoOnSubmit = true;
 
             CourseService.update({id:$scope.id},$scope.course,function(course){
-                CourseNameService.save($scope.course.name,function(response){console.log(response);});
+                CourseNameService.save({name: $scope.course.name},function(response){console.log(response);});
             });
         };           
     }
@@ -135,6 +138,7 @@
                     var course = {
                                     name: temp[0],
                                     school: $scope.school._id,
+                                    description: 'Sem descrição',
                                     supervisor: {
                                         firstname: temp[1],
                                         lastname: temp[2],
@@ -159,6 +163,7 @@
         
         $scope.subject = {
             name: '',
+            description: '',
             course: '',
             school: '',
             year: ''

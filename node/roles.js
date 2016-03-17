@@ -35,23 +35,31 @@ user.use('change password', function (req) {if (req.user.type === 'admin' || req
 user.use('list user', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete user', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
+//Absences
+user.use('list absences', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
+user.use('create absence', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
+user.use('list absence', function (req) {if (req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
+
 //Schools
 user.use('list schools', function (req) {if (req.user.type === 'admin') {return true;}});
 user.use('create schools', function (req) {if (req.user.type === 'admin') {return true;}});
 user.use('list school', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete school', function (req) {if (req.user.type === 'admin') {return true;}});
+user.use('update school', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
 //Courses
 user.use('list courses', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('create courses', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 user.use('list course', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete course', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('update course', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
 //Subjects
 user.use('list subjects', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('create subjects', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 user.use('list subject', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete subject', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('update subject', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
 //Sessions
 user.use('list sessions', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
@@ -64,6 +72,7 @@ user.use('list schedules', function (req) {if (req.user.type === 'admin' || req.
 user.use('create schedules', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 user.use('list schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('delete schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('update schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
 //Coursenames
 user.use('list coursenames', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
@@ -98,6 +107,11 @@ app.post('/users', user.can('create users'), function (req, res, next) {next();}
 app.get('/users/:id', user.can('list user'), function (req, res, next) {next();});
 app.put('/users/:id', user.can('update user'), function (req, res, next) {next();});
 app.delete('/users/:id', user.can('delete user'), function (req, res, next) {next();});
+
+//Absences Authorization Control
+app.get('/absences', user.can('list absences'), function (req, res, next) {next();});
+app.post('/absences', user.can('create absence'), function (req, res, next) {next();});
+app.get('/absences/:id', user.can('list absence'), function (req, res, next) {next();});
 
 //School Authorization Control
 app.get('/schools', user.can('list schools'), function (req, res, next) {next();});

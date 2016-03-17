@@ -25,6 +25,12 @@
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
+                                                <label>Descriçāo</label>
+                                                <textarea ng-model="course.description" columns="1" md-maxlength="200"></textarea>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
                                                 <label>Nome do Supervisor</label>
                                                 <input name="firstname" ng-model="course.supervisor.firstname">
                                             </md-input-container>

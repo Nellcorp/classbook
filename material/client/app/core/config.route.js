@@ -70,7 +70,7 @@
                 'page/subject/sessions/:id',
                 'page/schedule/sessions/:id',
                 'page/schedule/students/:id',
-                'page/schedule/session/new/:id/:user',
+                'page/schedule/session/new/:id',
                 'page/user/delete/:id',
                 'table/dynamic',
                 'table/responsive',

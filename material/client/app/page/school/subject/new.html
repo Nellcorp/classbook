@@ -30,6 +30,12 @@
                                                     </md-option>
                                                 </md-select>
                                             </md-input-container>
+                                            <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Descrição</label>
+                                                <textarea ng-model="subject.description" columns="1" md-maxlength="200"></textarea>
+                                            </md-input-container>
+                                        </div>
                                         </div>
                                         <md-input-container class="md-block">
                                             <md-button type="submit"

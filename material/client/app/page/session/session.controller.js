@@ -2,11 +2,11 @@
     'use strict';
 
     angular.module('app.session', ['app.service','validation.match','angularRandomString'])
-        .controller('createSessionCtrl', ['$scope','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','$stateParams',createSessionCtrl])
-        .controller('sessionCtrl', ['$scope','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','$stateParams',sessionCtrl]);
+        .controller('createSessionCtrl', ['$scope','$cookies','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',createSessionCtrl])
+        .controller('sessionCtrl', ['$scope','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',sessionCtrl]);
 
 
-    function createSessionCtrl ($scope, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+    function createSessionCtrl ($scope, $cookies, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
         $scope.id = $stateParams.id;
         
         $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
@@ -31,8 +31,10 @@
         var weekday = $scope.d.getDay();
         $scope.weekday_str = $scope.weekdays[$scope.d.getDay()];
 
-        UserService.get({id: $stateParams.user},function(user){
-            $scope.user = user;
+        $scope.user = $cookies.getObject('user');
+        //UserService.get({id: $stateParams.user},function(user){
+            //$scope.user = user;
+
             ScheduleService.get({id: $scope.id},function(schedule){
                 $scope.schedule = schedule;
                 SubjectService.get({id: schedule.subject},function(subject){
@@ -73,7 +75,7 @@
                     });
                 });
             });
-        });
+        //});
 
         
         $scope.selected = [];
@@ -91,7 +93,7 @@
         
         $scope.canSubmit = function() {
             //return $scope.session.summary != '';
-            return true;
+            return !!$scope.students;
         };    
         
         $scope.submitForm = function() {
@@ -106,9 +108,60 @@
             
             $scope.session.missing = missing;
 
-            SessionService.save($scope.session,function(response){ 
+            /*
+            var chain = $q.when();
+            angular.forEach(missing, function(){
+                chain = chain.then(function(){
+                    var absence = {
+                        user: missing[i]._id,
+                        phone: missing[i].phone,
+                        school: missing[i].school,
+                        year: missing[i].year,
+                        course: $scope.course.name,
+                        subject: $scope.subject.name,
+                        session: response._id,
+                        message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        supervisor_phone: missing[i].supervisor.phone,
+                        supervisor_message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        time: $scope.locale
+                    };
+                    
+                    return AbsenceService.save(absence,function(res){
+                        console.log(res);
+                        $location.url('/page/session/profile/'+$scope.response._id);
+                    });
+                });
+            });
+
+            // the final chain object will resolve once all the posts have completed.
+            chain.then(function(){
+                console.log('all done!');
+            });
+                */
+
+            SessionService.save($scope.session,function(response){
                 console.log(response);
-                $location.url('/page/session/profile/'+$scope.response._id);
+                for (var i = 0; i < missing.length; i++) {
+                    var absence = {
+                        user: missing[i]._id,
+                        phone: missing[i].phone,
+                        school: missing[i].school,
+                        year: missing[i].year,
+                        course: $scope.course.name,
+                        subject: $scope.subject.name,
+                        session: response._id,
+                        message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        supervisor_phone: missing[i].supervisor.phone,
+                        supervisor_message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        time: $scope.locale
+                    };
+                    AbsenceService.save(absence,function(res){
+                        console.log(res);
+                    },function(err){
+                        console.log(err);
+                    });
+                }
+                if(i == missing.length){$location.url('/page/session/profile/'+$scope.response._id);}
         });
 
 
@@ -118,7 +171,7 @@
         
     }
 
-    function sessionCtrl ($scope, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+    function sessionCtrl ($scope, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.students = [];
 

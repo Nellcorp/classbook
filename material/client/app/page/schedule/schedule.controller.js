@@ -261,7 +261,8 @@
         //console.log($scope.weekday);
 
         
-        $scope.late = 1200;
+        //$scope.late = 1200;
+        $scope.late = 40000;
         $scope.early = -600;
     
         UserService.get({id: $scope.id},function(user) {

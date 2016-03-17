@@ -6,7 +6,8 @@
         'ScheduleService', 'SessionService', 'AuthService','ContextService', '$state','$stateParams', '$rootScope', sidebarCtrl]);
     
     function sidebarCtrl($scope, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, ContextService, $state, $stateParams, $rootScope) {
-            $scope.user = { id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' };
+            //$scope.user = { id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' };
+            $scope.user = $cookies.getObject('user');
             
             $scope.state = $state;
             $scope.params = $stateParams;
@@ -16,6 +17,7 @@
             $scope.items = [
                     {
                         name: 'Minha Conta',
+                        route: '#/page/profile/' + $scope.user.id,
                         items: [
                             { name: 'Standby', route: '#/page/lock-screen' },
                             { name: 'Alterar Perfil', route: '#/page/edit-profile' }
@@ -27,6 +29,7 @@
                 admin: [
                     {
                         name: 'Minha Conta',
+                        route: '#/page/profile/' + $scope.user.id,
                         items: [
                             { name: 'Criar Escola', route: '#/page/manager/new' },
                             { name: 'Ver Escolas', route: '#/page/school/list' }
@@ -38,12 +41,14 @@
                 manager: [
                     {
                         name: 'Escola',
+                        route: '#/page/school/profile/' + $scope.user.school,
                         items: [
                             { name: 'Perfil da Escola', route: '#/page/school/profile/' + $scope.user.school }
                         ]
                     },
                     {
                         name: 'Cursos',
+                        route: '#/page/school/courses/' + $scope.user.school,
                         items: [
                             { name: 'Cursos', route: '#/page/school/courses/' + $scope.user.school },
                             { name: 'Adiconar Curso', route: '#/page/school/course/new/' + $scope.user.school },
@@ -52,6 +57,7 @@
                     },
                     {
                         name: 'Disciplinas',
+                        route: '#/page/school/subjects/' + $scope.user.school,
                         items: [
                             { name: 'Disciplinas', route: '#/page/school/subjects/' + $scope.user.school },
                             { name: 'Adicionar Disciplina', route: '#/page/school/subject/new/' + $scope.user.school },
@@ -60,6 +66,7 @@
                     },
                     {
                         name: 'Professores',
+                        route: '#/page/school/professors/' + $scope.user.school,
                         items: [
                             { name: 'Professores', route: '#/page/school/professors/' + $scope.user.school },
                             { name: 'Adicionar Professor', route: '#/page/school/professor/new/' + $scope.user.school },
@@ -68,6 +75,7 @@
                     },
                     {
                         name: 'Estudantes',
+                        route: '#/page/school/students/' + $scope.user.school,
                         items: [
                             { name: 'Estudantes', route: '#/page/school/students/' + $scope.user.school },
                             { name: 'Adicionar Estudante', route: '#/page/school/student/new/' + $scope.user.school },
@@ -77,7 +85,8 @@
                 ],
                 professor: [
                     {
-                        name: 'Minha Conta',
+                        name: 'Escola',
+                        route: '#/page/school/profile/' + $scope.user.school,
                         items: [
                             { name: 'Perfil da Escola', route: '#/page/school/profile/' + $scope.user.school },
                             { name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
@@ -91,19 +100,22 @@
                 ]
             };
 
+            $scope.items = $scope.roles[$scope.user.type];
+
             $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-                var path = $location.$$path;
-                var temp_path = path.split('/');
-                var id = temp_path[temp_path.length -1];
-                temp_path.splice(0, 1);
-                temp_path.splice(temp_path.length - 1, 1);
-                path = temp_path.join('/');
+                
                 $scope.context = ContextService.items[currentRoute.name + '/:id'];
 
                     if(!!$scope.context){
                         $scope.hideOptions = false;
                     for (var i = 0; i < $scope.context.length; i++) {
-                        $scope.context[i].url = $scope.context[i].url + id;
+                        var url = $scope.context[i].url.split('/');
+                        console.log(url);
+                        console.log($stateParams.id);
+                        if(url[url.length-1] != $stateParams.id){
+                            $scope.context[i].url = $scope.context[i].url + $stateParams.id;
+                            console.log($scope.context[i].url);
+                        }
                     };
                 }else{
                     $scope.context = [];
@@ -112,9 +124,6 @@
         });
 
 
-            if(AuthService.isAuthenticated()){
-                $scope.items = $scope.roles[$scope.user.type];
-            }
 
             $scope.init =  function() {
                 //console.log(AuthService.isAuthenticated());

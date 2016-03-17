@@ -14,6 +14,7 @@
         
         $scope.subject = {
             name: '',
+            description: '',
             course: '',
             school: '',
             year: ''
@@ -106,6 +107,7 @@
                     var subject = {
                                     name: temp[0],
                                     school: $scope.course.school,
+                                    description: 'Sem Descrição',
                                     course: $scope.course._id,
                                     year: temp[1],
                             };
@@ -150,7 +152,7 @@
                     CourseService.query({name: temp[1], school: $scope.school._id},function(courses) {
                         
                         if(courses.length != 0){
-                            var subject = { name: temp[0], school: $scope.school._id, course: courses[0]._id, year: temp[2] };
+                            var subject = { name: temp[0], school: $scope.school._id, description: 'Sem Descrição', course: courses[0]._id, year: temp[2] };
                             SubjectService.save(subject,function(response){
                                 console.log(response);
                                 SubjectNameService.save({name: temp[0]},function(response){console.log(response);});

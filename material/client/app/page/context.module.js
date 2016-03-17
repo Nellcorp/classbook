@@ -15,6 +15,7 @@
         ],
 'page/course/profile/:id': [
         {name: 'View Subjects', url: 'page/course/subjects/'+id},
+        {name: 'Add Subjects', url: 'page/course/subject/batch/'+id},
         {name: 'View Students', url: 'page/course/students/'+id},
         {name: 'View All Courses', url: 'page/school/courses/'+id}
         ],
@@ -121,12 +122,14 @@
         //{name: 'View Course', url: '/'},
         {name: 'View Schedules', url: 'page/subject/schedules/'+id},
         {name: 'View Students', url: 'page/subject/students/'+id},
-        {name: 'View Sessions', url: 'page/subject/sessions/'+id}
+        {name: 'View Sessions', url: 'page/subject/sessions/'+id},
+        {name: 'Add Schedule', url: 'page/subject/schedule/new/'+id},
+        {name: 'Add Schedules', url: 'page/subject/schedule/batch/'+id}
         ],
 'page/subject/schedules/:id': [
         {name: 'View Subject', url: 'page/subject/profile/'+id},
-        {name: 'Add Schedule', url: 'page/school/schedule/new/'+id},
-        {name: 'Add Schedules', url: 'page/school/schedule/batch/'+id}
+        {name: 'Add Schedule', url: 'page/subject/schedule/new/'+id},
+        {name: 'Add Schedules', url: 'page/subject/schedule/batch/'+id}
         ],
 'page/subject/students/:id': [
         {name: 'View Subject', url: 'page/subject/profile/'+id}

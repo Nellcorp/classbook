@@ -5,6 +5,7 @@ var uniqueValidator = require('mongoose-unique-validator');
 var CourseSchema = new mongoose.Schema({
   name: { type: String, required: true, lowercase: true, trim: true },
   school: { type: String, required: true, lowercase: true, trim: true },
+  description: { type: String, required: true, trim: true },
   supervisor: {
     firstname: { type: String, lowercase: true, trim: true },
     lastname: { type: String, lowercase: true, trim: true },
