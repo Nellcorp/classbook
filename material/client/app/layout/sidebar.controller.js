@@ -19,6 +19,7 @@
                         name: 'Minha Conta',
                         route: '#/page/profile/' + $scope.user.id,
                         items: [
+                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Standby', route: '#/page/lock-screen' },
                             { name: 'Alterar Perfil', route: '#/page/edit-profile' }
                         ]
@@ -31,6 +32,7 @@
                         name: 'Minha Conta',
                         route: '#/page/profile/' + $scope.user.id,
                         items: [
+                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Criar Escola', route: '#/page/manager/new' },
                             { name: 'Ver Escolas', route: '#/page/school/list' }
                         ]
@@ -43,6 +45,7 @@
                         name: 'Escola',
                         route: '#/page/school/profile/' + $scope.user.school,
                         items: [
+                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Perfil da Escola', route: '#/page/school/profile/' + $scope.user.school }
                         ]
                     },
@@ -88,6 +91,7 @@
                         name: 'Escola',
                         route: '#/page/school/profile/' + $scope.user.school,
                         items: [
+                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Perfil da Escola', route: '#/page/school/profile/' + $scope.user.school },
                             { name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
                             { name: 'Horários', route: '#/page/professor/schedules/' + $scope.user.id },
@@ -100,10 +104,8 @@
                 ]
             };
 
-            $scope.items = $scope.roles[$scope.user.type];
-
             $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-                
+                $scope.items = $scope.roles[$scope.user.type][0].items; 
                 $scope.context = ContextService.items[currentRoute.name + '/:id'];
 
                     if(!!$scope.context){
@@ -112,10 +114,9 @@
                         var url = $scope.context[i].url.split('/');
                         console.log(url);
                         console.log($stateParams.id);
-                        if(url[url.length-1] != $stateParams.id){
-                            $scope.context[i].url = $scope.context[i].url + $stateParams.id;
+                            url.splice(url.length -1);
+                            $scope.context[i].url = url.join('/') + '/'+$stateParams.id;
                             console.log($scope.context[i].url);
-                        }
                     };
                 }else{
                     $scope.context = [];
@@ -140,7 +141,8 @@
                 if(AuthService.isAuthenticated()){
                     $scope.user = $cookies.getObject('user');
                     
-                    $scope.items = $scope.roles[$scope.user.type];
+                    $scope.items = $scope.roles[$scope.user.type][0].items;
+                    console.log($scope.items);
                 }
             };
 

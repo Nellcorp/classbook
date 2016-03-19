@@ -32,7 +32,12 @@
         var orig_school = angular.copy($scope.school);
 
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
+
+            var validate_second = $scope.school.semesters.second.end > $scope.school.semesters.second.start;
+            var validate_first = $scope.school.semesters.first.end > $scope.school.semesters.first.start;
+            var validate_semesters = $scope.school.semesters.first.end < $scope.school.semesters.second.start;
+            var validate_form = $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
+            return validate_first && validate_second && validate_semesters && validate_form;
         };    
         
         $scope.submitForm = function() {

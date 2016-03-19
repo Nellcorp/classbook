@@ -2,11 +2,11 @@
     'use strict';
 
     angular.module('app.session', ['app.service','validation.match','angularRandomString'])
-        .controller('createSessionCtrl', ['$scope','$cookies','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',createSessionCtrl])
+        .controller('createSessionCtrl', ['$scope', '$q', '$cookies','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',createSessionCtrl])
         .controller('sessionCtrl', ['$scope','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',sessionCtrl]);
 
 
-    function createSessionCtrl ($scope, $cookies, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
+    function createSessionCtrl ($scope, $q, $cookies, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
         $scope.id = $stateParams.id;
         
         $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
@@ -41,25 +41,30 @@
                     $scope.subject = subject;
                     CourseService.get({id: subject.course},function(course){
                         $scope.course = course;
-                        UserService.query({course: course._id,type: 'student'},function(students){
+                        UserService.query({course: course._id,type: 'student', year: subject.year},function(students){
                             $scope.students = students;
 
-                            var start_str = $scope.schedule.schedule[$scope.weekday_str].start.split( ":" );
+        var start_str = $scope.schedule.schedule[$scope.weekday_str].start.split( ":" );
         var start = new Date(year,month,day,start_str[0],start_str[1]);
         var end_str = $scope.schedule.schedule[$scope.weekday_str].end.split( ":" );
         var end = new Date(year,month,day,start_str[0],end_str[1]);
 
+        SessionService.query({start: start,end: end,schedule: $scope.schedule._id},function(sessions){
+                    if(sessions.length > 0){$location.url('/page/profile/'+$scope.user.id);}
+        });
+
         $scope.late = 999999999;
-        $scope.early = -600;
+        //$scope.early = -600;
+        $scope.early = -4000000;
             
-        if($scope.d.getTime() - start.getTime() < $scope.early || $scope.d.getTime() - start.getTime() >= $scope.late){
-                   $location.url('/page/profile/'+$scope.user._id);
+        if($scope.d.getTime() - start.getTime() < $scope.early*1000 || $scope.d.getTime() - start.getTime() >= $scope.late*1000){
+                   $location.url('/page/profile/'+$scope.user.id);
         }
         
         
         
         $scope.session = {
-            title: '',
+            title: $scope.subject.name,
             schedule: $scope.schedule._id,
             summary: '',
             start: start,
@@ -108,8 +113,10 @@
             
             $scope.session.missing = missing;
 
-            /*
-            var chain = $q.when();
+            SessionService.save($scope.session,function(response){
+                console.log(response);
+                var session_id = response._id;
+                var chain = $q.when();
             angular.forEach(missing, function(){
                 chain = chain.then(function(){
                     var absence = {
@@ -119,6 +126,7 @@
                         year: missing[i].year,
                         course: $scope.course.name,
                         subject: $scope.subject.name,
+                        type: 'student',
                         session: response._id,
                         message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
                         supervisor_phone: missing[i].supervisor.phone,
@@ -128,7 +136,7 @@
                     
                     return AbsenceService.save(absence,function(res){
                         console.log(res);
-                        $location.url('/page/session/profile/'+$scope.response._id);
+                        $location.url('/page/session/profile/'+session_id);
                     });
                 });
             });
@@ -137,31 +145,6 @@
             chain.then(function(){
                 console.log('all done!');
             });
-                */
-
-            SessionService.save($scope.session,function(response){
-                console.log(response);
-                for (var i = 0; i < missing.length; i++) {
-                    var absence = {
-                        user: missing[i]._id,
-                        phone: missing[i].phone,
-                        school: missing[i].school,
-                        year: missing[i].year,
-                        course: $scope.course.name,
-                        subject: $scope.subject.name,
-                        session: response._id,
-                        message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
-                        supervisor_phone: missing[i].supervisor.phone,
-                        supervisor_message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
-                        time: $scope.locale
-                    };
-                    AbsenceService.save(absence,function(res){
-                        console.log(res);
-                    },function(err){
-                        console.log(err);
-                    });
-                }
-                if(i == missing.length){$location.url('/page/session/profile/'+$scope.response._id);}
         });
 
 

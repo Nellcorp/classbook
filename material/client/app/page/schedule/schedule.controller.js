@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app.schedule', ['app.service','validation.match','angularRandomString'])
-        .controller('createScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','$stateParams',createScheduleCtrl])
+        .controller('createScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','AbsenceService','SchoolService','CourseService','$stateParams',createScheduleCtrl])
         .controller('subjectScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',subjectScheduleCtrl])
         .controller('profScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',profScheduleCtrl])
         .controller('scheduleSessionCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',scheduleSessionCtrl])
@@ -11,7 +11,7 @@
         .controller('batchScheduleCtrl', ['$scope','$location','UserService','CourseService','SubjectService','ScheduleService','$stateParams',batchScheduleCtrl]);
 
 
-    function createScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, $stateParams) {
+    function createScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, AbsenceService, SchoolService, CourseService, $stateParams) {
         $scope.id = $stateParams.id;
         
         $scope.schedule = {
@@ -28,9 +28,18 @@
 
         $scope.email = '';
 
-        SubjectService.get({id: $scope.id},function(response) {
-            $scope.subject = response;
+
+        SubjectService.get({id: $scope.id},function(subject) {
+            $scope.subject = subject;
             $scope.schedule.subject = $scope.subject._id;
+
+            SchoolService.get({id: subject.school},function(school) {
+                $scope.school = school;
+            });
+
+            CourseService.get({id: subject.course},function(course) {
+                $scope.course = course;
+            });
         });
 
         
@@ -38,20 +47,100 @@
         var orig = angular.copy($scope.schedule);
     
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid && !angular.equals($scope.subject, orig);
+            return !!$scope.userForm && $scope.userForm.$valid && !angular.equals($scope.schedule, orig) && !!$scope.school && !!$scope.subject;
         };    
         
         $scope.submitForm = function() {
 
             UserService.query({email: $scope.email, type: 'professor'},function(response) {
-                
+
                 $scope.professor = response[0];
                 $scope.schedule.professor = response[0]._id;
-
+                console.log($scope.professor);
                 //console.log($scope.schedule);
                 ScheduleService.save($scope.schedule,function(response){
                     //console.log(response);
-                    $location.url('/page/subject/schedules/'+$scope.id);
+
+                var weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+                var temp = new Date();
+                var offset = -60;
+
+                if(temp.getTimezoneOffset() == offset){
+                    var today = temp;    
+                }else{
+                    var utc = temp.getTime() + (temp.getTimezoneOffset() * 60000);
+                    var today = new Date(utc - (3600000*offset));
+                }
+
+
+                var schedule = $scope.schedule.schedule;
+                var first_start = new Date($scope.school.semesters.first.start);
+                var first_end = new Date($scope.school.semesters.first.end);
+                var second_start = new Date($scope.school.semesters.second.start);
+                var second_end = new Date($scope.school.semesters.second.end);
+                var locale = today.toLocaleString();
+                
+                if(today < first_end){
+                    var start = first_start;
+                    var end = first_end;
+                } else if (today >= first_end && today < second_end ){
+                    var start = second_start;
+                    var end = second_end;
+                }
+
+                var sessions = [];
+                console.log($scope.schedule);
+                console.log(schedule);
+                
+                for (var i = 1; i <= 5; i++) {
+                    var weekday = weekdays[i];
+                    
+                        if (schedule.hasOwnProperty(weekday) && schedule[weekday].start != '' && schedule[weekday].end != '') {
+
+                            var start_weekday = start.getDay(); //index
+                            var session_weekday = weekdays.indexOf(weekday);
+                            var diff = (start_weekday < session_weekday)? session_weekday - start_weekday : start_weekday - session_weekday + 7;
+
+                            var start_str = schedule[weekday].start.split( ":" );
+                            var end_str = schedule[weekday].end.split( ":" );
+                            var session_date = new Date(start.getFullYear(),start.getMonth(),start.getDate(),start_str[0],start_str[1]);
+                            var start_date = new Date(session_date.setTime( session_date.getTime() + diff * 86400000 ));
+                            var current = start_date;
+                            var next = new Date(session_date.setTime( session_date.getTime() + 7 * 86400000 ));
+                            //create professor absences until temp date + 7 is greater than end date
+                            
+                            var absence = {
+                                    user: $scope.professor._id,
+                                    phone: $scope.professor.phone,
+                                    school: $scope.professor.school,
+                                    year: $scope.subject.year,
+                                    schedule: $scope.schedule._id,
+                                    course: $scope.subject.course,
+                                    subject: $scope.subject._id,
+                                    supervisor_phone: $scope.course.supervisor.phone,
+                                    message:'O professor '+$scope.professor.firstname+' '+$scope.professor.lastname+' faltou à aula de '+$scope.subject.name,
+                                    supervisor_message: 'O professor '+$scope.professor.firstname+' '+$scope.professor.lastname+' faltou à aula de '+$scope.subject.name,
+                                    time: []
+                                };
+
+                            while( next <= end ){
+                                var current_locale = current.toLocaleString();
+                                var message = 'O professor '+$scope.professor.firstname+' '+$scope.professor.lastname+' faltou à aula de '+$scope.subject.name;
+                                var supervisor_message = 'O professor '+$scope.professor.firstname+' '+$scope.professor.lastname+' faltou à aula de '+$scope.subject.name;
+                                var end_time = current;
+                                end_time.setHours(parseInt(end_str[0]), parseInt(end_str[1]));
+                                absence.time.push({ start: current, end: end_time, late: 20, message: message, supervisor_message: supervisor_message });
+
+                                var current = next;
+                                var next = new Date(current.setTime( current.getTime() + 7 * 86400000 ));
+                            }
+
+                            AbsenceService.save(absence,function(response){
+                                console.log(response);
+                                $location.url('/page/subject/schedules/'+$scope.id);
+                            });
+                        }
+                }
                 });
 
             });
@@ -262,8 +351,9 @@
 
         
         //$scope.late = 1200;
+        //$scope.early = -600;
         $scope.late = 40000;
-        $scope.early = -600;
+        $scope.early = -40000;
     
         UserService.get({id: $scope.id},function(user) {
                 $scope.user = user;
@@ -298,7 +388,7 @@
                                 //console.log(start.getTime());
                                 //console.log($scope.d.getTime());
                                 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
+                                if($scope.d.getTime() - start.getTime() >= $scope.early*1000 || $scope.d.getTime() - start.getTime() < $scope.late*1000){
                                     schedules[i].schedule.monday.show = true;
                                     schedules[i].schedule.monday.hide = false;
                                 }

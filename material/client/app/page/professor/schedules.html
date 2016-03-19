@@ -22,7 +22,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="schedule in schedules">
-                    <td class="numeric">{{schedule.subject_name}}</td>
+                    <td class="numeric"><a href="#/page/subject/profile/{{schedule.subject}}">{{schedule.subject_name}}</a></td>
                     <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
                     <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>
                     <td class="numeric">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</td>

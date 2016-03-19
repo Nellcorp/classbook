@@ -48,8 +48,31 @@ jobs
 
 /* POST /todos */
 router.post('/', function(req, res, next) {
-  
-  Absence.create(req.body, function (err, post) {
+  var type = req.body.type;
+  delete req.body.type;
+
+  if(type = 'professor'){
+    for (var i = 0; i < req.body.time.length; i++) {
+      var start = new Date(req.body.time[i].start);
+      var delay = new Date(start.getTime() + req.body.time[i].late*60000);
+      console.log(delay);
+    var job = jobs.create('absence check', {
+          user: req.body.professor,
+          phone: req.body.phone,
+          school: req.body.school,
+          course: req.body.course,
+          year: req.body.year,
+          subject: req.body.subject,
+          schedule: req.body.schedule,
+          time: req.body.time[i],
+          message:  req.body.time[i].message,
+          supervisor_phone: req.body.supervisor_phone,
+          supervisor_message:  req.body.time[i].supervisor_message,
+        }).delay(delay).removeOnComplete(true).save();
+  };
+    res.json(job);
+  }else{
+    Absence.create(req.body, function (err, post) {
     if (err) return next(err);
 
     var user_job = jobs.create('absence notification', {
@@ -64,7 +87,9 @@ router.post('/', function(req, res, next) {
 
     res.json(post);
   });
+  }
 });
+
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {

@@ -40,6 +40,12 @@
                                                 <input name="email" ng-model="course.supervisor.email">
                                             </md-input-container>
                                         </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Descrição</label>
+                                                <textarea ng-model="course.description" columns="1" md-maxlength="200"></textarea>
+                                            </md-input-container>
+                                        </div>
                                         <div layout layout-sm="column" ng-repeat="i in labels track by $index">
                                             <md-input-container flex>
                                                 <label>Cadeiras do {{labels[$index]}} ano</label>
