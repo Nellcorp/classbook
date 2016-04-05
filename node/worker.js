@@ -28,7 +28,7 @@ var jobs = kue.createQueue({
 
 var port = process.env.port_worker;
 kue.app.set('title', 'Classbook');
-kue.app.listen(port);
+//kue.app.listen(port);
 
 var nexmo = require('easynexmo');
 var key = process.env.nexmokey;

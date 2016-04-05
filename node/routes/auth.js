@@ -82,12 +82,15 @@ router.post('/reset', function(req, res, next) {
 
   User.find({phone: req.body.phone},function (err, users) {
     var user = users[0];
+    console.log(req.body);
+    console.log(users);
+    console.log(user);
     if (err) return next(err);
     
     Token.create({ user: user._id }, function (err, token) {
       if (err) return next(err);
-      message.html = 'Clique no link abaixo para restaurar a sua senha: <br/><a href="http://classbook.nellcorp.com:3000/#/page/reset/'+token._id+'">Restaurar Senha</a>';
-      message.text = 'Clique no link para restaurar a sua senha: http://classbook.nellcorp.com:3000/#/page/reset/'+token._id;
+      message.html = 'Clique no link abaixo para restaurar a sua senha: <br/><a href="http://www.classbook.co/#/page/reset/'+token._id+'">Restaurar Senha</a>';
+      message.text = 'Clique no link para restaurar a sua senha: http://www.classbook.co/#/page/reset/'+token._id;
       message.to[0].email = user.email;
       message.to[0].name = user.firstname +' '+ user.lastname;
       console.log(message);

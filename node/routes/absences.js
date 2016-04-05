@@ -51,7 +51,7 @@ router.post('/', function(req, res, next) {
   var type = req.body.type;
   delete req.body.type;
 
-  if(type = 'professor'){
+  if(type == 'professor'){
     for (var i = 0; i < req.body.time.length; i++) {
       var start = new Date(req.body.time[i].start);
       var delay = new Date(start.getTime() + req.body.time[i].late*60000);

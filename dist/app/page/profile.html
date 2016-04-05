@@ -2,15 +2,15 @@
 <div class="page page-profile">
 
     <header class="profile-header">
-        <div class="profile-img">
+        <div class="profile-img" style="visibility:hidden">
             <img alt="" src="images/g1.jpg" class="img-circle">
         </div>
 
-        <div class="profile-social">
+        <!--<div class="profile-social">
             <a href="javascript:;" class="btn-icon btn-icon-round btn-facebook"><i class="fa fa-facebook"></i></a>
             <a href="javascript:;" class="btn-icon btn-icon-round btn-twitter"><i class="fa fa-twitter"></i></a>
             <a href="javascript:;" class="btn-icon btn-icon-round btn-instagram"><i class="fa fa-instagram"></i></a>
-        </div>
+        </div>-->
         <!--
         <div class="profile-info">
             <ul class="list-unstyled list-inline">
@@ -21,7 +21,7 @@
             </ul>
         </div>-->
     </header>
-
+<!--
     <div class="divider divider-lg"></div>
     <div class="row">
         <div class="col-sm-3">
@@ -69,11 +69,11 @@
             </div>
         </div>
     </div>
-
+-->
     <div class="divider divider-lg"></div>
-<div class="row ui-section">
+<div class="row ui-section" ng-controller="profScheduleCtrl">
     <div class="col-lg-8 clearfix">
-        <h2 class="section-header">Horário Escolar</h2>
+        <h2 class="section-header">Horário de Aulas</h2>
     </div>
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -82,7 +82,7 @@
             <table class="table table-striped cf no-margin">
                 <thead class="cf">
                 <tr>
-                    <th>Disciplina</th>
+                    <th class="numeric">Disciplina</th>
                     <th class="numeric">Segunda-Feira</th>
                     <th class="numeric">Terça-Feira</th>
                     <th class="numeric">Quarta-Feira</th>
@@ -91,37 +91,28 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>Matemática I</td>
-                    <td class="numeric">8h - 10h</td>
-                    <td class="numeric">8h - 10h</td>
-                    <td class="numeric">8h - 10h</td>
-                    <td class="numeric">8h - 10h</td>
-                    <td class="numeric">8h - 10h</td>
-                </tr>
-                <tr>
-                    <td>Física</td>
-                    <td class="numeric">11h - 13h</td>
-                    <td class="numeric">11h - 13h</td>
-                    <td class="numeric">11h - 13h</td>
-                    <td class="numeric">11h - 13h</td>
-                    <td class="numeric">11h - 13h</td>
-                </tr>
-                <tr>
-                    <td>Estatística</td>
-                    <td class="numeric">14h - 16h</td>
-                    <td class="numeric">14h - 16h</td>
-                    <td class="numeric">14h - 16h</td>
-                    <td class="numeric">14h - 16h</td>
-                    <td class="numeric">14h - 16h</td>
-                </tr>
-                <tr>
-                    <td>Matemática II</td>
-                    <td class="numeric">18h - 20h</td>
-                    <td class="numeric">18h - 20h</td>
-                    <td class="numeric">18h - 20h</td>
-                    <td class="numeric">18h - 20h</td>
-                    <td class="numeric">18h - 20h</td>
+                <tr ng-repeat="schedule in schedules">
+                    <td class="numeric">{{schedule.subject_name}}</td>
+                    <td class="numeric" >
+                        <a ng-if="schedule.schedule.monday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</a>
+                        <span ng-if="schedule.schedule.monday.hide">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</span>
+                    </td>
+                    <td class="numeric" >
+                        <a ng-if="schedule.schedule.tuesday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</a>
+                        <span ng-if="schedule.schedule.tuesday.hide">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</span>
+                    </td>
+                    <td class="numeric" >
+                        <a ng-if="schedule.schedule.wednesday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</a>
+                        <span ng-if="schedule.schedule.wednesday.hide">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</span>
+                    </td>
+                    <td class="numeric" >
+                        <a ng-if="schedule.schedule.thursday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</a>
+                        <span ng-if="schedule.schedule.thursday.hide">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</span>
+                    </td>
+                    <td class="numeric" >
+                        <a ng-if="schedule.schedule.friday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</a>
+                        <span ng-if="schedule.schedule.friday.hide">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</span>
+                    </td>
                 </tr>
                 </tbody>
             </table>

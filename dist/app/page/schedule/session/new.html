@@ -1,0 +1,43 @@
+<div class="page" data-ng-controller="createSessionCtrl" ng-init="init()">
+<div class="row">
+        <div class="col-lg-8 clearfix">
+            <h2 class="section-header">Sumário de {{subject.name}}: {{locale}}</h2>
+        </div>
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body">
+                    <md-input-container class="md-block">
+                                            <label>Sumário da Aula</label>
+                                            <textarea ng-model="session.summary" columns="1"></textarea>
+                                        </md-input-container>
+                </div>
+            </section>
+            <div class="row ui-section" ng-controller="ListCtrl" ng-cloak>
+        <div class="col-lg-8 clearfix">
+            <h2 class="section-header">Apontar Presenças</h2>
+        </div>
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default panel-labeled">
+                        <div class="panel-body">
+                            <md-list>
+                                <md-subheader class="md-no-sticky">Alunos registados na aula</md-subheader>
+                                <md-list-item ng-repeat="student in students">
+                                    <p> {{ student.firstname }} {{ student.lastname }}</p>
+                                    <md-checkbox ng-checked="exists(student, selected)" ng-click="toggle(student, selected)" class="md-secondary"></md-checkbox>
+                                </md-list-item>
+                            </md-list>                           
+                            <!--<div class="callout callout-info"><span>Present: {{selected | json}}</span></div>-->
+                            <md-input-container class="md-block">
+<md-button type="submit" ng-click="submitForm()"
+class="md-raised btn-w-md md-primary btn-block btn-lg"
+data-ng-disabled="!canSubmit()">Começar Aula</md-button>
+</md-input-container>
+                        </div>
+                    </div> 
+                </div>
+        </div>
+    </div>
+</div>
+        </div>

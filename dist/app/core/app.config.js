@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module('app.core')
-    .factory('appConfig', [appConfig])
+    .factory('appConfig', ['$cookies',appConfig])
     .config(['$mdThemingProvider', mdConfig]);
 
-    function appConfig() {
+    function appConfig($cookies) {
         var pageTransitionOpts = [
             {
                 name: 'Fade up',
@@ -23,10 +23,15 @@
         ];
         var date = new Date();
         var year = date.getFullYear();
+        var user = '';
+        
+        if(!!$cookies.get('auth') && !!$cookies.getObject('user')){
+            user = $cookies.getObject('user');
+        }
+        
         var main = {
             brand: 'Classbook',
-            name: 'Joana Almeida',
-            year: year,
+            user: user,
             layout: 'wide',                                 // 'boxed', 'wide'
             menu: 'vertical',                               // 'horizontal', 'vertical', 'collapsed'
             fixedHeader: true,                              // true, false
@@ -34,6 +39,8 @@
             pageTransition: pageTransitionOpts[0],          // 0, 1, 2, 3... and build your own
             skin: '12'                                      // 11,12,13,14,15,16; 21,22,23,24,25,26; 31,32,33,34,35,36
         };
+
+        
         var color = {
             primary:    '#009688',
             success:    '#8BC34A',

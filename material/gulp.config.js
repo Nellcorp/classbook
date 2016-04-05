@@ -20,7 +20,7 @@ module.exports = function() {
             client + "/bower_components/font-awesome/fonts/*", 
             client + "/bower_components/weather-icons/css/*", 
             client + "/bower_components/weather-icons/font/*", 
-            client + "/bower_components/weather-icons/fonts/*", 
+            client + "/bower_components/weather-icons/fonts/*",
             client + "/bower_components/material-design-iconic-font/dist/**/*",
             client + "/fonts/**/*",
             client + "/i18n/**/*", 

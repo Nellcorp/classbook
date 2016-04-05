@@ -28,7 +28,7 @@
         
         // 3rd party feature modules
         ,'ui.tree'
-//        ,'ngMap'
+        ,'ngMap'
         ,'textAngular'
         ,'ngResource'
         ,'ngCookies'

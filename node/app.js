@@ -54,7 +54,11 @@ var sessions = require('./routes/sessions');
 var app = express();
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://classbook.nellcorp.com:3000");
+  //res.header("Access-Control-Allow-Origin", "http://classbook.nellcorp.com:3000");
+  var allowed = ['http://classbook.co','http://www.classbook.co','http://classbook.nellcorp.com','http://classbook.nellcorp.com:3000'];
+  var origin = req.get('origin');
+  
+  if(allowed.indexOf(origin) > -1){ res.header("Access-Control-Allow-Origin", origin);}
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Credentials', true);

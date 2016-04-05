@@ -1,0 +1,41 @@
+<div class="page-forgot" ng-controller="authCtrl">
+    <div class="wrapper">
+        <div class="main-body">
+            <div class="body-inner">
+                <div class="card bg-white">
+                    <div class="card-content">
+                        <section class="logo text-center">
+                            <h1><a href="#/">{{main.brand}}</a></h1>
+                        </section>                    
+                        <form name="resetForm" data-ng-submit="reset()">
+                            <fieldset>
+                                <div class="form-group">
+                                    <div class="ui-input-group">        
+                                        <input type="text" required class="form-control" ng-model="reset_phone">
+                                        <span class="input-bar"></span>
+                                        <label>Telefone</label>
+                                    </div>
+                                    <div class="additional-info text-center text-small">
+                                       Insira o seu número de telefone para confirmar a sua identidade.
+                                   </div>
+                               </div>
+                           </fieldset>
+                           <div class="form-group">
+                                    <div class="ui-input-group">        
+                                        <md-input-container class="md-block">
+                                            <md-button type="submit" class="md-raised btn-w-md md-primary btn-block btn-lg"
+                                               data-ng-disabled="!canReset()">ACTIVAR</md-button>
+                                            </md-input-container>
+                                    </div>
+                           </div>
+                           <div class="callout callout-info" ng-hide="!form_error">
+                                    <span>Houve um erro ao activar a conta. Tente novamente.</span>
+                                </div>
+                       </form>
+                   </div>
+                </div>
+            </div>
+        </div> 
+
+    </div>
+</div>
