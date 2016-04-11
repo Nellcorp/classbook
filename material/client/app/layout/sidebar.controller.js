@@ -17,7 +17,11 @@
             $scope.params = $stateParams;
             $scope.hideOptions = true;
             
-            
+            if(!$scope.user){
+            $scope.items = [];
+            $scope.roles = {};
+            }
+            else{
             $scope.items = [
                     {
                         name: 'Minha Conta',
@@ -107,6 +111,7 @@
 
                 ]
             };
+        }
 
 
             $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {

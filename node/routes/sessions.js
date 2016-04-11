@@ -7,7 +7,7 @@ var Session = require('../models/Session.js');
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
   Session.find(req.query,function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 });
@@ -15,7 +15,7 @@ router.get('/', function(req, res, next) {
 /* POST /todos */
 router.post('/', function(req, res, next) {
   Session.create(req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     
     res.json(post);
   });
@@ -24,7 +24,7 @@ router.post('/', function(req, res, next) {
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
   Session.findById(req.params.id, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     if (post == null) return res.status(404).json({ error: "Resource Not found." });
     res.json(post);
   });
@@ -33,7 +33,7 @@ router.get('/:id', function(req, res, next) {
 /* PUT /todos/:id */
 router.put('/:id', function(req, res, next) {
   Session.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 });
@@ -41,7 +41,7 @@ router.put('/:id', function(req, res, next) {
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
   Session.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 })

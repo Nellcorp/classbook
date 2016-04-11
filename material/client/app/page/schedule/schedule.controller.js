@@ -197,7 +197,7 @@
             $scope.ready = [];
             var subjects = StorageService.subjects();
             var users = StorageService.users();
-            
+            console.log(JSON.stringify(subjects));
 
             var lines = $scope.batch.split( "\n" );
             //b,123456789,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
@@ -351,8 +351,8 @@
         
         $scope.late = 1200;
         $scope.early = 600;
-        //$scope.late = 8000;
-        //$scope.early = 8000;
+        //$scope.late = 36000;
+        //$scope.early = 36000;
     
         UserService.get({id: $scope.id},function(user) {
                 $scope.user = user;

@@ -140,6 +140,7 @@
             var school = /^[0-9a-fA-F]{24}$/;
             var subjects = StorageService.subjects();
             var courses = StorageService.courses();
+            console.log(JSON.stringify(courses));
             var found = false;
 
 

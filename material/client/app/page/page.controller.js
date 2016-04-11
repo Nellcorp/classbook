@@ -31,7 +31,6 @@
 
 
                 AuthService.auth.get(function(user) {
-                    
                     $cookies.putObject('user',{
                         id: user._id,
                         email: user.email,
@@ -48,9 +47,10 @@
 
                     $location.url('/page/profile/'+user._id);
 
+                }, function(error) {
+                    AuthService.clear();
                 });
                 
-                AuthService.clear();
             };
             
             $scope.login = function() {

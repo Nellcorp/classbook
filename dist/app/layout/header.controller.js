@@ -9,12 +9,12 @@
 
             $scope.logout = function() {
                 AuthService.logout.get(function(success) {
+                    AuthService.clear();
                     $cookies.remove('auth');
                     $cookies.remove('user');
                     $location.url('/page/signin');
 
                 }, function(error) {
-                    console.log(error);
                     $scope.form_error = true;
                     if(error.status == 403 || error.status == 401){
                         AuthService.clear();

@@ -56,8 +56,8 @@
 
         $scope.late = 1200;//20 minutes
         $scope.early = 600;//10 minutes
-        //$scope.late = 8000;
-        //$scope.early = 8000;
+        //$scope.late = 36000;
+        //$scope.early = 36000;
                                 console.log('start = ',start);
                                 console.log('now = ',$scope.d);
                                 console.log('start - now = ',start.getTime() - $scope.d.getTime());

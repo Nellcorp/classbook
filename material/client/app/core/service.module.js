@@ -24,17 +24,19 @@
           var session = {};
           var user = $cookies.getObject('user');
           session.load = function () {
-            if(!!user && user.type == 'admin'){
-              SchoolService.query({},function(response) { $sessionStorage.schools = response; });
-              CourseService.query({},function(response) { $sessionStorage.courses = response; });
-              SubjectService.query({},function(response) { $sessionStorage.subjects = response; });
-              UserService.query({},function(response) { $sessionStorage.users = response; });
-            }else{
-              SchoolService.get({id: user.school},function(response) { $sessionStorage.schools = [response]; });
-              CourseService.query({school: user.school},function(response) { $sessionStorage.courses = response; });
-              SubjectService.query({school: user.school},function(response) { $sessionStorage.subjects = response; });
-              UserService.query({school: user.school},function(response) { $sessionStorage.users = response; });              
+            if(!!user){
+              if(user.type == 'admin'){
+                SchoolService.query({},function(response) { $sessionStorage.schools = response; });
+                CourseService.query({},function(response) { $sessionStorage.courses = response; });
+                SubjectService.query({},function(response) { $sessionStorage.subjects = response; console.log(JSON.stringify(response));});
+                UserService.query({},function(response) { $sessionStorage.users = response; });
+              }else if(user.type == 'manager' || user.type == 'professor' || user.type == 'student') {
+                SchoolService.get({id: user.school},function(response) { $sessionStorage.schools = [response]; console.log(JSON.stringify(response));});
+                CourseService.query({school: user.school},function(response) { $sessionStorage.courses = response; });
+                SubjectService.query({school: user.school},function(response) { $sessionStorage.subjects = response; });
+                UserService.query({school: user.school},function(response) { $sessionStorage.users = response; });
             }
+          }
           };
 
           session.clear = function () { $sessionStorage.$reset();};

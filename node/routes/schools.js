@@ -7,7 +7,7 @@ var School = require('../models/School.js');
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
   School.find(req.query,function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 });
@@ -17,7 +17,7 @@ router.post('/', function(req, res, next) {
 
   
   School.create(req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     
     res.json(post);
   });
@@ -26,7 +26,7 @@ router.post('/', function(req, res, next) {
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
   School.findById(req.params.id, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     if (post == null) return res.status(404).json({ error: "Resource Not found." });
     res.json(post);
   });
@@ -35,7 +35,7 @@ router.get('/:id', function(req, res, next) {
 /* PUT /todos/:id */
 router.put('/:id', function(req, res, next) {
   School.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 });
@@ -43,7 +43,7 @@ router.put('/:id', function(req, res, next) {
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
   School.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) res.status(500).json(err);
+    if (err) return res.status(500).json(err);
     res.json(post);
   });
 })
