@@ -53,11 +53,21 @@
                     if(sessions.length > 0){$location.url('/page/profile/'+$scope.user.id);}
         });
 
-        $scope.late = 999999999;
-        //$scope.early = -600;
-        $scope.early = -4000000;
-            
-        if($scope.d.getTime() - start.getTime() < $scope.early*1000 || $scope.d.getTime() - start.getTime() >= $scope.late*1000){
+
+        $scope.late = 1200;//20 minutes
+        $scope.early = 600;//10 minutes
+        //$scope.late = 8000;
+        //$scope.early = 8000;
+                                console.log('start = ',start);
+                                console.log('now = ',$scope.d);
+                                console.log('start - now = ',start.getTime() - $scope.d.getTime());
+                                console.log('scope early x 1000 = ',$scope.early*1000);
+                                console.log('now - start = ',$scope.d.getTime() - start.getTime());
+                                console.log('scope late x 1000 = ',$scope.late*1000);
+                                console.log('is early?',start.getTime() - $scope.d.getTime() > $scope.early*1000);
+                                console.log('is late?',$scope.d.getTime() - start.getTime() > $scope.late*1000);
+
+        if(start.getTime() - $scope.d.getTime() > $scope.early*1000 || $scope.d.getTime() - start.getTime() > $scope.late*1000){
                    $location.url('/page/profile/'+$scope.user.id);
         }
         
@@ -94,7 +104,9 @@
         };        
 
 
-        
+        $scope.init = function() {
+            
+        };    
         
         $scope.canSubmit = function() {
             //return $scope.session.summary != '';
@@ -103,13 +115,16 @@
         
         $scope.submitForm = function() {
             var missing = $scope.students;
+            console.log(missing);
             for (var i = 0; i < $scope.selected.length; i++) {
                 for (var j = 0; j < missing.length; j++) {
                     if($scope.selected[i] == missing[j]._id){missing.splice(j, 1);}
+                    console.log(missing);
                 };
             };
 
-            console.log(missing);
+            delete $scope.students;
+            //console.log(missing);
             
             $scope.session.missing = missing;
 
@@ -117,26 +132,25 @@
                 console.log(response);
                 var session_id = response._id;
                 var chain = $q.when();
-            angular.forEach(missing, function(){
+            angular.forEach(missing, function(student,key){
                 chain = chain.then(function(){
                     var absence = {
-                        user: missing[i]._id,
-                        phone: missing[i].phone,
-                        school: missing[i].school,
-                        year: missing[i].year,
+                        user: student._id,
+                        phone: student.phone,
+                        school: student.school,
+                        year: student.year,
                         course: $scope.course.name,
                         subject: $scope.subject.name,
                         type: 'student',
                         session: response._id,
-                        message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
-                        supervisor_phone: missing[i].supervisor.phone,
-                        supervisor_message: missing[i].firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        message: student.firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
+                        supervisor_phone: student.supervisor.phone,
+                        supervisor_message: student.firstname+', faltou à aula de '+$scope.subject.name+' em '+$scope.d.toLocaleDateString(),
                         time: $scope.locale
                     };
                     
                     return AbsenceService.save(absence,function(res){
-                        console.log(res);
-                        $location.url('/page/session/profile/'+session_id);
+                        //console.log(res);
                     });
                 });
             });
@@ -144,6 +158,7 @@
             // the final chain object will resolve once all the posts have completed.
             chain.then(function(){
                 console.log('all done!');
+                $location.url('/page/session/profile/'+session_id);
             });
         });
 
@@ -161,16 +176,18 @@
         SessionService.get({id: $scope.id},function(session) {
             $scope.session = session;
             $scope.date = new Date(session.started).toLocaleString();
-            
-            SubjectService.get({id: session.subject},function(subject) {$scope.subject = subject;});     
+            console.log(session);
+            ScheduleService.get({id: session.schedule},function(schedule) {
+                $scope.schedule = schedule;
+                SubjectService.get({id: schedule.subject},function(subject) {
+                    $scope.subject = subject;
 
-            for (var i = 0; i < session.missing.length; i++) {
-                UserService.get({id: session.missing[i]},function(missing) {$scope.students.push(missing);});     
-            };
-            
-        });
-        
-        
+                    angular.forEach(session.missing, function(student,key){
+                        UserService.get({id: student},function(response) {$scope.students.push(response);});
+                    });
+                });
+            });
+            });   
     }
 
 

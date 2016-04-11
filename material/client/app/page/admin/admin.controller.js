@@ -14,7 +14,6 @@
             firstname: '',
             lastname: '',
             phone: '',
-            email: '',
             type: 'admin',
             school: 'none',
             email: '',

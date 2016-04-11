@@ -23,7 +23,7 @@
         <span class="icon-bar"></span>
     </div>
 
-    <div class="top-nav" ng-controller="authCtrl">
+    <div class="top-nav" ng-controller="headerCtrl" ng-init="init()">
         <ul class="nav-right pull-right list-unstyled">
 
             <li class="dropdown text-normal nav-profile"    uib-dropdown is-open="status.isopenProfile">
@@ -36,13 +36,13 @@
                 </a>
                 <ul class="uib-dropdown-menu with-arrow pull-right dropdown-menu-scaleIn">
                     <li>
-                        <a href="#/page/profile/{{main.user.id}}">
+                        <a href="#/page/profile/{{user.id}}">
                             <i class="zmdi zmdi-account"></i>
                             <span data-translate="Ver Perfil"></span>
                         </a>
                     </li>
                     <li>
-                        <a href="#/page/{{main.user.type}}/profile/{{main.user.id}}">
+                        <a href="#/page/{{user.type}}/profile/{{user.id}}">
                             <i class="zmdi zmdi-account"></i>
                             <span data-translate="Editar Perfil"></span>
                         </a>

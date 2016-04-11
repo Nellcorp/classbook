@@ -25,6 +25,7 @@
         ,'app.service'
         ,'app.context'
         ,'app.sidebar'
+        ,'app.header'
         
         // 3rd party feature modules
         ,'ui.tree'

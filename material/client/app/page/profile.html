@@ -94,7 +94,7 @@
                 <tr ng-repeat="schedule in schedules">
                     <td class="numeric">{{schedule.subject_name}}</td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.monday.show" href="#/page/schedule/session/new/{{schedule._id}}/{{user._id}}">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</a>
+                        <a ng-if="schedule.schedule.monday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</a>
                         <span ng-if="schedule.schedule.monday.hide">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</span>
                     </td>
                     <td class="numeric" >

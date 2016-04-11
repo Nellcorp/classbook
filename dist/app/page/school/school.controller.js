@@ -14,7 +14,7 @@
         $scope.id = $stateParams.id;
         
         SchoolService.get({id: $scope.id},function(school) {
-                console.log(school);
+                //console.log(school);
                 $scope.school = school;
                 $scope.school.semesters.first.start = new Date($scope.school.semesters.first.start);
                 $scope.school.semesters.first.end = new Date($scope.school.semesters.first.end);
@@ -44,11 +44,11 @@
             //$scope.showInfoOnSubmit = true;
 
             SchoolService.update({id: $scope.id},$scope.school,function(response){
-                console.log(response);
+                //console.log(response);
             });
             
             UserService.update({id:$scope.user._id},$scope.user,function(response){
-               console.log(response); 
+               //console.log(response); 
             });
            
 
@@ -61,7 +61,7 @@
         
         SchoolService.query(function(schools) {
                 $scope.schools = schools;
-                console.log($scope.schools);
+                //console.log($scope.schools);
             }); 
     }
 
@@ -73,7 +73,7 @@
                 
                 UserService.query({school: school._id, type: 'professor'},function(users) {
                     $scope.users = users;
-                    console.log(users);
+                    //console.log(users);
                 });
             });
         
@@ -100,7 +100,7 @@
                 
                 CourseService.query({school: school._id},function(courses) {
                     $scope.courses = courses;
-                    console.log(courses);
+                    //console.log(courses);
                 });
             });
         
@@ -114,7 +114,7 @@
                 
                 SubjectService.query({school: school._id},function(subjects) {
                     $scope.subjects = subjects;
-                    console.log(subjects);
+                    //console.log(subjects);
 
                    
                     CourseService.query({school: $scope._id},function(courses) {

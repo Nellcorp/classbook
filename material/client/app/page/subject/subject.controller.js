@@ -5,8 +5,8 @@
         .controller('createSubjectCtrl', ['$scope','$location','SchoolService','CourseService','SubjectService','SubjectNameService','$stateParams',createSubjectCtrl])
         .controller('subjectClassCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',subjectClassCtrl])
         .controller('subjectCtrl', ['$scope','$location','CourseService','SubjectService','SubjectNameService','$stateParams',subjectCtrl])
-        .controller('batchSubjectCtrl', ['$scope','$location','SchoolService','CourseService','CourseNameService','SubjectService','SubjectNameService','$stateParams',batchSubjectCtrl])
-        .controller('batchSchoolSubjectCtrl', ['$scope','$location','SchoolService','CourseService','CourseNameService','SubjectService','SubjectNameService','$stateParams',batchSchoolSubjectCtrl]);
+        .controller('batchSubjectCtrl', ['$scope','$q','$location','SchoolService','CourseService','CourseNameService','SubjectService','SubjectNameService','StorageService','$stateParams',batchSubjectCtrl])
+        .controller('batchSchoolSubjectCtrl', ['$scope','$q','$location','SchoolService','CourseService','CourseNameService','SubjectService','SubjectNameService','StorageService','$stateParams',batchSchoolSubjectCtrl]);
 
 
     function createSubjectCtrl ($scope, $location, SchoolService, CourseService, SubjectService, SubjectNameService, $stateParams) {
@@ -23,7 +23,7 @@
         CourseService.query({school: $scope.id},function(courses) {
                 $scope.courses = courses;
                 $scope.subject.school = courses[0].school;
-                console.log($scope.courses);
+                //console.log($scope.courses);
             });
 
         //SubjectNameService.query(function(subjects) {$scope.subjects = subjects;});
@@ -38,8 +38,8 @@
         $scope.submitForm = function() {
 
             SubjectService.save($scope.subject,function(response){
-                console.log(response);
-                SubjectNameService.save({name: $scope.subject.name},function(response){console.log(response);});
+                //console.log(response);
+                //SubjectNameService.save({name: $scope.subject.name},function(response){console.log(response);});
                 $location.url('/page/school/subjects/'+$scope.id);
             });
         };           
@@ -52,7 +52,7 @@
             $scope.subject = subject;
             
             CourseService.get({id: $scope.subject.course},function(course) {
-                console.log(course);
+                //console.log(course);
                 $scope.course = course;
             }); 
         });
@@ -68,11 +68,9 @@
             //$scope.showInfoOnSubmit = true;
 
             SubjectService.update({id: $scope.subject._id},$scope.subject,function(response){
-                console.log(response);
+                //console.log(response);
                 
-                SubjectNameService.save({name: $scope.subject.name},function(response){
-                    console.log(response);
-                });
+                //SubjectNameService.save({name: $scope.subject.name},function(response){ console.log(response); });
             });
 
         };           
@@ -80,7 +78,7 @@
         
     }
 
-    function batchSubjectCtrl ($scope, $location, SchoolService, CourseService, CourseNameService, SubjectService, SubjectNameService, $stateParams) {
+    function batchSubjectCtrl ($scope, $q, $location, SchoolService, CourseService, CourseNameService, SubjectService, SubjectNameService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         
         $scope.batch = '';
@@ -98,11 +96,11 @@
 
             var temp = [];
             //curso,firstname,lastname,email,telefone
-            for( var i = 0; i < subjects.length; i++ ) {
-
-                temp = subjects[i].split( "," );
+            var chain = $q.when();
+            
+            angular.forEach(subjects, function(value,key){
+                var temp = value.split( "," );
                 console.log(temp);
-
                 if(temp.length == 2 && temp[1] > 0 && temp[1] < 6){
                     var subject = {
                                     name: temp[0],
@@ -111,58 +109,69 @@
                                     course: $scope.course._id,
                                     year: temp[1],
                             };
-                
-                    SubjectService.save(subject,function(response){
-                        console.log(response);
-                        SubjectNameService.save({name: temp[0]},function(response){console.log(response);});
+                    chain = chain.then(function(){
+                        SubjectService.save(subject,function(response){
+                        //SubjectNameService.save({name: temp[0]},function(response){console.log(response);});
                     });
+                });
+                    
                 }
-            }
+                
+                });
 
-        $location.url('/page/course/subjects/'+$scope.id);
-        };           
-        
-        
+                chain.then(function(){
+                    //console.log('all done!');
+                    $location.url('/page/course/subjects/'+$scope.id);
+                });
+            };
     }
 
-    function batchSchoolSubjectCtrl ($scope, $location, SchoolService, CourseService, CourseNameService, SubjectService, SubjectNameService, $stateParams) {
+    function batchSchoolSubjectCtrl ($scope, $q, $location, SchoolService, CourseService, CourseNameService, SubjectService, SubjectNameService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
+        $scope.ready = [];
         
         $scope.batch = '';
 
         SchoolService.get({id: $scope.id},function(school) {$scope.school = school;});
         
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid;
+            $scope.ready = [];
+            var valid = true;
+            var school = /^[0-9a-fA-F]{24}$/;
+            var subjects = StorageService.subjects();
+            var courses = StorageService.courses();
+            var found = false;
+
+
+            var lines = $scope.batch.split( "\n" );
+            //cadeira1,curso1,1
+            for( var i = 0; i < lines.length; i++ ) {
+                var temp = lines[i].split( "," );
+                if(temp.length != 3 || temp[2] < 1 || temp[2] > 5){ return false;}
+                for( var j = 0; j < subjects.length; j++ ) { if(temp[0] == subjects[j].name){ return false;} }
+                for( var j = 0; j < courses.length; j++ ) {
+                    if(temp[1] == courses[j].name){
+                        $scope.ready.push({ name: temp[0], school: $scope.id, description: 'Sem Descrição', year: temp[2], course: courses[j]._id });
+                        found = true; break;
+                    }
+                }
+                
+            }
+            
+            return $scope.userForm.$valid && valid && found;
         };    
         
         $scope.submitForm = function() {
+            var chain = $q.when();
             
-            var subjects = $scope.batch.split( "\n" );
-
-            var temp = [];
             //curso,firstname,lastname,email,telefone
-            for( var i = 0; i < subjects.length; i++ ) {
-
-                temp = subjects[i].split( "," );
-                console.log(temp);
-
-                if(temp.length == 3 && temp[2] > 0 && temp[2] < 6){
-                    
-                    CourseService.query({name: temp[1], school: $scope.school._id},function(courses) {
-                        
-                        if(courses.length != 0){
-                            var subject = { name: temp[0], school: $scope.school._id, description: 'Sem Descrição', course: courses[0]._id, year: temp[2] };
-                            SubjectService.save(subject,function(response){
-                                console.log(response);
-                                SubjectNameService.save({name: temp[0]},function(response){console.log(response);});
-                            });
-                        }
-                    });
-                }
-            }
-
-        $location.url('/page/school/subjects/'+$scope.id);
+            chain = chain.then(function(){
+                for(var i = 0; i < $scope.ready.length; i++){ SubjectService.save($scope.ready[i],function(response){ console.log(response);}); }
+            });
+            chain.then(function(){
+                StorageService.load();
+                $location.url('/page/school/subjects/'+$scope.id);
+            });
         };           
         
         
@@ -176,7 +185,7 @@
                 
                 SubjectService.query({course: course.name, school: course.school.toLowerCase()},function(subjects) {
                     $scope.subjects = subjects;
-                    console.log(subjects);
+                    //console.log(subjects);
                 });
             });
         

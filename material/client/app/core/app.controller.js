@@ -2,12 +2,13 @@
     'use strict';
 
     angular.module('app')
-    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService','$cookies', AppCtrl]) // overall control
+    .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService','StorageService','$cookies', AppCtrl]) // overall control
     
-    function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService, $cookies) {
+    function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService, StorageService, $cookies) {
 
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
+        appConfig.main.user = $cookies.getObject('user');
         $scope.color = appConfig.color;
         
         $scope.$watch('main', function(newVal, oldVal) {
@@ -37,8 +38,9 @@
         }, true);
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            //console.log('stateChangeStart',$cookies.getObject('user'));
                 //console.log(fromState);
-                console.log(toState);
+                //console.log(toState);
                 //console.log(AuthService.isAuthenticated());
                 var school = /^\/page\/school(\/([A-Za-z]*)){0,1}\/:id$/.test(toState.url);
                 var profile = /\/page\/profile\/:id$/.test(toState.url);
@@ -79,6 +81,7 @@
                     }, {'expires': $scope.exp});
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
+                    if(StorageService.isEmpty()){ StorageService.load();}
                 }, function(error) {
                     AuthService.clear();
                     
@@ -88,15 +91,23 @@
             }
         });
 
+    
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
             $cookies.putObject('state',currentRoute);
             if (currentRoute.authenticate && !AuthService.isAuthenticated()){
+            
                 AuthService.clear();
                 $state.transitionTo('page/signin');
                 event.preventDefault(); 
             }else{
+                //console.log('stateChangeSuccess');
                 $document.scrollTo(0, 0);
             }
+        });
+
+        $rootScope.$on('$viewContentLoaded', function(){
+             //console.log($cookies.getObject('user'));
+             //console.log('viewContentLoaded');
         });
 
         $rootScope.$on('$stateChangeError', function(event) {

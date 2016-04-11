@@ -8,7 +8,7 @@
         .controller('scheduleSessionCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',scheduleSessionCtrl])
         .controller('createScheduleSessionCtrl', ['$scope','$location','SubjectService','SessionService','$stateParams',createScheduleSessionCtrl])
         .controller('scheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','$stateParams',scheduleCtrl])
-        .controller('batchScheduleCtrl', ['$scope','$location','UserService','CourseService','SubjectService','ScheduleService','$stateParams',batchScheduleCtrl]);
+        .controller('batchScheduleCtrl', ['$scope','$q','$location','UserService','CourseService','SubjectService','ScheduleService','StorageService','$stateParams',batchScheduleCtrl]);
 
 
     function createScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, AbsenceService, SchoolService, CourseService, $stateParams) {
@@ -174,9 +174,9 @@
         };           
     }
 
-    function batchScheduleCtrl ($scope, $location, UserService, CourseService, SubjectService, ScheduleService, $stateParams) {
-        //console.log($stateParams);
+    function batchScheduleCtrl ($scope, $q, $location, UserService, CourseService, SubjectService, ScheduleService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
+        $scope.ready = [];
         
         $scope.batch = '';
 
@@ -191,33 +191,30 @@
         });
         
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid;
-        };    
-        
-        $scope.submitForm = function() {
-            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            var phone = /^\d{9}$/;
             var time = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+            var phone = /^\d{9}$/;  
 
-            var schedules = $scope.batch.split( "\n" );
+            $scope.ready = [];
+            var subjects = StorageService.subjects();
+            var users = StorageService.users();
+            
 
-            var temp = [];
-            //subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
-            for( var i = 0; i < schedules.length; i++ ) {
+            var lines = $scope.batch.split( "\n" );
+            //b,123456789,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
+            for( var i = 0; i < lines.length; i++ ) {
+                var temp = lines[i].split( "," );
+                var professor = false;
+                var subject = false;
 
-                temp = schedules[i].split( "," );
-                //console.log(temp);
-
-                if( temp.length == 12 && email.test(temp[1]) != false &&
-                    time.test(temp[2]) != false && time.test(temp[3]) != false &&
-                    time.test(temp[4]) != false && time.test(temp[5]) != false &&
-                    time.test(temp[6]) != false && time.test(temp[7]) != false &&
-                    time.test(temp[8]) != false && time.test(temp[9]) != false &&
-                    time.test(temp[10]) != false && time.test(temp[11]) != false){
-                    
-                    var schedule = {
-                                    subject: '',
-                                    professor: '',
+                if( temp.length != 12 || !phone.test(temp[1]) || !time.test(temp[2]) || !time.test(temp[3]) ||
+                    !time.test(temp[4]) || !time.test(temp[5]) || !time.test(temp[6]) || !time.test(temp[7]) ||
+                    !time.test(temp[8]) || !time.test(temp[9]) || !time.test(temp[10]) || !time.test(temp[11])){return false;}
+                
+                for( var j = 0; j < users.length; j++ ) { if(temp[1] == users[j].phone){ professor = users[j]._id; break;} }
+                for( var j = 0; j < subjects.length; j++ ) { if(temp[0] == subjects[j].name){ subject = subjects[j]._id; break;} }
+                    if(professor && subject){$scope.ready.push({
+                                    subject: subject,
+                                    professor: professor,
                                     schedule: {
                                         monday: {start: temp[2],end: temp[3]},
                                         tuesday: {start: temp[4],end: temp[5]},
@@ -225,22 +222,24 @@
                                         thursday: {start: temp[8],end: temp[9]},
                                         friday: {start: temp[10],end: temp[11]}
                                 }
-                            };
-
-                    for( var j = 0; j < $scope.subjects.length; j++ ) {
-                        if($scope.subjects[j].name == temp[0]){
-                            schedule.subject = $scope.subjects[j]._id;
-                        }
-                    }
-                    for( var j = 0; j < $scope.professors.length; j++ ) {if($scope.professors[j].email == temp[1]){ schedule.professor = $scope.professors[j]._id;}}
-                
-                    ScheduleService.save(schedule,function(response){
-                        //console.log(response);
-                    });
-                }
+                            });}else{return false;}
             }
+            return $scope.userForm.$valid;
+        };
+        
+        $scope.submitForm = function() {
+            var schedules = $scope.batch.split( "\n" );
 
-        $location.url('/page/course/subjects/'+$scope.course.school);
+            var temp = [];
+            //subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
+            var chain = $q.when();
+            chain = chain.then(function(){
+                for(var i = 0; i < $scope.ready.length; i++){ ScheduleService.save($scope.ready[i],function(response){ console.log(response); }); }
+            });
+            chain.then(function(){
+                StorageService.load();
+                $location.url('/page/course/subjects/'+$scope.id);
+            });
         };           
     }
 
@@ -350,10 +349,10 @@
         //console.log($scope.weekday);
 
         
-        //$scope.late = 1200;
-        //$scope.early = -600;
-        $scope.late = 40000;
-        $scope.early = -40000;
+        $scope.late = 1200;
+        $scope.early = 600;
+        //$scope.late = 8000;
+        //$scope.early = 8000;
     
         UserService.get({id: $scope.id},function(user) {
                 $scope.user = user;
@@ -387,8 +386,14 @@
                                 //console.log($scope.d);
                                 //console.log(start.getTime());
                                 //console.log($scope.d.getTime());
+                                console.log('start - now = ',start.getTime() - $scope.d.getTime());
+                                console.log('scope early x 1000 = ',$scope.early*1000);
+                                console.log('now - start = ',$scope.d.getTime() - start.getTime());
+                                console.log('scope late x 1000 = ',$scope.late*1000);
+                                console.log('is not early?',start.getTime() - $scope.d.getTime() <= $scope.early*1000)
+                                console.log('is not late?',$scope.d.getTime() - start.getTime() <= $scope.late*1000)
                                 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early*1000 || $scope.d.getTime() - start.getTime() < $scope.late*1000){
+                            if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
                                     schedules[i].schedule.monday.show = true;
                                     schedules[i].schedule.monday.hide = false;
                                 }
@@ -399,7 +404,7 @@
                                 var start_str = schedules[i].schedule.tuesday.start.split( ":" );
                                 var start = new Date(year,month,day,start_str[0],start_str[1]);
 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
                                     schedules[i].schedule.tuesday.show = true;
                                     schedules[i].schedule.tuesday.hide = false;
                                 }
@@ -408,7 +413,7 @@
                                 var start_str = schedules[i].schedule.wednesday.start.split( ":" );
                                 var start = new Date(year,month,day,start_str[0],start_str[1]);
 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
                                     schedules[i].schedule.wednesday.show = true;
                                     schedules[i].schedule.wednesday.hide = false;
                                 }
@@ -417,7 +422,7 @@
                                 var start_str = schedules[i].schedule.thursday.start.split( ":" );
                                 var start = new Date(year,month,day,start_str[0],start_str[1]);
 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
                                     schedules[i].schedule.thursday.show = true;
                                     schedules[i].schedule.thursday.hide = false;
                                 }
@@ -426,7 +431,7 @@
                                 var start_str = schedules[i].schedule.friday.start.split( ":" );
                                 var start = new Date(year,month,day,start_str[0],start_str[1]);
 
-                                if($scope.d.getTime() - start.getTime() >= $scope.early || $scope.d.getTime() - start.getTime() < $scope.late){
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
                                     schedules[i].schedule.friday.show = true;
                                     schedules[i].schedule.friday.hide = false;
                                 }

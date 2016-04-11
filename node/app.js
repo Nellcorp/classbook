@@ -1,4 +1,5 @@
 var express = require('express');
+var compress = require('compression');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -29,7 +30,14 @@ mongoose.connect('mongodb://localhost/node', function(err) {
 
 //Remember to configure cors for all routes
 var cors = require('cors');
-var whitelist = ['http://classbook.nellcorp.com:3000', 'http://classbook.nellcorp.com'];
+var whitelist = [ 'http://classbook.co'
+                  ,'http://classbook.co:3000'
+                  ,'http://www.classbook.co'
+                  ,'http://www.classbook.co:3000'
+                  ,'http://classbook.nellcorp.com'
+                  ,'http://classbook.nellcorp.com:3000'
+                ];
+
 var corsOptions = {
   origin: function(origin, callback){
     var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
@@ -52,13 +60,14 @@ var schedules = require('./routes/schedules');
 var sessions = require('./routes/sessions');
 
 var app = express();
+app.use(compress());
 
 app.use(function(req, res, next) {
   //res.header("Access-Control-Allow-Origin", "http://classbook.nellcorp.com:3000");
-  var allowed = ['http://classbook.co','http://www.classbook.co','http://classbook.nellcorp.com','http://classbook.nellcorp.com:3000'];
+  
   var origin = req.get('origin');
   
-  if(allowed.indexOf(origin) > -1){ res.header("Access-Control-Allow-Origin", origin);}
+  if(whitelist.indexOf(origin) > -1){ res.header("Access-Control-Allow-Origin", origin);}
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Credentials', true);

@@ -2,14 +2,21 @@
     'use strict';
 
     angular.module('app.manager', ['app.service','validation.match','angularRandomString'])
-        .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', createManagerCtrl])
+        .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', 'StorageService', createManagerCtrl])
         .controller('managerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', '$stateParams',managerCtrl]);
 
 
-    function createManagerCtrl ($scope, $location, randomString, UserService, SchoolService, AuthService) {
+    function createManagerCtrl ($scope, $location, randomString, UserService, SchoolService, AuthService, StorageService) {
         
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
-        
+        $scope.phones = [];
+        UserService.query({},function(users) {
+            console.log(users);
+            for (var i = 0; i < users.length; i++) {
+                $scope.phones.push(users[i].phone);
+            };
+        });
+
         var orig_user, orig_school;
 
         $scope.user = {
@@ -17,7 +24,6 @@
             lastname: '',
             school: '',
             phone: '',
-            email: '',
             type: 'manager',
             email: '',
             password: randomString()
@@ -39,11 +45,20 @@
         orig_school = angular.copy($scope.school);
 
         $scope.canSubmit = function() {
-            var validate_second = $scope.school.semesters.second.end > $scope.school.semesters.second.start;
-            var validate_first = $scope.school.semesters.first.end > $scope.school.semesters.first.start;
-            var validate_semesters = $scope.school.semesters.first.end < $scope.school.semesters.second.start;
-            var validate_form = $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
-            return validate_first && validate_second && validate_semesters && validate_form;
+            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var phone = /^\d{9}$/;
+            var users = StorageService.users();
+            var schools = StorageService.schools();
+            var validate_phone = false;
+            
+            if(!$scope.user.phone || !phone.test($scope.user.phone) || !phone.test($scope.school.phone) || $scope.phones.indexOf($scope.user.phone) > -1){return false;}
+            if(!$scope.user.firstname || !$scope.user.lastname || !$scope.user.email || !$scope.school.name || !$scope.school.address || !$scope.school.city){return false;}
+            for( var i = 0; i < schools.length; i++ ) { if($scope.school.phone == schools[i].phone || $scope.school.name == schools[i].name){ return false;} }
+            if($scope.school.semesters.second.end <= $scope.school.semesters.second.start){return false}
+            if($scope.school.semesters.first.end <= $scope.school.semesters.first.start){return false}
+            if($scope.school.semesters.first.end >= $scope.school.semesters.second.start){return false}
+            
+            return $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
         };    
         
         $scope.submitForm = function() {
@@ -54,6 +69,7 @@
         
                 AuthService.register.save($scope.user,function(user){ 
                 $scope.user = user;
+                StorageService.load();
                 $location.url('/page/manager/profile/'+$scope.user._id);});
                 
         });

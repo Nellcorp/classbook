@@ -3,7 +3,7 @@
 
     angular.module('app.student', ['app.service','validation.match','angularRandomString'])
         .controller('createStudentCtrl', ['$scope','$location','randomString', 'UserService','AuthService','SchoolService','$stateParams',createStudentCtrl])
-        .controller('batchStudentCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','$stateParams',batchStudentCtrl])
+        .controller('batchStudentCtrl', ['$scope','$q','$location','$cookies','randomString', 'UserService','SchoolService','CourseService','StorageService','$stateParams',batchStudentCtrl])
         .controller('courseStudentCtrl', ['$scope','$location','randomString', 'UserService','CourseService','$stateParams',courseStudentCtrl])
         .controller('subjectStudentCtrl', ['$scope','$location','randomString', 'UserService','CourseService','SubjectService','$stateParams',subjectStudentCtrl])
         .controller('scheduleStudentCtrl', ['$scope','$location','randomString', 'UserService','CourseService','SubjectService','ScheduleService','$stateParams',scheduleStudentCtrl])
@@ -19,7 +19,6 @@
             lastname: '',
             school: '',
             phone: '',
-            email: '',
             type: 'student',
             email: '',
             year: '',
@@ -62,52 +61,65 @@
         
     }
 
-    function batchStudentCtrl ($scope, $location, randomString, UserService, SchoolService, CourseService, $stateParams) {
+    function batchStudentCtrl ($scope, $q, $location, $cookies,randomString, UserService, SchoolService, CourseService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
+        $scope.user = $cookies.getObject('user');
+        $scope.ready = [];
         
-        CourseService.query({school: $scope.id},function(courses){$scope.courses = courses;});
-
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
         $scope.batch = '';
 
-        SchoolService.get({id: $scope.id},function(school) {
+        SchoolService.get({id: $scope.user.school},function(school) {
                 console.log(school);
                 $scope.school = school;
+
+                CourseService.query({school: $scope.user.school},function(courses){$scope.courses = courses;});
             });    
 
         
         
 
-        $scope.canSubmit = function() {return $scope.userForm.$valid && $scope.batch != '';};    
+        $scope.canSubmit = function() {
+            $scope.ready = [];
+            var valid = true;
+            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var phone = /^\d{9}$/;
+            var school = /^[0-9a-fA-F]{24}$/;
+            var users = StorageService.users();
+            var courses = StorageService.courses();
+            //console.log(courses);
+            if($scope.batch == '' || !$scope.userForm.$valid || !school.test($scope.id)){return false;}
+            var lines = $scope.batch.split( "\n" );
+            
+            for( var i = 0; i < lines.length; i++ ) {
+                var course = false;
+                var temp = lines[i].split( "," );
+                var found = false;
+                
+                if(temp.length != 10 || !email.test(temp[2]) || !email.test(temp[6]) || !phone.test(temp[3]) || !phone.test(temp[7]) || temp[9] < 1 || temp[9] > 5){return false;}
+                
+                for( var j = 0; j < users.length; j++ ) { if(temp[2] == users[j].email || temp[3] == users[j].phone){return false;} }
+                
+                //fname2,lname2,fname2.lname2@studentmail.com,111111112,first,last,first.last@studentmail2.com,111111112,curso1,2
+                for( var j = 0; j < courses.length; j++ ) { if(temp[8] == courses[j].name){ course = courses[j]._id; break; } }
+                
+                if(course){
+                    $scope.ready.push({
+                                firstname: temp[0], lastname: temp[1], school: $scope.user.school, course: course, phone: temp[3], email: temp[2], type: 'student',
+                                year: temp[9], supervisor:{firstname: temp[4], lastname: temp[5],email: temp[6],phone: temp[7]},password: randomString()
+                        });
+                }else{return false;}
+            }
+            return valid;    
+        };    
         
         $scope.submitForm = function() {
-            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            var phone = /^\d{9}$/;  
-
-            var students = $scope.batch.split( "\n" );
-
-            var temp = [];
-            
-            //firtname,lastname,email,phone,fname,lname,email,phone,course,year
-            for( var i = 0; i < students.length; i++ ) {
-
-                temp = students[i].split( "," );
-                
-                if(temp.length == 10 && email.test(temp[2]) && email.test(temp[6]) && phone.test(temp[3]) && phone.test(temp[7]) && temp[9] > 0 && temp[9] < 6){
-
-                    for( var j = 0; j < $scope.courses.length; j++ ) {
-                        if($scope.courses[j].name == temp[8].toLowerCase()){
-                            var student = {
-                                firstname: temp[0], lastname: temp[1], school: $scope.id, course: $scope.courses[j], phone: temp[3], email: temp[2], type: 'student',
-                                year: temp[9], supervisor:{firstname: temp[4], lastname: temp[5],email: temp[6],phone: temp[7]},password: randomString()
-                            };
-                            UserService.save(student,function(response){console.log(response);});
-                        }
-                    }
-                }
-            }
-
-        $location.url('/page/school/students/'+$scope.id);
+            var chain = $q.when();
+            chain = chain.then(function(){ for( var i = 0; i < $scope.ready.length; i++ ) { UserService.save($scope.ready[i],function(response){console.log(response);}); } });
+            chain.then(function(){
+                StorageService.load();
+                $location.url('/page/school/students/'+$scope.id);
+            });
         };           
     }
 
@@ -124,10 +136,9 @@
         
 
         var orig_user = angular.copy($scope.user);
-        var orig_school = angular.copy($scope.school);
-
+        
         $scope.canSubmit = function() {
-            return $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
+            return $scope.userForm.$valid && !angular.equals($scope.user, orig_user);
         };    
         
         $scope.submitForm = function() {

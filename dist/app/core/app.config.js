@@ -23,12 +23,13 @@
         ];
         var date = new Date();
         var year = date.getFullYear();
-        var user = '';
-        
-        if(!!$cookies.get('auth') && !!$cookies.getObject('user')){
-            user = $cookies.getObject('user');
-        }
-        
+        //var user = $cookies.getObject('user');
+        //console.log('app.config.cookies.user',$cookies.getObject('user'));
+        //console.log('app.config.user',user);
+        var user = {firstname: "Assis", lastname: "Ngolo"};
+
+
+
         var main = {
             brand: 'Classbook',
             user: user,
@@ -39,7 +40,6 @@
             pageTransition: pageTransitionOpts[0],          // 0, 1, 2, 3... and build your own
             skin: '12'                                      // 11,12,13,14,15,16; 21,22,23,24,25,26; 31,32,33,34,35,36
         };
-
         
         var color = {
             primary:    '#009688',

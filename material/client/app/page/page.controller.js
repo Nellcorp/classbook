@@ -2,25 +2,10 @@
     'use strict';
 
     angular.module('app.page',['app.service','ngCookies'])
-    .controller('invoiceCtrl', ['$scope', '$window', invoiceCtrl])
-    .controller('authCtrl', ['$scope', '$window', '$location', '$cookies', 'UserService', 'AuthService', '$stateParams', authCtrl]);
+    .controller('authCtrl', ['$scope', '$window', '$location', '$cookies', 'UserService', 'AuthService', 'StorageService','$stateParams', authCtrl]);
 
-    function invoiceCtrl($scope, $window) {
-        var printContents, originalContents, popupWin;
-        
-        $scope.printInvoice = function() {
-            printContents = document.getElementById('invoice').innerHTML;
-            originalContents = document.body.innerHTML;        
-            popupWin = window.open();
-            popupWin.document.open();
-            popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="styles/main.css" /></head><body onload="window.print()">' + printContents + '</html>');
-            popupWin.document.close();
-        }
-    }
-
-
-    function authCtrl($scope, $window, $location, $cookies, UserService, AuthService, $stateParams) {
-            
+    function authCtrl($scope, $window, $location, $cookies, UserService, AuthService, StorageService, $stateParams) {
+            //console.log('auth ctrl',$cookies.getObject('user'));
 
             $scope.credentials = { phone: '', password: '' };
             $scope.form_error = false;
@@ -32,12 +17,17 @@
             $scope.reset_phone = '';
             $scope.url_404 = '/page/signin';
             $scope.token = false;
-
+            $scope.user = '';
+            
+            
+            $scope.initUser = function () {
+                $scope.user = $cookies.getObject('user');
+            };
 
             //LOGIN
             $scope.initLogin = function () {
-
                 //$cookies.remove('auth'); $cookies.remove('user');
+                //console.log('login init',$cookies.getObject('user'));
 
 
                 AuthService.auth.get(function(user) {
@@ -54,16 +44,17 @@
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     
+                    if(StorageService.isEmpty()){ StorageService.load();}
+
                     $location.url('/page/profile/'+user._id);
 
-                }, function(error) {
-                    AuthService.clear();
                 });
-
+                
+                AuthService.clear();
             };
             
             $scope.login = function() {
-            
+            //console.log('login',$cookies.getObject('user'));
                 AuthService.login.save($scope.credentials,function(user) {
                     
                     $cookies.putObject('user',{
@@ -77,6 +68,8 @@
                     }, {'expires': $scope.exp});
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
+                    StorageService.clear();
+                    StorageService.load();
                     
                     $location.url('/page/profile/'+user._id);
                     //$location.url('/page/profile');

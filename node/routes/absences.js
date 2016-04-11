@@ -73,7 +73,7 @@ router.post('/', function(req, res, next) {
     res.json(job);
   }else{
     Absence.create(req.body, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
 
     var user_job = jobs.create('absence notification', {
         phone: req.body.phone,
@@ -94,7 +94,7 @@ router.post('/', function(req, res, next) {
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
   Absence.find(req.query,function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     res.json(post);
   });
 });
@@ -102,7 +102,7 @@ router.get('/', function(req, res, next) {
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
   Absence.findById(req.params.id, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     if (post == null) return res.status(404).json({ error: "Resource Not found." });
     res.json(post);
   });

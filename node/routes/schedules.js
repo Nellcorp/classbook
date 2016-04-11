@@ -7,7 +7,7 @@ var Schedule = require('../models/Schedule.js');
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
   Schedule.find(req.query,function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     res.json(post);
   });
 });
@@ -16,7 +16,7 @@ router.get('/', function(req, res, next) {
 router.post('/', function(req, res, next) {
     
   Schedule.create(req.body, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     
     res.json(post);
   });
@@ -25,7 +25,7 @@ router.post('/', function(req, res, next) {
 /* GET /todos/id */
 router.get('/:id', function(req, res, next) {
   Schedule.findById(req.params.id, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     if (post == null) return res.status(404).json({ error: "Resource Not found." });
     res.json(post);
   });
@@ -34,7 +34,7 @@ router.get('/:id', function(req, res, next) {
 /* PUT /todos/:id */
 router.put('/:id', function(req, res, next) {
   Schedule.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     res.json(post);
   });
 });
@@ -42,7 +42,7 @@ router.put('/:id', function(req, res, next) {
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
   Schedule.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) return next(err);
+    if (err) res.status(500).json(err);
     res.json(post);
   });
 })

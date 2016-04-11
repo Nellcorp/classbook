@@ -53,11 +53,21 @@
                     if(sessions.length > 0){$location.url('/page/profile/'+$scope.user.id);}
         });
 
-        $scope.late = 999999999;
-        //$scope.early = -600;
-        $scope.early = -4000000;
-            
-        if($scope.d.getTime() - start.getTime() < $scope.early*1000 || $scope.d.getTime() - start.getTime() >= $scope.late*1000){
+
+        $scope.late = 1200;//20 minutes
+        $scope.early = 600;//10 minutes
+        //$scope.late = 8000;
+        //$scope.early = 8000;
+                                console.log('start = ',start);
+                                console.log('now = ',$scope.d);
+                                console.log('start - now = ',start.getTime() - $scope.d.getTime());
+                                console.log('scope early x 1000 = ',$scope.early*1000);
+                                console.log('now - start = ',$scope.d.getTime() - start.getTime());
+                                console.log('scope late x 1000 = ',$scope.late*1000);
+                                console.log('is early?',start.getTime() - $scope.d.getTime() > $scope.early*1000);
+                                console.log('is late?',$scope.d.getTime() - start.getTime() > $scope.late*1000);
+
+        if(start.getTime() - $scope.d.getTime() > $scope.early*1000 || $scope.d.getTime() - start.getTime() > $scope.late*1000){
                    $location.url('/page/profile/'+$scope.user.id);
         }
         

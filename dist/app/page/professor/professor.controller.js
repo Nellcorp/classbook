@@ -3,7 +3,7 @@
 
     angular.module('app.professor', ['app.service','validation.match','angularRandomString'])
         .controller('createProfCtrl', ['$scope','$location','randomString', 'UserService','AuthService', 'SchoolService','$stateParams',createProfCtrl])
-        .controller('batchProfCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','$stateParams',batchProfCtrl])
+        .controller('batchProfCtrl', ['$scope','$q','$location','randomString', 'UserService','AuthService','SchoolService','CourseService','StorageService','$stateParams',batchProfCtrl])
         .controller('profCtrl', ['$scope','$location','randomString', 'UserService', 'SchoolService','$stateParams',profCtrl]);
 
 
@@ -82,8 +82,9 @@
         
     }
 
-    function batchProfCtrl ($scope, $location, randomString, UserService, SchoolService, CourseService, $stateParams) {
+    function batchProfCtrl ($scope, $q, $location, randomString, UserService, AuthService, SchoolService, CourseService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
+        $scope.ready = [];
         
         CourseService.query({school: $scope.id},function(courses){$scope.courses = courses;});
 
@@ -98,36 +99,41 @@
         
         
 
-        $scope.canSubmit = function() {return $scope.userForm.$valid && $scope.batch != '';};    
+        $scope.canSubmit = function() {
+            var valid = true;
+            $scope.ready = [];
+            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            var phone = /^\d{9}$/;
+            var school = /^[0-9a-fA-F]{24}$/;
+            var users = StorageService.users();
+            
+            if($scope.batch == '' || !$scope.userForm.$valid || !school.test($scope.id)){return false;}
+            var lines = $scope.batch.split( "\n" );
+            
+            for( var i = 0; i < lines.length; i++ ) {
+                var temp = lines[i].split( "," );
+                if(temp.length != 4 || !email.test(temp[2]) || !phone.test(temp[3])){ return false;}
+                for( var j = 0; j < users.length; j++ ) { if(temp[2] == users[j].email || temp[3] == users[j].phone){return false;} }
+                $scope.ready.push({
+                    firstname: temp[0],
+                    lastname: temp[1],
+                    school: $scope.id,
+                    phone: temp[3],
+                    email: temp[2],
+                    type: 'professor',
+                    password: randomString()
+                });
+            }
+            return valid;    
+        };    
         
         $scope.submitForm = function() {
-            var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            var phone = /^\d{9}$/;  
-
-            var users = $scope.batch.split( "\n" );
-
-            var temp = [];
-            
-            //firtname,lastname,email,phone
-            for( var i = 0; i < users.length; i++ ) {
-
-                temp = users[i].split( "," );
-                
-                if(temp.length == 4 && email.test(temp[2]) && phone.test(temp[3])){
-                            var user = {
-                                firstname: temp[0],
-                                lastname: temp[1],
-                                school: $scope.id,
-                                phone: temp[3],
-                                email: temp[2],
-                                type: 'professor',
-                                password: randomString()
-                            };
-                            UserService.save(user,function(response){console.log(response);});
-                }
-            }
-
-        $location.url('/page/school/professors/'+$scope.id);
+            var chain = $q.when();
+            chain = chain.then(function(){ for( var i = 0; i < $scope.ready.length; i++ ) { AuthService.register.save($scope.ready[i],function(response){console.log(response);}); } });
+            chain.then(function(){
+                StorageService.load();
+                $location.url('/page/school/professors/'+$scope.id);
+            });
         };           
     }
 

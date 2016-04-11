@@ -6,9 +6,13 @@
         'ScheduleService', 'SessionService', 'AuthService','ContextService', '$state','$stateParams', '$rootScope', sidebarCtrl]);
     
     function sidebarCtrl($scope, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, ContextService, $state, $stateParams, $rootScope) {
-            //$scope.user = { id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' };
             $scope.user = $cookies.getObject('user');
             
+
+            //console.log('sidebar ctrl',$cookies.getObject('user'));
+            
+            
+            //console.log('user here', $scope.user);
             $scope.state = $state;
             $scope.params = $stateParams;
             $scope.hideOptions = true;
@@ -93,7 +97,7 @@
                         items: [
                             { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Perfil da Escola', route: '#/page/school/profile/' + $scope.user.school },
-                            { name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
+                            //{ name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
                             { name: 'Horários', route: '#/page/professor/schedules/' + $scope.user.id },
                             //{ name: 'Faltas', route: '#/page/professor/absences/' + $scope.user.id },
                             { name: 'Cursos', route: '#/page/school/courses/' + $scope.user.school },
@@ -104,20 +108,40 @@
                 ]
             };
 
+
             $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-                $scope.items = $scope.roles[$scope.user.type][0].items; 
+                $scope.user = $cookies.getObject('user');
+                if(!!$scope.user && ['admin','student','professor','manager'].indexOf($scope.user.type) > -1){
+                        $scope.items = $scope.roles[$scope.user.type][0].items; 
+                        //console.log('manager',$scope.user.type);
+                        //console.log('Items',$scope.items);
+                    }
+                
                 $scope.context = ContextService.items[currentRoute.name + '/:id'];
 
                     if(!!$scope.context){
                         $scope.hideOptions = false;
-                    for (var i = 0; i < $scope.context.length; i++) {
-                        var url = $scope.context[i].url.split('/');
-                        console.log(url);
-                        console.log($stateParams.id);
-                            url.splice(url.length -1);
-                            $scope.context[i].url = url.join('/') + '/'+$stateParams.id;
-                            console.log($scope.context[i].url);
-                    };
+                        
+                        var skip = [];
+                    
+                        for ( var i = 0; i < $scope.context.length; i++) {
+                            if($scope.context[i].roles.indexOf($scope.user.type) > -1){
+                                var url = $scope.context[i].url.split('/');
+                                url.splice(url.length -1);
+                                $scope.context[i].url = url.join('/') + '/'+$stateParams.id;
+                            }else{
+                                $scope.context[i] = false;
+                            }
+
+                        }
+                        $scope.context = $scope.context.filter( Boolean );
+                        //console.log($scope.context);
+
+                        if($scope.context.length == 0){
+                                $scope.context = [];
+                                $scope.hideOptions = true;
+                            }
+                        
                 }else{
                     $scope.context = [];
                     $scope.hideOptions = true;
@@ -127,8 +151,9 @@
 
 
             $scope.init =  function() {
+                //console.log('sidebar init',$cookies.getObject('user'));
                 //console.log(AuthService.isAuthenticated());
-                //console.log($scope.user);
+                
                 //console.log($location);
                 
                 //setTimeout(function(){ console.log($state.current);}, 1000);
@@ -136,14 +161,24 @@
                 
 
                 //console.log(path);
+
                 //console.log(id);
-                
+                //console.log($cookies.getObject('user'));
+                $scope.user = $cookies.getObject('user');
+
+                $scope.name = $scope.user.firstname.substring(0, 1).toUpperCase() + $scope.user.firstname.substring(1) +
+                ' ' + $scope.user.lastname.substring(0, 1).toUpperCase() + $scope.user.lastname.substring(1);
+
                 if(AuthService.isAuthenticated()){
-                    $scope.user = $cookies.getObject('user');
+                    //$scope.user = $cookies.getObject('user');
+                    if(!!$scope.user && ['admin','student','professor'].indexOf($scope.user.type) > -1){
+                        $scope.items = $scope.roles[$scope.user.type][0].items;
+                        //console.log($scope.items);
+                    }
                     
-                    $scope.items = $scope.roles[$scope.user.type][0].items;
-                    console.log($scope.items);
                 }
+
+                //console.log('Sidebar User',$scope.user);
             };
 
             //$state.current.name

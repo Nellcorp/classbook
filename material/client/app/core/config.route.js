@@ -114,7 +114,8 @@
 
             $urlRouterProvider
                 .when('/', '/page/signin') //send root path to login page
-                .otherwise('/page/404');//send invalid routes to login page
+                //.otherwise('/page/404');//send invalid routes to login page
+                .otherwise('/page/signin');//send invalid routes to login page
 
 
             //$stateProvider.state('profile', { url: '/page/profile', templateUrl: 'app/page/profile.html' });
