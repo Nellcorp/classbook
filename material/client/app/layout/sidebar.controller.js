@@ -38,9 +38,9 @@
                 admin: [
                     {
                         name: 'Minha Conta',
-                        route: '#/page/profile/' + $scope.user.id,
+                        route: '#/page/profile/admin',
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
+                            { name: 'Meu Perfil', route: '#/page/profile/admin'},
                             { name: 'Criar Escola', route: '#/page/manager/new' },
                             { name: 'Ver Escolas', route: '#/page/school/list' }
                         ]
@@ -53,7 +53,7 @@
                         name: 'Escola',
                         route: '#/page/school/profile/' + $scope.user.school,
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
+                            { name: 'Meu Perfil', route: '#/page/profile/manager'},
                             { name: 'Minha Escola', route: '#/page/school/profile/' + $scope.user.school }
                         ]
                     },
@@ -99,7 +99,7 @@
                         name: 'Escola',
                         route: '#/page/school/profile/' + $scope.user.school,
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
+                            { name: 'Meu Perfil', route: '#/page/profile/professor'},
                             { name: 'Minha Escola', route: '#/page/school/profile/' + $scope.user.school },
                             //{ name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
                             //{ name: 'Horários', route: '#/page/professor/schedules/' + $scope.user.id },

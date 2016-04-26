@@ -9,7 +9,7 @@
         .controller('scheduleSessionCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',scheduleSessionCtrl])
         .controller('createScheduleSessionCtrl', ['$scope','$location','SubjectService','SessionService','$stateParams',createScheduleSessionCtrl])
         .controller('scheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','$stateParams',scheduleCtrl])
-        .controller('batchScheduleCtrl', ['$scope','$q','$location','UserService','CourseService','SubjectService','ScheduleService','StorageService','$stateParams',batchScheduleCtrl]);
+        .controller('batchScheduleCtrl', ['$scope','$q','$location','UserService','CourseService','SubjectService','ScheduleService','AbsenceService','StorageService','$stateParams',batchScheduleCtrl]);
 
 
     function createScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, AbsenceService, SchoolService, CourseService, $stateParams) {
@@ -176,14 +176,14 @@
         };           
     }
 
-    function batchScheduleCtrl ($scope, $q, $location, UserService, CourseService, SubjectService, ScheduleService, StorageService, $stateParams) {
+    function batchScheduleCtrl ($scope, $q, $location, UserService, CourseService, SubjectService, ScheduleService, AbsenceService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.ready = [];
         
         $scope.batch = '';
 
         StorageService.load();
-        
+        $scope.school = StorageService.school_by_id($scope.id);
         
         $scope.canSubmit = function() {
             var time = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -204,15 +204,21 @@
                     !time.test(temp[5]) || !time.test(temp[6]) || !time.test(temp[7]) || !time.test(temp[8]) ||
                     !time.test(temp[9]) || !time.test(temp[10]) || !time.test(temp[11]) || !time.test(temp[12])){return false;}
 
-                if(courses.hasOwnProperty(temp[0])){var course = courses[temp[0]]._id}else{return false;}
-                if(subjects.hasOwnProperty(course+'_'+temp[1])){ var subject = subjects[course+'_'+temp[1]]}else{return false;}
-                if(users.hasOwnProperty(temp[2])){var professor = users[temp[2]]._id}else{return false;}
-
-                $scope.ready.push({
-                    subject: subject,
-                    professor: professor,
+                if(courses.hasOwnProperty(temp[0])){var course = courses[temp[0]]}else{return false;}
+                console.log('here1');
+                //console.log('subject',course+'_'+temp[1]);
+                //console.log('subjects',subjects);
+                if(subjects.hasOwnProperty(course._id+'_'+temp[1])){ var subject = subjects[course._id+'_'+temp[1]]}else{return false;}
+                console.log('here2');
+                if(users.hasOwnProperty(temp[2])){var professor = users[temp[2]]}else{return false;}
+                console.log(subject);
+                
+                var temp_schedule = {
+                    subject: subject._id,
+                    professor: professor._id,
                     school: $scope.id,
-                    course: course,
+                    course: course._id,
+                    absences: [],
                     schedule: {
                         monday: {start: temp[3],end: temp[4]},
                         tuesday: {start: temp[5],end: temp[6]},
@@ -220,7 +226,83 @@
                         thursday: {start: temp[9],end: temp[10]},
                         friday: {start: temp[11],end: temp[12]}
                     }
-                });
+                };
+
+                var weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+                var temp2 = new Date();
+                var offset = -60;
+
+                if(temp2.getTimezoneOffset() == offset){ var today = temp2;}else{
+                    var utc = temp2.getTime() + (temp2.getTimezoneOffset() * 60000);
+                    var today = new Date(utc - (3600000*offset));
+                }
+
+                var schedule = temp_schedule.schedule;
+                var first_start = new Date($scope.school.semesters.first.start);
+                var first_end = new Date($scope.school.semesters.first.end);
+                var second_start = new Date($scope.school.semesters.second.start);
+                var second_end = new Date($scope.school.semesters.second.end);
+                var locale = today.toLocaleString();
+                
+                if(today < first_end){
+                    var start = first_start;
+                    var end = first_end;
+                } else if (today >= first_end && today < second_end ){
+                    var start = second_start;
+                    var end = second_end;
+                }
+
+                var sessions = [];
+                
+                for (var j = 1; j <= 5; j++) {
+                    var weekday = weekdays[j];
+                    
+                        if (schedule.hasOwnProperty(weekday) && schedule[weekday].start != '' && schedule[weekday].end != '') {
+
+                            var start_weekday = start.getDay(); //index
+                            var session_weekday = weekdays.indexOf(weekday);
+                            var diff = (start_weekday < session_weekday)? session_weekday - start_weekday : start_weekday - session_weekday + 7;
+
+                            var start_str = schedule[weekday].start.split( ":" );
+                            var end_str = schedule[weekday].end.split( ":" );
+                            var session_date = new Date(start.getFullYear(),start.getMonth(),start.getDate(),start_str[0],start_str[1]);
+                            var start_date = new Date(session_date.setTime( session_date.getTime() + diff * 86400000 ));
+                            var current = start_date;
+                            var next = new Date(session_date.setTime( session_date.getTime() + 7 * 86400000 ));
+                            //create professor absences until temp date + 7 is greater than end date
+                            
+                            var absence = {
+                                    user: professor._id,
+                                    phone: professor.phone,
+                                    school: professor.school,
+                                    year: subject.year,
+                                    schedule: '',
+                                    //type: 'professor',
+                                    course: course._id,
+                                    subject: subject._id,
+                                    supervisor_phone: course.supervisor.phone,
+                                    message:'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name,
+                                    supervisor_message: 'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name,
+                                    time: []
+                                };
+
+                            while( next <= end ){
+                                var current_locale = current.toLocaleString();
+                                var message = 'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name;
+                                var supervisor_message = 'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name;
+                                var end_time = current;
+                                end_time.setHours(parseInt(end_str[0]), parseInt(end_str[1]));
+                                absence.time.push({ start: current, end: end_time, late: 20, message: message, supervisor_message: supervisor_message });
+
+                                var current = next;
+                                var next = new Date(current.setTime( current.getTime() + 7 * 86400000 ));
+                            }
+
+                            temp_schedule.absences.push(absence);
+                        }
+                }
+                
+                $scope.ready.push(temp_schedule);
             }
             return $scope.userForm.$valid;
         };
@@ -232,10 +314,22 @@
             //course,subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < $scope.ready.length; i++){ ScheduleService.save($scope.ready[i],function(response){ console.log(response); }); }
+                for(var i = 0; i < $scope.ready.length; i++){
+                    var absences = $scope.ready[i].absences;
+                    //console.log(absences);
+                    delete $scope.ready[i].absences;
+
+                    ScheduleService.save($scope.ready[i],function(response){
+                        console.log(response);
+                        for(var j = 0; j < absences.length; j++){
+                            absences[j].schedule = response._id;
+                            AbsenceService.save(absences[j],function(response){ console.log(response)},function(error){ console.log(error)});
+                        }
+                    });
+                }
             });
             chain.then(function(){
-                $location.url('/page/school/professors/'+$scope.id);
+                $location.url('/page/school/schedules/'+$scope.id);
             });
         };           
     }

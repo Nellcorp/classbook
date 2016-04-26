@@ -7,6 +7,10 @@
             
             routes = [
                 'app/calendar',
+                'page/profile/admin',
+                'page/profile/professor',
+                'page/profile/student',
+                'page/profile/manager',
                 'form/elements',
                 'form/validation',
                 'form/wizard',

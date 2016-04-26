@@ -2,17 +2,17 @@
 # use $1
 mongo <<EOF
 use dev
+db.users.remove({"type": "manager"})
+db.schools.drop()
 db.absences.drop()
 db.coursenames.drop()
 db.courses.drop()
 db.schedules.drop()
-db.schools.drop()
 db.sessions.drop()
 db.subjectnames.drop()
 db.subjects.drop()
 db.tokens.drop()
 db.users.remove({"type": "professor"})
-db.users.remove({"type": "manager"})
 db.users.remove({"type": "student"})
 quit()
 exit

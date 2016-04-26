@@ -1,25 +1,16 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
-var mandrill = require('mandrill-api/mandrill');
-var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
-
+//var mandrill = require('mandrill-api/mandrill');
+//var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
+var sendgrid  = require('sendgrid')('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');
 
 var message = {
-    "html": "<p>Classbook.com</p>",
-    "text": "Example text content",
-    "subject": "Notificação Classbook",
-    "from_email": "noreply@classbook.co",
-    "from_name": "Classbook.co",
-    "to": [{
-            "email": '',
-            "name": '',
-            "type": "to"
-        }],
-    "headers": {
-        "Reply-To": "noreply@classbook.co"
-    }
+  from:     'noreply@classbook.co',
+  fromname:     'Classbook',
+  subject:  'Notificação Classbook'
 };
+
 
 var mongoose = require('mongoose');
 var User = require('../models/User.js');
@@ -38,15 +29,9 @@ router.post('/register', function(req, res, next) {
       if (err) return res.status(500).json(err);
       message.html = user.firstname+' '+user.lastname+'! Bem vindo/a ao Classbook! Clique no link abaixo para criar a sua senha: <br/><a href="http://www.classbook.co/#/page/reset/'+token._id+'">Activar Conta</a>';
       message.text = user.firstname+' '+user.lastname+'! Bem vindo ao Classbook! Clique no link para criar a sua senha: http://www.classbook.co/#/page/reset/'+token._id;
-      message.to[0].email = user.email;
-      message.to[0].name = user.firstname +' '+ user.lastname;
-      
-      mandrill_client.messages.send({"message": message, "async": false, "ip_pool": "Main Pool", "send_at": ''}, function(result) {
-        console.log(result);
-        res.json(token);
-      }, function(e) {
-        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-      });
+      message.to = user.email;
+      message.toname = user.firstname +' '+ user.lastname;
+      sendgrid.send(message, function(err, result) { if (err){console.log(err);} res.json(token);console.log(result); });
 
   });
       
@@ -109,17 +94,9 @@ router.post('/reset', function(req, res, next) {
       console.log(token);
       message.html = 'Clique no link abaixo para restaurar a sua senha: <br/><a href="http://www.classbook.co/#/page/reset/'+token._id+'">Restaurar Senha</a>';
       message.text = 'Clique no link para restaurar a sua senha: http://www.classbook.co/#/page/reset/'+token._id;
-      message.to[0].email = user.email;
-      message.to[0].name = user.firstname +' '+ user.lastname;
-      console.log(message);
-      
-
-      mandrill_client.messages.send({"message": message, "async": false, "ip_pool": "Main Pool", "send_at": ''}, function(result) {
-        console.log(result);
-        res.json(token);
-      }, function(e) {
-        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-      });
+      message.to = user.email;
+      message.toname = user.firstname +' '+ user.lastname;
+      sendgrid.send(message, function(err, result) { if (err){console.log(err);} res.json(token);console.log(result); });
 
   });
 
