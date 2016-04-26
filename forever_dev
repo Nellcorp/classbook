@@ -1,0 +1,7 @@
+export PORT=3002
+export DATABASE=dev
+
+source $(dirname $0)/api.keys
+
+nohup forever start ~/classbook/node/bin/www
+nohup forever start ~/classbook/node/worker.js

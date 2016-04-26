@@ -85,8 +85,9 @@
     function batchProfCtrl ($scope, $q, $location, randomString, UserService, AuthService, SchoolService, CourseService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.ready = [];
-        
+        StorageService.load();
         CourseService.query({school: $scope.id},function(courses){$scope.courses = courses;});
+        
 
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
         $scope.batch = '';
@@ -129,9 +130,10 @@
         
         $scope.submitForm = function() {
             var chain = $q.when();
-            chain = chain.then(function(){ for( var i = 0; i < $scope.ready.length; i++ ) { AuthService.register.save($scope.ready[i],function(response){console.log(response);}); } });
+            chain = chain.then(function(){
+                for( var i = 0; i < $scope.ready.length; i++ ) { AuthService.register.save($scope.ready[i],function(response){console.log(response);}); }
+            });
             chain.then(function(){
-                StorageService.load();
                 $location.url('/page/school/professors/'+$scope.id);
             });
         };           

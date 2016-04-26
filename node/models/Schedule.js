@@ -5,6 +5,8 @@ var uniqueValidator = require('mongoose-unique-validator');
 var ScheduleSchema = new mongoose.Schema({
   subject: { type: String, unique: true, required: true, lowercase: true, trim: true },
   professor: { type: String, required: true, lowercase: true, trim: true },
+  school: { type: String, required: true, lowercase: true, trim: true },
+  course: { type: String, required: true, trim: true},
   schedule: {
     monday: {
       start: { type: String, lowercase: true, trim: true },

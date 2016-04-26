@@ -110,7 +110,10 @@
              //console.log('viewContentLoaded');
         });
 
-        $rootScope.$on('$stateChangeError', function(event) {
+        $rootScope.$on('$stateChangeError', function (event, toState, toParams, fromState, fromParams) {
+            $state.get('error').error = { code: 123, description: 'Exception stack trace' }
+            //console.log('$stateChangeError - fired when an error occurs during transition.');
+            //console.log(arguments);
             $state.transitionTo('page/404');
             event.preventDefault(); 
         });

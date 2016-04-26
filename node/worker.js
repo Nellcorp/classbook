@@ -67,7 +67,12 @@ jobs.process('absence check', function (job, done){
 
         
   Session.find({schedule: job.data.schedule, start: job.data.time.start},function (err, sessions) {
-    if (err) return next(err);
+    if (err){
+      job.remove(function(error){
+        if (error) return next(error);
+        console.log('Removed orphan job #%d', job.id); });
+        done && done();
+    }
     if(sessions.length == 0 ){
         var sessionData = {
             title: job.data.subject,

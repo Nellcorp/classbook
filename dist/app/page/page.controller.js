@@ -31,6 +31,10 @@
 
 
                 AuthService.auth.get(function(user) {
+                    AuthService.clear();
+                    $cookies.remove('auth');
+                    $cookies.remove('user');
+
                     $cookies.putObject('user',{
                         id: user._id,
                         email: user.email,
@@ -55,8 +59,11 @@
             
             $scope.login = function() {
             //console.log('login',$cookies.getObject('user'));
+                    AuthService.clear();
+                    $cookies.remove('auth');
+                    $cookies.remove('user');
                 AuthService.login.save($scope.credentials,function(user) {
-                    
+
                     $cookies.putObject('user',{
                         id: user._id,
                         email: user.email,
@@ -68,7 +75,6 @@
                     }, {'expires': $scope.exp});
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
-                    StorageService.clear();
                     StorageService.load();
                     
                     $location.url('/page/profile/'+user._id);

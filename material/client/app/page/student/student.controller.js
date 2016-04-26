@@ -65,7 +65,7 @@
         $scope.id = $stateParams.id;
         $scope.user = $cookies.getObject('user');
         $scope.ready = [];
-        
+        StorageService.load();
         //$scope.user = UserService.get({id: "56b8d11c98a3eae30a734ac6"});
         $scope.batch = '';
 
@@ -117,7 +117,6 @@
             var chain = $q.when();
             chain = chain.then(function(){ for( var i = 0; i < $scope.ready.length; i++ ) { UserService.save($scope.ready[i],function(response){console.log(response);}); } });
             chain.then(function(){
-                StorageService.load();
                 $location.url('/page/school/students/'+$scope.id);
             });
         };           

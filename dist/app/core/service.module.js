@@ -4,7 +4,9 @@
     angular.module('app.service', ['ngCookies','ngStorage'])
         .config(['$localStorageProvider', function ($localStorageProvider) { $localStorageProvider.setKeyPrefix('classbook-'); }])
         .config(['$sessionStorageProvider', function ($sessionStorageProvider) { $sessionStorageProvider.setKeyPrefix('classbook-'); }])
-        .factory("UserService", function ($resource){return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
+        .factory("UserService", function ($resource, $state){
+          console.log($state);
+          return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SchoolService", function ($resource){return $resource(api+"/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("CourseService", function ($resource){return $resource(api+"/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SubjectService", function ($resource){return $resource(api+"/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});})

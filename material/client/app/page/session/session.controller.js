@@ -75,7 +75,11 @@
         
         $scope.session = {
             title: $scope.subject.name,
+            school: $scope.user.school,
+            professor: $scope.user._id,
             schedule: $scope.schedule._id,
+            course: $scope.course._id,
+            subject: $scope.subject._id,
             summary: '',
             start: start,
             end: end,

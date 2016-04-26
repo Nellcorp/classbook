@@ -3,6 +3,10 @@ var mongoose = require('mongoose');
 var SessionSchema = new mongoose.Schema({
   title: { type: String, required: false, lowercase: true, trim: true},
   schedule: { type: String, required: true, lowercase: true, trim: true},
+  school: { type: String, required: true, lowercase: true, trim: true },
+  course: { type: String, required: true, trim: true},
+  subject: { type: String, required: true, trim: true},
+  professor: { type: String, required: true, lowercase: true, trim: true },
   summary: { type: String, required: true, trim: true},
   start: Date,
   started: Date,

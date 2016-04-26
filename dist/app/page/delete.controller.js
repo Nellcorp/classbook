@@ -12,8 +12,10 @@
 
     
     function removeUserCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
-        //Make sure I don't delete an admin
-        //Make sure I don't delete a professor with a 
+        //Cannot delete if user
+        //is admin
+        //is professor assigned to subject
+        //is manager (must delete school)
 
         $scope.id = $stateParams.id;
         $scope.form_error = false;
@@ -37,6 +39,7 @@
     }
 
     function removeSchoolCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+        //Must warn user
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         
@@ -55,6 +58,7 @@
     }
 
     function removeCourseCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+        //delete all course sessions, schedules and subjects
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         
@@ -73,6 +77,7 @@
     }
 
     function removeSubjectCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+        //delete all subject sessions and schedules
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         
@@ -91,6 +96,7 @@
     }
 
     function removeScheduleCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+        //delete all sessions
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         
@@ -109,6 +115,7 @@
     }
 
     function removeSessionCtrl ($scope, $location, $cookies, randomString, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, $stateParams) {
+        //delete all tokens and jobs
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         

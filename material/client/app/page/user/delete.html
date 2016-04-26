@@ -43,10 +43,10 @@
                                         <md-input-container class="md-block">
                                             <md-button type="submit"
                                                class="md-raised btn-w-md md-primary btn-block btn-lg"
-                                               data-ng-disabled="!canDelete()">Deseja eliminar {{user.firstname}} {{user.lastname}}?</md-button>
+                                               data-ng-disabled="!canDelete()">{{button}}</md-button>
                                         </md-input-container>
                                         <div class="callout callout-info" ng-hide="!form_error">
-                                            <span>O login falhou. Tente novamente.</span>
+                                            <span>{{message}}</span>
                                         </div>
                                     </form>
                                 </md-content>

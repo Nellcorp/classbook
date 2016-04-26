@@ -117,6 +117,7 @@
         $scope.batch = '';
 
         SchoolService.get({id: $scope.id},function(school) {$scope.school = school;});
+        StorageService.load();
         
         $scope.canSubmit = function() {
             
@@ -162,7 +163,6 @@
                 for(var i = 0; i < $scope.ready.length; i++){ CourseService.save($scope.ready[i],function(response){ console.log(response);}); }
             });
             chain.then(function(){
-                StorageService.load();
                 $location.url('/page/school/courses/'+$scope.id);
             });
 

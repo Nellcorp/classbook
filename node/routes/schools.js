@@ -42,10 +42,33 @@ router.put('/:id', function(req, res, next) {
 
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
-  School.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) return res.status(500).json(err);
-    res.json(post);
-  });
+    var school = req.params.id;
+    Absence.remove({ school: school }, function (err, success) {
+      if (err) return res.status(500).json(err);
+    
+      Session.remove({ school: school }, function (err, success) {
+        if (err) return res.status(500).json(err);
+
+        Schedule.remove({ school: school }, function (err, success) {
+          if (err) return res.status(500).json(err);
+        
+          Subject.remove({ school: school }, function (err, success)  {
+          if (err) return res.status(500).json(err);
+        
+            Course.remove({ school: school }, function (err, success) {
+            if (err) return res.status(500).json(err);
+        
+              User.remove({ school: school }, function (err, success) {
+                if (err) return res.status(500).json(err);
+                School.findByIdAndRemove(school, function (err, success) {
+                  if (err) return res.status(500).json({message: "Não foi possível eliminar a escola"});
+                  res.json(success); });
+              });
+            });
+          });
+        });
+      });
+    });
 })
 
 module.exports = router;

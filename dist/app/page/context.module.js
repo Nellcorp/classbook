@@ -4,7 +4,7 @@
     angular.module('app.context', ['ngCookies'])
         .factory('ContextService', function ($resource, $cookies, $location, $state) {
   			var contextService = {};
-        
+            
         //var id = $state.params.id;
         var id = '';
         //var state = $state.current.name + '/:id';

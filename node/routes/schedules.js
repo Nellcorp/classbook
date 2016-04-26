@@ -41,10 +41,9 @@ router.put('/:id', function(req, res, next) {
 
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
-  Schedule.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) return res.status(500).json(err);
-    res.json(post);
-  });
+  Schedule.findByIdAndRemove(req.params.id, function (err, success) {
+    if (err) return res.status(500).json({message: "Não foi possível eliminar o horário"});
+    res.json(success); });
 })
 
 module.exports = router;

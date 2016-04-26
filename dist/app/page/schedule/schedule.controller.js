@@ -180,6 +180,7 @@
         
         $scope.batch = '';
 
+        StorageService.load();
         CourseService.get({id: $scope.id},function(course) {
             $scope.course = course;
 
@@ -237,7 +238,6 @@
                 for(var i = 0; i < $scope.ready.length; i++){ ScheduleService.save($scope.ready[i],function(response){ console.log(response); }); }
             });
             chain.then(function(){
-                StorageService.load();
                 $location.url('/page/course/subjects/'+$scope.id);
             });
         };           

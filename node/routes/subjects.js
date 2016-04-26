@@ -3,6 +3,7 @@ var router = express.Router();
 
 var mongoose = require('mongoose');
 var Subject = require('../models/Subject.js');
+var Schedule = require('../models/Schedule.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {
@@ -42,9 +43,12 @@ router.put('/:id', function(req, res, next) {
 
 /* DELETE /todos/:id */
 router.delete('/:id', function(req, res, next) {
-  Subject.findByIdAndRemove(req.params.id, req.body, function (err, post) {
-    if (err) return res.status(500).json(err);
-    res.json(post);
+  Subject.findByIdAndRemove(req.params.id, function (err, success) {
+    if (err) return res.status(500).json({message: "Não foi possível eliminar a disciplina"});
+    Schedule.remove({subject: req.params.id}, function (err, success) {
+      if (err) return res.status(500).json({message: "Não foi possível eliminar os horários da disciplina"});
+      res.json(success);
+    });
   });
 })
 

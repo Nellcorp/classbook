@@ -4,6 +4,7 @@
     angular.module('app.schedule', ['app.service','validation.match','angularRandomString'])
         .controller('createScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','AbsenceService','SchoolService','CourseService','$stateParams',createScheduleCtrl])
         .controller('subjectScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',subjectScheduleCtrl])
+        .controller('schoolScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', 'SchoolService', 'StorageService','$stateParams',schoolScheduleCtrl])
         .controller('profScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',profScheduleCtrl])
         .controller('scheduleSessionCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',scheduleSessionCtrl])
         .controller('createScheduleSessionCtrl', ['$scope','$location','SubjectService','SessionService','$stateParams',createScheduleSessionCtrl])
@@ -56,6 +57,7 @@
 
                 $scope.professor = response[0];
                 $scope.schedule.professor = response[0]._id;
+                $scope.schedule.course = $scope.course._id;
                 console.log($scope.professor);
                 //console.log($scope.schedule);
                 ScheduleService.save($scope.schedule,function(response){
@@ -180,49 +182,45 @@
         
         $scope.batch = '';
 
-        CourseService.get({id: $scope.id},function(course) {
-            $scope.course = course;
-
-            SubjectService.query({course: $scope.id},function(subjects) {
-                $scope.subjects = subjects;
-                //console.log($scope.subjects);
-            });
-            UserService.query({school: $scope.course.school, type: 'professor'},function(professors) {$scope.professors = professors;});
-        });
+        StorageService.load();
+        
         
         $scope.canSubmit = function() {
             var time = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
             var phone = /^\d{9}$/;  
 
             $scope.ready = [];
-            var subjects = StorageService.subjects();
-            var users = StorageService.users();
-            console.log(JSON.stringify(subjects));
+            var courses = StorageService.courses_by_name();
+            var subjects = StorageService.subjects_by_name();
+            var users = StorageService.users_by_phone();
+            //console.log(JSON.stringify(subjects));
 
             var lines = $scope.batch.split( "\n" );
-            //b,123456789,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
+            //course,subject,123456789,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
             for( var i = 0; i < lines.length; i++ ) {
                 var temp = lines[i].split( "," );
-                var professor = false;
-                var subject = false;
-
-                if( temp.length != 12 || !phone.test(temp[1]) || !time.test(temp[2]) || !time.test(temp[3]) ||
-                    !time.test(temp[4]) || !time.test(temp[5]) || !time.test(temp[6]) || !time.test(temp[7]) ||
-                    !time.test(temp[8]) || !time.test(temp[9]) || !time.test(temp[10]) || !time.test(temp[11])){return false;}
                 
-                for( var j = 0; j < users.length; j++ ) { if(temp[1] == users[j].phone){ professor = users[j]._id; break;} }
-                for( var j = 0; j < subjects.length; j++ ) { if(temp[0] == subjects[j].name){ subject = subjects[j]._id; break;} }
-                    if(professor && subject){$scope.ready.push({
-                                    subject: subject,
-                                    professor: professor,
-                                    schedule: {
-                                        monday: {start: temp[2],end: temp[3]},
-                                        tuesday: {start: temp[4],end: temp[5]},
-                                        wednesday: {start: temp[6],end: temp[7]},
-                                        thursday: {start: temp[8],end: temp[9]},
-                                        friday: {start: temp[10],end: temp[11]}
-                                }
-                            });}else{return false;}
+                if( temp.length != 13 || !phone.test(temp[2]) || !time.test(temp[3]) || !time.test(temp[4]) ||
+                    !time.test(temp[5]) || !time.test(temp[6]) || !time.test(temp[7]) || !time.test(temp[8]) ||
+                    !time.test(temp[9]) || !time.test(temp[10]) || !time.test(temp[11]) || !time.test(temp[12])){return false;}
+
+                if(courses.hasOwnProperty(temp[0])){var course = courses[temp[0]]._id}else{return false;}
+                if(subjects.hasOwnProperty(course+'_'+temp[1])){ var subject = subjects[course+'_'+temp[1]]}else{return false;}
+                if(users.hasOwnProperty(temp[2])){var professor = users[temp[2]]._id}else{return false;}
+
+                $scope.ready.push({
+                    subject: subject,
+                    professor: professor,
+                    school: $scope.id,
+                    course: course,
+                    schedule: {
+                        monday: {start: temp[3],end: temp[4]},
+                        tuesday: {start: temp[5],end: temp[6]},
+                        wednesday: {start: temp[7],end: temp[8]},
+                        thursday: {start: temp[9],end: temp[10]},
+                        friday: {start: temp[11],end: temp[12]}
+                    }
+                });
             }
             return $scope.userForm.$valid;
         };
@@ -231,14 +229,13 @@
             var schedules = $scope.batch.split( "\n" );
 
             var temp = [];
-            //subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
+            //course,subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
             var chain = $q.when();
             chain = chain.then(function(){
                 for(var i = 0; i < $scope.ready.length; i++){ ScheduleService.save($scope.ready[i],function(response){ console.log(response); }); }
             });
             chain.then(function(){
-                StorageService.load();
-                $location.url('/page/course/subjects/'+$scope.id);
+                $location.url('/page/school/professors/'+$scope.id);
             });
         };           
     }
@@ -305,6 +302,34 @@
                     
                     UserService.query({school: $scope.subject.school,type:'professor'},function(professors){
                         for (var i = 0; i < schedules.length; i++) {
+                            for (var j = 0; j < professors.length; j++) {
+                                if(schedules[i].professor == professors[j]._id){
+                                    schedules[i].professor_name = professors[j].firstname+' '+professors[j].lastname;
+                                }
+                            };
+                        };
+                        $scope.schedules = schedules;
+                    });
+                    
+
+                    
+                    //console.log($scope.schedules[i]);
+                });
+            });
+        
+    }
+
+    function schoolScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, SchoolService, StorageService, $stateParams) {
+        $scope.id = $stateParams.id;
+        
+        SchoolService.get({id: $scope.id},function(school) {
+                $scope.school = school;
+                
+                ScheduleService.query({school: $scope.id},function(schedules) {
+                    
+                    UserService.query({school: $scope.id,type:'professor'},function(professors){
+                        for (var i = 0; i < schedules.length; i++) {
+                            schedules[i].subject_name = StorageService.subject_by_id(schedules[i].subject).name;
                             for (var j = 0; j < professors.length; j++) {
                                 if(schedules[i].professor == professors[j]._id){
                                     schedules[i].professor_name = professors[j].firstname+' '+professors[j].lastname;

@@ -133,6 +133,7 @@
         $scope.batch = '';
 
         SchoolService.get({id: $scope.id},function(school) {$scope.school = school;});
+        StorageService.load();
         
         $scope.canSubmit = function() {
             $scope.ready = [];

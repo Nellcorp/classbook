@@ -17,11 +17,11 @@
             $scope.params = $stateParams;
             $scope.hideOptions = true;
             
-            if(!$scope.user){
-            $scope.items = [];
-            $scope.roles = {};
-            }
-            else{
+            //if(!$scope.user){
+            //$scope.items = [];
+            //$scope.roles = {};
+            //}
+            //else{
             $scope.items = [
                     {
                         name: 'Minha Conta',
@@ -111,7 +111,7 @@
 
                 ]
             };
-        }
+        //}
 
 
             $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
@@ -124,7 +124,9 @@
                 
                 $scope.context = ContextService.items[currentRoute.name + '/:id'];
 
+                console.log('After Change Route',currentRoute.name + '/:id');
                     if(!!$scope.context){
+                        console.log('After Change Success',$cookies.getObject('user').type,$scope.context);
                         $scope.hideOptions = false;
                         
                         var skip = [];
@@ -148,9 +150,11 @@
                             }
                         
                 }else{
+                    console.log('After Change, Else',$cookies.getObject('user').type,$scope.context);
                     $scope.context = [];
                     $scope.hideOptions = true;
                 }
+                console.log('After Change',$cookies.getObject('user').type,$scope.context);
         });
 
 
@@ -168,7 +172,7 @@
                 //console.log(path);
 
                 //console.log(id);
-                //console.log($cookies.getObject('user'));
+                console.log($cookies.getObject('user').type);
                 $scope.user = $cookies.getObject('user');
 
                 $scope.name = $scope.user.firstname.substring(0, 1).toUpperCase() + $scope.user.firstname.substring(1) +

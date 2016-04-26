@@ -18,8 +18,9 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var ConnectRoles = require('./roles');
 
+var database = process.env.DATABASE;
 
-mongoose.connect('mongodb://localhost/node', function(err) {
+mongoose.connect('mongodb://localhost/'+database, function(err) {
     if(err) {
         console.log('connection error', err);
     } else {

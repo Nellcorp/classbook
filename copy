@@ -1,0 +1,9 @@
+#!/bin/bash
+mongo <<EOF
+use dev
+db.dropDatabase()
+use node
+db.users.find({'type':'admin'}).forEach(function(d){ db.getSiblingDB('dev')['users'].insert(d); });
+quit()
+exit
+EOF
