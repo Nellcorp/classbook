@@ -2,8 +2,8 @@
 <section class="page-form-ele page" >
 
 
-    <div class="row ui-section" ng-controller="removeUserCtrl" >
-        <div class="col-lg-8 clearfix"> <h2 class="section-header">{{user.firstname}} {{user.lastname}}</h2> </div>
+    <div class="row ui-section" ng-controller="removeSchoolStudentCtrl" >
+        <div class="col-lg-8 clearfix"> <h2 class="section-header">{{school.name}}</h2> </div>
         <div class="col-md-12">
             <section class="panel panel-default">
                 <div class="panel-body">
@@ -16,28 +16,38 @@
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
                                                 <label>Nome</label>
-                                                <input name="firstname" ng-model="user.firstname" disabled>
+                                                <input name="school" ng-model="school.name" disabled>
+                                            </md-input-container>
+                                        </div>
+                                        <div layout layout-sm="column">
+                                            <md-input-container flex>
+                                                <label>Gerente (Nome)</label>
+                                                <input name="school" ng-model="user.firstname" disabled>
                                             </md-input-container>
                                             <md-input-container flex>
-                                                <label>Apelido</label>
+                                                <label>Gerente (Apelido)</label>
                                                 <input name="lastname" ng-model="user.lastname" disabled>
                                             </md-input-container>
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
                                                 <label>Telefone</label>
-                                                <input name="telephone" ng-model="user.phone" placeholder="123456789"
+                                                <input name="telephone" ng-model="school.phone" placeholder="123456789"
                                                              required ng-pattern="/^[0-9]{9}$/" md-maxlength="9" disabled>
                                             </md-input-container>
                                             <md-input-container flex>
-                                                <label>Email</label>
+                                                <label>Email (Gerente)</label>
                                                 <input name="email" ng-model="user.email" disabled>
                                             </md-input-container>
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
-                                                <label>Escola</label>
-                                                <input name="school" ng-model="school.name" disabled>
+                                                <label>Endereço da Escola</label>
+                                                <input name="address" ng-model="school.address" disabled>
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Cidade</label>
+                                                <input name="city" ng-model="school.city" disabled>
                                             </md-input-container>
                                         </div>
                                         <md-input-container class="md-block">

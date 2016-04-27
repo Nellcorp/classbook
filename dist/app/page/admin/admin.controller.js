@@ -3,6 +3,7 @@
 
     angular.module('app.admin', ['app.service','ngCookies','validation.match','angularRandomString'])
         .controller('createAdminCtrl', ['$scope','$location','randomString', 'UserService','AuthService',createAdminCtrl])
+        .controller('adminListCtrl', ['$scope','$location','randomString', 'UserService','$stateParams',adminListCtrl])
         .controller('adminCtrl', ['$scope','$location','randomString', 'UserService','AuthService','$stateParams',adminCtrl]);
 
 
@@ -30,6 +31,10 @@
             
             AuthService.register.save($scope.user,function(user){ $location.url('/page/profile/'+user._id); });
         };           
+    }
+
+    function adminListCtrl ($scope, $location, randomString, UserService, $stateParams) {
+        UserService.query({type: 'admin'},function(users) { $scope.users = users; });
     }
 
     function adminCtrl ($scope, $location, randomString, UserService, AuthService, $stateParams) {

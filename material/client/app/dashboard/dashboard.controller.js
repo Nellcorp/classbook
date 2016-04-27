@@ -9,7 +9,7 @@
         .controller('DashboardCtrl', ['$scope', '$cookies', 'StorageService','StatsService',DashboardCtrl])
 
     function adminDashboardCtrl($scope, $cookies, StorageService, StatsService) {
-
+        StorageService.load();
 
         
         $scope.stats = [
@@ -27,6 +27,7 @@
     }
 
     function managerDashboardCtrl($scope, $cookies, StorageService, StatsService) {
+        StorageService.load();
         var user = $cookies.getObject('user');
         var school = user.school;
         $scope.stats = [
@@ -42,6 +43,7 @@
     }
 
     function professorDashboardCtrl($scope, $cookies, StorageService, StatsService) {
+        StorageService.load();
         $scope.stats = [
             { name: 'UTILIZADORES', icon: 'zmdi-local-airport', value: StatsService.users(), unit: '', color: 'color-success' },
             { name: 'ESTUDANTES', icon: 'zmdi-graduation-cap', value: StatsService.students(), unit: '', color: 'color-info' },
@@ -55,6 +57,7 @@
     }
 
     function studentDashboardCtrl($scope, $cookies, StorageService, StatsService) {
+        StorageService.load();
         $scope.stats = [
             { name: 'UTILIZADORES', icon: 'zmdi-local-airport', value: StatsService.users(), unit: '', color: 'color-success' },
             { name: 'ESTUDANTES', icon: 'zmdi-graduation-cap', value: StatsService.students(), unit: '', color: 'color-info' },
@@ -68,6 +71,7 @@
     }
 
     function DashboardCtrl($scope, $cookies, StorageService, StatsService) {
+        StorageService.load();
         $scope.smline1 = {}; $scope.smline2 = {}; $scope.smline3 = {}; $scope.smline4 = {};
 
         

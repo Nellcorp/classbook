@@ -65,17 +65,18 @@
         {name: 'Estudantes', url: 'page/school/students/'+id, roles: ['manager','professor','admin']},
         {name: 'Professores', url: 'page/school/professors/'+id, roles: ['manager','professor','admin']},
         {name: 'Horários', url: 'page/school/schedules/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
-        {name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
-        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
-        {name: 'Adicionar Horários', url: 'page/school/schedule/batch/'+id, roles: ['manager']},
-        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
-        {name: 'Eliminar Cursos', url: 'page/school/course/delete/'+id, roles: ['admin','manager']},
-        {name: 'Eliminar Professores', url: 'page/school/professor/delete/'+id, roles: ['admin','manager']},
-        {name: 'Eliminar Estudantes', url: 'page/school/student/delete/'+id, roles: ['admin','manager']},
-        {name: 'Eliminar Disciplinas', url: 'page/school/subject/delete/'+id, roles: ['admin','manager']},
-        {name: 'Eliminar Horários', url: 'page/school/schedule/delete/'+id, roles: ['admin','manager']},
-        {name: 'Eliminar Escola', url: 'page/school/delete/'+id, roles: ['admin']}
+        {name: 'Importar Conteúdo', url: 'page/import', roles: ['manager']}
+        //{name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Horários', url: 'page/school/schedule/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
+        //{name: 'Eliminar Cursos', url: 'page/school/course/delete/'+id, roles: ['admin','manager']},
+        //{name: 'Eliminar Professores', url: 'page/school/professor/delete/'+id, roles: ['admin','manager']},
+        //{name: 'Eliminar Estudantes', url: 'page/school/student/delete/'+id, roles: ['admin','manager']},
+        //{name: 'Eliminar Disciplinas', url: 'page/school/subject/delete/'+id, roles: ['admin','manager']},
+        //{name: 'Eliminar Horários', url: 'page/school/schedule/delete/'+id, roles: ['admin','manager']},
+        //{name: 'Eliminar Escola', url: 'page/school/delete/'+id, roles: ['admin']}
         ],
 'page/school/schedules/:id': [
         {name: 'Eliminar Horários', url: 'page/school/schedule/delete/'+id, roles: ['admin','manager']}

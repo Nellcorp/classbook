@@ -26,7 +26,8 @@
     "ngECharts": "ngecharts#~0.1.1",
     "angular-resource": "^1.5.0",
     "angular-random-string": "^0.1.0",
-    "angular-cookies": "^1.5.0"
+    "angular-cookies": "^1.5.0",
+    "xlsx-model": "angular-xlsx-model#*"
   },
   "devDependencies": {
     "bourbon": "~4.2.0",

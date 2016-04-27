@@ -54,6 +54,7 @@
             <table class="table table-striped cf no-margin">
                 <thead class="cf">
                 <tr>
+                    <th class="numeric"></th>
                     <th class="numeric">Professor</th>
                     <th class="numeric">Segunda-Feira</th>
                     <th class="numeric">Terça-Feira</th>
@@ -64,6 +65,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="schedule in schedules">
+                    <td class="numeric"><a href="#/page/schedule/delete/{{schedule._id}}">Eliminar</a></td>
                     <td class="numeric"><a href="#/page/professor/profile/{{schedule.professor}}">{{schedule.professor_name}}</a></td>
                     <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
                     <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>

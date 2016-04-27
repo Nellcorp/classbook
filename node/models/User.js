@@ -10,6 +10,7 @@ var UserSchema = new mongoose.Schema({
   phone: { type: String, required: true, unique: true },
   school: { type: String, required: true, lowercase: true, trim: true},
   title: { type: String, lowercase: true, trim: true},
+  bio: { type: String, lowercase: true, trim: true},
   discipline: { type: String, lowercase: true, trim: true},
   supervisor: {
     firstname: { type: String, lowercase: true, trim: true },

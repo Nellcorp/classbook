@@ -11,126 +11,152 @@
         
         var items = {
 'page/admin/profile/:id': [
-        {name: 'All Admins', url: 'page/admin/list', roles: ['admin']}
+        {name: 'All Admins', url: 'page/admin/list', roles: ['admin']},
+        {name: 'Eliminar Administrador', url: 'page/user/delete/'+id, roles: ['admin']}
         ],
 'page/course/profile/:id': [
-        {name: 'Ver Disciplinas', url: 'page/course/subjects/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Estudantes', url: 'page/course/students/'+id, roles: ['manager','professor']},
-        {name: 'Ver todos os Cursos', url: 'page/school/courses/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Horários', url: 'page/course/schedule/batch/'+id, roles: ['manager','professor','admin']}
+        {name: 'Disciplinas', url: 'page/course/subjects/'+id, roles: ['manager','professor','admin']},
+        {name: 'Estudantes', url: 'page/course/students/'+id, roles: ['manager','professor']},
+        {name: 'todos os Cursos', url: 'page/school/courses/'+id, roles: ['manager','professor','admin']},
+        {name: 'Adicionar Horários', url: 'page/course/schedule/batch/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Curso', url: 'page/course/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Disciplinas', url: 'page/course/subject/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Estudantes', url: 'page/course/student/delete/'+id, roles: ['admin','manager']}
         ],
 'page/course/subjects/:id': [
-        {name: 'Ver Curso', url: 'page/course/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Curso', url: 'page/course/profile/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Disciplinas', url: 'page/course/subject/delete/'+id, roles: ['admin','manager']}
         ],
 'page/course/students/:id': [
-        {name: 'Ver Curso', url: 'page/course/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Disciplinas', url: 'page/course/subjects/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Horários', url: 'page/course/schedules/'+id, roles: ['manager','professor','admin']}
+        {name: 'Curso', url: 'page/course/profile/'+id, roles: ['manager','professor','admin']},
+        {name: 'Disciplinas', url: 'page/course/subjects/'+id, roles: ['manager','professor','admin']},
+        {name: 'Horários', url: 'page/course/schedules/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Estudantes', url: 'page/course/student/delete/'+id, roles: ['admin','manager']}
         ],
 'page/manager/profile/:id': [
-        //{name: 'Ver Escola', url: '/'}
+        //{name: 'Escola', url: '/'}
+        {name: 'Eliminar Escola', url: 'page/user/delete/'+id, roles: ['admin','manager']}
         ],
 'page/professor/profile/:id': [
-        //{name: 'Ver Escola', url: '/'},
-        {name: 'Ver Horários', url: 'page/professor/schedules/'+id, roles: ['manager','professor','admin']},
-        //{name: 'Ver Absences', url: 'page/professor/absences/'+id}
+        //{name: 'Escola', url: '/'},
+        {name: 'Horários', url: 'page/professor/schedules/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Professor', url: 'page/user/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Horários', url: 'page/professor/schedule/delete/'+id, roles: ['admin','manager']}
+        //{name: 'Absences', url: 'page/professor/absences/'+id}
         ],
 'page/professor/schedules/:id': [
-        {name: 'Ver professor', url: 'page/professor/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'professor', url: 'page/professor/profile/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Horários', url: 'page/professor/schedule/delete/'+id, roles: ['admin','manager']}
         ],
 'page/professor/absences/:id': [
-        {name: 'Ver Professor', url: 'page/professor/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Professor', url: 'page/professor/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/courses/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']}
+        {name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
+        {name: 'Eliminar Cursos', url: 'page/school/course/delete/'+id, roles: ['admin','manager']}
         ],
 'page/school/professors/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']}
+        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
+        {name: 'Eliminar Professores', url: 'page/school/professor/delete/'+id, roles: ['admin','manager']}
         ],
 'page/school/profile/:id': [
-        {name: 'Ver Cursos', url: 'page/school/courses/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Disciplinas', url: 'page/school/subjects/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Estudantes', url: 'page/school/students/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Professores', url: 'page/school/professors/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
+        {name: 'Cursos', url: 'page/school/courses/'+id, roles: ['manager','professor','admin']},
+        {name: 'Disciplinas', url: 'page/school/subjects/'+id, roles: ['manager','professor','admin']},
+        {name: 'Estudantes', url: 'page/school/students/'+id, roles: ['manager','professor','admin']},
+        {name: 'Professores', url: 'page/school/professors/'+id, roles: ['manager','professor','admin']},
+        {name: 'Horários', url: 'page/school/schedules/'+id, roles: ['manager','professor','admin']},
         {name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
         {name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
-        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']}
-        
+        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
+        {name: 'Adicionar Horários', url: 'page/school/schedule/batch/'+id, roles: ['manager']},
+        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
+        {name: 'Eliminar Cursos', url: 'page/school/course/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Professores', url: 'page/school/professor/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Estudantes', url: 'page/school/student/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Disciplinas', url: 'page/school/subject/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Horários', url: 'page/school/schedule/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Escola', url: 'page/school/delete/'+id, roles: ['admin']}
+        ],
+'page/school/schedules/:id': [
+        {name: 'Eliminar Horários', url: 'page/school/schedule/delete/'+id, roles: ['admin','manager']}
         ],
 'page/school/course/batch/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/subject/new/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/subject/batch/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/student/new/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/student/batch/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/professor/new/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/professor/batch/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/course/new/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/subject/schedule/batch/:id': [
-        {name: 'Ver Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/subject/schedule/new/:id': [
-        {name: 'Ver Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/students/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
+        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
+        {name: 'Eliminar Estudantes', url: 'page/school/student/delete/'+id, roles: ['admin','manager']}
         ],
 'page/school/subjects/:id': [
-        {name: 'Ver Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']}
+        //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
+        {name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
+        {name: 'Eliminar Disciplinas', url: 'page/school/subject/delete/'+id, roles: ['admin','manager']}
         ],
 'page/session/profile/:id': [
-        //{name: 'Ver Disciplina', url: '/'},
-        //{name: 'Ver Horário', url: '/'}
+        //{name: 'Disciplina', url: '/'},
+        //{name: 'Horário', url: '/'}
         ],
 'page/student/profile/:id': [
-        //{name: 'Ver Curso', url: '/'},
-        //{name: 'Ver Absences', url: '/'}
+        {name: 'Eliminar Estudante', url: 'page/user/delete/'+id, roles: ['manager','admin']}
+        //{name: 'Curso', url: '/'},
+        //{name: 'Absences', url: '/'}
         ],
 'page/student/absences/:id': [
-        {name: 'Ver Estudante', url: 'page/student/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Estudante', url: 'page/student/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/subject/profile/:id': [
-        //{name: 'Ver Curso', url: '/'},
-        {name: 'Ver Horários', url: 'page/subject/schedules/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Estudantes', url: 'page/subject/students/'+id, roles: ['manager','professor','admin']},
-        {name: 'Ver Sessions', url: 'page/subject/sessions/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Curso', url: '/'},
+        {name: 'Horários', url: 'page/subject/schedules/'+id, roles: ['manager','professor','admin']},
+        {name: 'Estudantes', url: 'page/subject/students/'+id, roles: ['manager','professor','admin']},
+        {name: 'Sessions', url: 'page/subject/sessions/'+id, roles: ['manager','professor','admin']},
+        {name: 'Eliminar Disciplina', url: 'page/subject/delete/'+id, roles: ['admin','manager']},
+        {name: 'Eliminar Horários', url: 'page/subject/schedule/delete/'+id, roles: ['admin','manager']}
         ],
 'page/subject/schedules/:id': [
-        {name: 'Ver Disciplina', url: 'page/subject/profile/'+id}
+        {name: 'Disciplina', url: 'page/subject/profile/'+id,roles: ['admin','manager','professor']},
+        {name: 'Eliminar Horários', url: 'page/subject/schedule/delete/'+id, roles: ['admin','manager']}
         ],
 'page/subject/students/:id': [
-        {name: 'Ver Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/subject/sessions/:id': [
-        {name: 'Ver Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Disciplina', url: 'page/subject/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/schedule/sessions/:id': [
-        {name: 'Ver Horário', url: 'page/schedule/profile/'+id, roles: ['manager','professor','admin']}
+        {name: 'Horário', url: 'page/schedule/profile/'+id, roles: ['manager','professor','admin']}
         //{name: 'Adicionar Session', url: 'page/session/profile/'+id}
         ],
 'page/schedule/students/:id': [
-        //{name: 'Ver Disciplina', url: '/'},
-        {name: 'Ver Horário', url: 'page/schedule/profile/'+id, roles: ['manager','professor','admin']}
+        //{name: 'Disciplina', url: '/'},
+        {name: 'Horário', url: 'page/schedule/profile/'+id, roles: ['manager','professor','admin']}
         ]
 };
 

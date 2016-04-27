@@ -8,6 +8,7 @@
             routes = [
                 'app/calendar',
                 'page/profile/admin',
+                'page/import',
                 'page/profile/professor',
                 'page/profile/student',
                 'page/profile/manager',

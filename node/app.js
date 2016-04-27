@@ -8,7 +8,8 @@ var bodyParser = require('body-parser');
 //var nodemailer = require('nodemailer');
 //var mandrill = require('mandrill-api/mandrill');
 //var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
-var sendgrid  = require('sendgrid')('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');
+
+var sendgrid  = require('sendgrid')(process.env.sendgrid_key);
 //var bcrypt = require('bcrypt-nodejs');
 //var async = require('async');
 //var crypto = require('crypto');

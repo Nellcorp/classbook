@@ -1,9 +1,9 @@
 
 <div class="page page-profile">
 
-<div class="row ui-section" ng-controller="profScheduleCtrl">
+<div class="row ui-section" ng-controller="schoolScheduleCtrl">
     <div class="col-lg-8 clearfix">
-        <h2 class="section-header">Horário de Aulas</h2>
+        <h2 class="section-header">Horários da Escola</h2>
     </div>
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -13,6 +13,7 @@
                 <thead class="cf">
                 <tr>
                     <th class="numeric"></th>
+                    <th class="numeric">Professor</th>
                     <th class="numeric">Disciplina</th>
                     <th class="numeric">Segunda-Feira</th>
                     <th class="numeric">Terça-Feira</th>
@@ -24,6 +25,7 @@
                 <tbody>
                 <tr ng-repeat="schedule in schedules">
                     <td class="numeric"><a href="#/page/schedule/delete/{{schedule._id}}">Eliminar</a></td>
+                    <td class="numeric"><a href="#/page/professor/profile/{{schedule.professor}}">{{schedule.professor_name}}</a></td>
                     <td class="numeric"><a href="#/page/subject/profile/{{schedule.subject}}">{{schedule.subject_name}}</a></td>
                     <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
                     <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>

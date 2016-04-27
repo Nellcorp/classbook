@@ -49,7 +49,8 @@
                     
                     if(StorageService.isEmpty()){ StorageService.load();}
 
-                    $location.url('/page/profile/'+user._id);
+                    //$location.url('/page/profile/'+user._id);
+                    $location.url('/page/profile/'+user.type);
 
                 }, function(error) {
                     AuthService.clear();
@@ -77,7 +78,8 @@
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     StorageService.load();
                     
-                    $location.url('/page/profile/'+user._id);
+                    //$location.url('/page/profile/'+user._id);
+                    $location.url('/page/profile/'+user.type);
                     //$location.url('/page/profile');
 
                 }, function(error) {
@@ -164,7 +166,8 @@
             
                 AuthService.password.save({password: $scope.password.password},function(user) {
                     
-                    $location.url('/page/profile/'+user._id);
+                    //$location.url('/page/profile/'+user._id);
+                    $location.url('/page/profile/'+user.type);
 
                 }, function(error) {
                     //$location.url('/page/404');
@@ -199,7 +202,9 @@
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     
-                    $scope.url_404 = '/page/profile/' + user._id;
+                    //$scope.url_404 = '/page/profile/' + user._id;
+                    $scope.url_404 = '/page/profile/'+user.type;
+                    
 
                 }, function(error) {
                     AuthService.clear();

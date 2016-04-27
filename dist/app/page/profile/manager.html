@@ -1,0 +1,21 @@
+<div class="page page-dashboard" data-ng-controller="managerDashboardCtrl">
+
+    <div class="row">
+       <!-- Stats -->
+        <div class="col-lg-3 col-xsm-6" ng-repeat="data in stats">
+            <div class="panel panel-box">
+                <div class="panel-top">
+                    <span class="zmdi {{data.icon}} {{data.color}}"></span>
+                </div>
+                <div class="panel-info">
+                    <span data-translate="{{data.name}}"></span>
+                </div>
+                <div class="panel-bottom bg-light">
+                    <span>{{data.value}} <span class="size-h4">{{data.unit}}</span></span>
+                </div>
+            </div>
+        </div>
+        <!-- end stats -->          
+    </div> 
+</div>
+    

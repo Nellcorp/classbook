@@ -37,10 +37,10 @@
             $scope.roles = {
                 admin: [
                     {
-                        name: 'Minha Conta',
+                        name: 'Início',
                         route: '#/page/profile/admin',
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/admin'},
+                            { name: 'Painel', route: '#/page/profile/' + $scope.user.type},
                             { name: 'Criar Escola', route: '#/page/manager/new' },
                             { name: 'Ver Escolas', route: '#/page/school/list' }
                         ]
@@ -50,10 +50,10 @@
                 ],
                 manager: [
                     {
-                        name: 'Escola',
-                        route: '#/page/school/profile/' + $scope.user.school,
+                        name: 'Início',
+                        route: '#/page/profile/' + $scope.user.type,
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/manager'},
+                            { name: 'Painel', route: '#/page/profile/' + $scope.user.type},
                             { name: 'Minha Escola', route: '#/page/school/profile/' + $scope.user.school }
                         ]
                     },
@@ -96,16 +96,16 @@
                 ],
                 professor: [
                     {
-                        name: 'Escola',
-                        route: '#/page/school/profile/' + $scope.user.school,
+                        name: 'Início',
+                        route: '#/page/profile/' + $scope.user.type,
                         items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/professor'},
+                            { name: 'Painel', route: '#/page/profile/' + $scope.user.type},
                             { name: 'Minha Escola', route: '#/page/school/profile/' + $scope.user.school },
                             //{ name: 'Começar Aula', route: '#/page/schedule/session/new/' + $scope.user.school + '/' + $scope.user.id },
                             //{ name: 'Horários', route: '#/page/professor/schedules/' + $scope.user.id },
                             //{ name: 'Faltas', route: '#/page/professor/absences/' + $scope.user.id },
                             { name: 'Cursos', route: '#/page/school/courses/' + $scope.user.school },
-                            { name: 'Professores', route: '#/page/school/professors/' + $scope.user.id }
+                            { name: 'Professores', route: '#/page/school/professors/' + $scope.user.school }
                         ]
                     }
 
@@ -124,9 +124,11 @@
                 
                 $scope.context = ContextService.items[currentRoute.name + '/:id'];
 
-                console.log('After Change Route',currentRoute.name + '/:id');
+                var no_id = ['page/import'];
+
+                //console.log('After Change Route',currentRoute.name + '/:id');
                     if(!!$scope.context){
-                        console.log('After Change Success',$cookies.getObject('user').type,$scope.context);
+                        //console.log('After Change Success',$cookies.getObject('user').type,$scope.context);
                         $scope.hideOptions = false;
                         
                         var skip = [];
@@ -135,7 +137,11 @@
                             if($scope.context[i].roles.indexOf($scope.user.type) > -1){
                                 var url = $scope.context[i].url.split('/');
                                 url.splice(url.length -1);
-                                $scope.context[i].url = url.join('/') + '/'+$stateParams.id;
+
+                                if(no_id.indexOf($scope.context[i].url) == -1){
+                                    $scope.context[i].url = url.join('/') + '/'+$stateParams.id;
+                                }
+                                
                             }else{
                                 $scope.context[i] = false;
                             }
@@ -150,11 +156,11 @@
                             }
                         
                 }else{
-                    console.log('After Change, Else',$cookies.getObject('user').type,$scope.context);
+                    //console.log('After Change, Else',$cookies.getObject('user').type,$scope.context);
                     $scope.context = [];
                     $scope.hideOptions = true;
                 }
-                console.log('After Change',$cookies.getObject('user').type,$scope.context);
+                //console.log('After Change',$cookies.getObject('user').type,$scope.context);
         });
 
 
@@ -172,7 +178,7 @@
                 //console.log(path);
 
                 //console.log(id);
-                console.log($cookies.getObject('user').type);
+                //console.log($cookies.getObject('user').type);
                 $scope.user = $cookies.getObject('user');
 
                 $scope.name = $scope.user.firstname.substring(0, 1).toUpperCase() + $scope.user.firstname.substring(1) +

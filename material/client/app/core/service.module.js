@@ -4,9 +4,7 @@
     angular.module('app.service', ['ngCookies','ngStorage'])
         .config(['$localStorageProvider', function ($localStorageProvider) { $localStorageProvider.setKeyPrefix('classbook-'); }])
         .config(['$sessionStorageProvider', function ($sessionStorageProvider) { $sessionStorageProvider.setKeyPrefix('classbook-'); }])
-        .factory("UserService", function ($resource, $state){
-          console.log($state);
-          return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
+        .factory("UserService", function ($resource, $state){ return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SchoolService", function ($resource){return $resource(api+"/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("CourseService", function ($resource){return $resource(api+"/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SubjectService", function ($resource){return $resource(api+"/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});})
@@ -169,29 +167,33 @@
 
           return options;
         })
-        .factory("StorageService", function ($resource, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
+        .factory("StorageService", function ($resource, $q, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
           var session = {};
           var user = $cookies.getObject('user');
           session.load = function () {
+            var promises = [];
             if(!!user){
               if(user.type == 'admin'){
                 //console.log(JSON.stringify(response));
-                SchoolService.query({},function(response) { $sessionStorage.schools = response; });
-                CourseService.query({},function(response) { $sessionStorage.courses = response; });
-                SubjectService.query({},function(response) { $sessionStorage.subjects = response; });
-                UserService.query({},function(response) { $sessionStorage.users = response; });
+                promises.push(SchoolService.query({},function(response) { $sessionStorage.schools = response; }).$promise);
+                promises.push(CourseService.query({},function(response) { $sessionStorage.courses = response; }).$promise);
+                promises.push(SubjectService.query({},function(response) { $sessionStorage.subjects = response; }).$promise);
+                promises.push(UserService.query({},function(response) { $sessionStorage.users = response; }).$promise);
                 $sessionStorage.schedules = [];
               }else if(user.type == 'manager' || user.type == 'professor' || user.type == 'student') {
-                SchoolService.get({id: user.school},function(response) { $sessionStorage.schools = [response];});
-                CourseService.query({school: user.school},function(response) { $sessionStorage.courses = response; });
-                SubjectService.query({school: user.school},function(response) { $sessionStorage.subjects = response; });
-                UserService.query({school: user.school},function(response) { $sessionStorage.users = response; });
-                ScheduleService.query({school: user.school},function(response) { $sessionStorage.schedules = response; });
+                promises.push(SchoolService.get({id: user.school},function(response) { $sessionStorage.schools = [response]; }).$promise);
+                promises.push(CourseService.query({school: user.school},function(response) { $sessionStorage.courses = response; }).$promise);
+                promises.push(SubjectService.query({school: user.school},function(response) { $sessionStorage.subjects = response; }).$promise);
+                promises.push(UserService.query({school: user.school},function(response) { $sessionStorage.users = response; }).$promise);
+                promises.push(ScheduleService.query({school: user.school},function(response) { $sessionStorage.schedules = response; }).$promise);
             }
           }
+          $q.all(promises).then(function(){ return promises;});
           };
 
           session.clear = function () { $sessionStorage.$reset();};
+
+          session.me = function () { return user;};
 
           session.error = function (error) { return ErrorService.parse(error); };
 
@@ -211,6 +213,12 @@
           session.courses_by_name = function () {
             var result = {};
             for(var i = 0; i < $sessionStorage.courses.length;i++){ result[$sessionStorage.courses[i].name] = $sessionStorage.courses[i]; }
+            return result;
+         };
+
+         session.courses_by_id = function () {
+            var result = {};
+            for(var i = 0; i < $sessionStorage.courses.length;i++){ result[$sessionStorage.courses[i]._id] = $sessionStorage.courses[i]; }
             return result;
          };
 
@@ -238,9 +246,24 @@
             return result;
          };
 
+         session.subjects_by_coursename = function () {
+            var result = {};
+            var courses = session.courses_by_id();
+            for(var i = 0; i < $sessionStorage.subjects.length;i++){
+              result[courses[$sessionStorage.subjects[i].course].name+'_'+$sessionStorage.subjects[i].name] = $sessionStorage.subjects[i];
+            }
+            return result;
+         };
+
          session.users_by_phone = function () {
             var result = {};
             for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i].phone] = $sessionStorage.users[i]; }
+            return result;
+         };
+
+         session.users_by_email = function () {
+            var result = {};
+            for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i].email] = $sessionStorage.users[i]; }
             return result;
          };
 

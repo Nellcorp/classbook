@@ -1,9 +1,9 @@
 #!/bin/bash
 # use $1
+# db.users.remove({"type": "manager"})
+# db.schools.drop()
 mongo <<EOF
 use dev
-db.users.remove({"type": "manager"})
-db.schools.drop()
 db.absences.drop()
 db.coursenames.drop()
 db.courses.drop()
