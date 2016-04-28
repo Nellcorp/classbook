@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.manager', ['app.service','validation.match','angularRandomString','xlsx-model'])
+    angular.module('app.manager', ['app.service','validation.match','angularRandomString'])
         .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', 'StorageService', createManagerCtrl])
         .controller('managerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', '$stateParams',managerCtrl])
         .controller('importCtrl', ['$scope','$q','$location','randomString','UserService','AuthService','SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','ErrorService','StorageService','$stateParams',importCtrl]);
@@ -46,6 +46,7 @@
         orig_school = angular.copy($scope.school);
 
         $scope.canSubmit = function() {
+
             var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             var phone = /^\d{9}$/;
             var users = StorageService.users();
@@ -109,8 +110,14 @@
 
     function importCtrl ($scope,$q,$location,randomString,UserService,AuthService,SchoolService,CourseService,SubjectService,ScheduleService,SessionService,AbsenceService,ErrorService,StorageService,$stateParams) {
         $scope.id = StorageService.me().school;
+        $scope.message = '';
+        $scope.form_error = false;
         
-        SchoolService.get({id: $scope.id},function(school) {$scope.school = school;});
+        if(!$scope.id){ $scope.message = "Escola inválida."; }
+        
+        SchoolService.get({id: $scope.id},function(school) {$scope.school = school;},function(error) {
+            $scope.message = "Escola inválida.";
+        });
         
         StorageService.load();
 
@@ -134,9 +141,12 @@
             //console.log('validating courses', $scope.data[data]);
             //debugger;
 
-            if(!$scope.data.hasOwnProperty(data)){ return false;}
+            if(!$scope.data.hasOwnProperty(data)){
+                $scope.message = 'O documento não possui uma folha com cursos';
+                return false;
+            }
             var keys = ['curso','nome','apelido','email','telefone','descricao'];
-            //console.log(data,$scope.data[data].length);
+            console.log(data,$scope.data[data].length);
 
             for( var i = 0; i < $scope.data[data].length; i++ ) {
 
@@ -144,18 +154,18 @@
                 var fields = Object.keys(temp);
                 
                 for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){return false;}
+                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
 
-            //console.log('validated course fields', temp);
+                //console.log('validated course fields', temp);
 
-                if($scope.existing_courses.hasOwnProperty(temp.curso)){ return false;}
+                if($scope.existing_courses.hasOwnProperty(temp.curso)){$scope.message = 'O curso '+temp.curso+' já existe.'; return false;}
                 
                 //console.log('course is unique', $scope.existing_courses);
 
@@ -188,7 +198,7 @@
             var data = 'disciplinas';
             //console.log('validating subjects', $scope.data[data]);
 
-            if(!$scope.data.hasOwnProperty(data)){ return false;}
+            if(!$scope.data.hasOwnProperty(data)){$scope.message = 'O documento não possui uma folha de disciplinas'; return false;}
             var keys = ['disciplina','curso','ano','descricao'];
 
             for( var i = 0; i < $scope.data[data].length; i++ ) {
@@ -196,23 +206,29 @@
                 var fields = Object.keys(temp);
                 
                 for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){return false;}
+                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
                 
-                if(temp.ano < 1 || temp.ano > 5){ return false;}
+                if(temp.ano < 1 || temp.ano > 5){$scope.message = 'Erro na disciplina de '+temp.disciplina+': use apeas anos de 1 a 5'; return false;}
                 //console.log('validated subject fields', temp);
 
                 //Ensure course exists
-                if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){ return false; }
+                if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){
+                    $scope.message = 'Erro na disciplina de '+temp.disciplina+': o curso de '+temp.curso+' não existe';
+                    return false;
+                }
 
                 //Ensure subject does not yet exist for this course
-                if($scope.existing_subjects.hasOwnProperty(temp.curso+'_'+temp.disciplina)){return false;}
+                if($scope.existing_subjects.hasOwnProperty(temp.curso+'_'+temp.disciplina)){
+                    $scope.message = 'Erro: a disciplina de '+temp.disciplina+' já existe';
+                    return false;
+                }
                 
                 $scope.subjects[temp.curso+'_'+temp.disciplina] = {name: temp.disciplina, school: $scope.id, description: temp.descricao, year: temp.ano, course: temp.curso };
             }
@@ -256,21 +272,24 @@ $scope.insertSubjects = function(courses) {
                 var fields = Object.keys(temp);
                 
                 for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){return false;}
+                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
 
-                if(!temp.hasOwnProperty('nome') || !temp.hasOwnProperty('apelido') || !temp.hasOwnProperty('email') || !temp.hasOwnProperty('telefone') || !temp.hasOwnProperty('descricao')){ return false;}
-                if(!temp.nome || !temp.apelido || !temp.telefone || !temp.email || !temp.descricao ){ return false;}
-                if(!email.test(temp.email) || !phone.test(temp.telefone)){ return false;}
-
-                if($scope.existing_users.hasOwnProperty(temp.telefone)){ return false;}
-                if($scope.existing_emails.hasOwnProperty(temp.email)){ return false;}
+                
+                if($scope.existing_users.hasOwnProperty(temp.telefone)){
+                    $scope.message = 'Erro: o telefone'+temp.telefone+': do professor '+temp.nome+' '+temp.apelido+' já existe';
+                    return false;
+                }
+                if($scope.existing_emails.hasOwnProperty(temp.email)){
+                    $scope.message = 'Erro: o email'+temp.email+': do professor '+temp.nome+' '+temp.apelido+' já existe';
+                    return false;
+                }
                 
                 $scope.professors[temp.telefone] = {
                     firstname: temp.nome,
@@ -296,13 +315,10 @@ $scope.insertSubjects = function(courses) {
                     promises.push(AuthService.register.save(value,function(response){
                         //console.log(response);
                         users[response.phone] = response;
-                        console.log('fucking users',users);
                     }).$promise);
                 });
             
             $q.all(promises).then(function(){
-                console.log('fucking users2',users);
-                console.log('fucking promises',promises);
                 $scope.professors_done = true;
                 return $scope.insertSchedules(users, courses, subjects);
             });
@@ -325,13 +341,13 @@ $scope.insertSubjects = function(courses) {
                 var professor = {};
                 
                 for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){return false;}
+                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
                 
                 //console.log('validated schedule fields', temp);
@@ -341,7 +357,10 @@ $scope.insertSubjects = function(courses) {
                     professor = $scope.existing_users[temp.telefone_professor];
                 }else if($scope.professors.hasOwnProperty(temp.telefone_professor)){
                     professor = $scope.professors[temp.telefone_professor];
-                }else{ return false; }
+                }else{
+                    $scope.message = 'Erro (Horários): não existe nenhum professor com o telefone '+temp.telefone_professor;
+                    return false;
+                }
 
                 //console.log('validated schedule professor', temp);
 
@@ -350,7 +369,10 @@ $scope.insertSubjects = function(courses) {
                     subject = $scope.existing_subjects[temp.curso+'_'+temp.disciplina];
                 }else if($scope.subjects.hasOwnProperty(temp.curso+'_'+temp.disciplina)){
                     subject = $scope.subjects[temp.curso+'_'+temp.disciplina];
-                }else{ return false; }
+                }else{
+                    $scope.message = 'Erro (Horários): não existe nenhuma disciplina chamada '+temp.disciplina;
+                    return false;
+                }
 
                 //console.log('validated schedule subject', temp);
 
@@ -359,7 +381,10 @@ $scope.insertSubjects = function(courses) {
                     course = $scope.existing_courses[temp.curso];
                 }else if($scope.courses.hasOwnProperty(temp.curso)){
                     course = $scope.courses[temp.curso];
-                }else{ return false; }
+                }else{
+                    $scope.message = 'Erro (Horários): não existe nenhum curso chamado '+temp.curso;
+                    return false;
+                }
 
                 
                 //console.log('validated schedule course', temp);
@@ -465,7 +490,7 @@ $scope.insertSubjects = function(courses) {
             $scope.existing_users = users;
             $scope.existing_subjects = subjects;
             $scope.existing_courses = courses;
-            console.log('Schedule Users',users);
+            //console.log('Schedule Users',users);
             //course,subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
             var promises = [];
                 //Check if I really have the course ID
@@ -502,7 +527,7 @@ $scope.insertSubjects = function(courses) {
         $scope.validate_students = function() {
             //Assume $scope.courses is ready
             var data = 'estudantes';
-            //console.log('validating students', $scope.data[data]);
+            console.log('validating students', $scope.data[data]);
 
             if(!$scope.data.hasOwnProperty(data)){ return false;}
             var keys = ['nome','apelido','email','telefone','nome_encarregado','apelido_encarregado','email_encarregado','telefone_encarregado','curso','ano'];
@@ -512,13 +537,13 @@ $scope.insertSubjects = function(courses) {
                 var fields = Object.keys(temp);
                 
                 for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){return false;}
+                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
                 
                 if(temp.ano < 1 || temp.ano > 5){ return false;}
@@ -527,8 +552,14 @@ $scope.insertSubjects = function(courses) {
                 if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){ return false; }
 
                 //Ensure user does not yet exist
-                if($scope.existing_users.hasOwnProperty(temp.telefone)){ return false;}
-                if($scope.existing_emails.hasOwnProperty(temp.email)){ return false;}
+                if($scope.existing_users.hasOwnProperty(temp.telefone)){
+                    $scope.message = 'Erro: o telefone'+temp.telefone+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
+                    return false;
+                }
+                if($scope.existing_emails.hasOwnProperty(temp.email)){
+                    $scope.message = 'Erro: o email'+temp.email+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
+                    return false;
+                }
                 
                 $scope.students[temp.telefone] = {
                         firstname: temp.nome, lastname: temp.apelido, school: $scope.id, course: temp.curso, phone: temp.telefone, email: temp.email, type: 'student',
@@ -558,9 +589,78 @@ $scope.insertSubjects = function(courses) {
             });
         };              
         
-        $scope.canSubmit = function() {
+    var XLX = XLSX;
+    $scope.process = function (data) {
+        var workbook = XLS.read(data, {type: 'base64'});
+        var output = $scope.to_json(workbook);
+        return output;
+    };
+
+
+    $scope.to_json = function (workbook) {
+        var result = {};
+        workbook.SheetNames.forEach(function(sheetName) {
+            var roa = XLS.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+            if(roa.length > 0){
+                result[sheetName] = roa;
+            }
+        });
+    return result;
+    };
+
+        $scope.canImport = function() { return $scope.valid;}    
+
+        $scope.canSubmit = function(event) {
+            var formats = ['application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            if(event.target.files.length == 0){ return false; }
+            var file = event.target.files[0];
+            
+            if(typeof file == 'undefined' || !('type' in file)){
+                $scope.form_error = true;
+                $scope.message = 'Ficheiro corrompido.';
+                return false;
+            };
+            
+            var type = file.type;
+            
+            if(formats.indexOf(type) == -1){
+                $scope.message = 'Formato de ficheiro não suportado. Use apenas .XLS ou .XLSX';
+                $scope.form_error = true;
+                return false;
+            }
+            var reader  = new FileReader();
+            
+            console.log('File',file);
+            
+            reader.onload = function(event) {
+            
+            //console.log('Base64 Data',event.target.result);
+            $scope.blob = event.target.result.split(',');
+            if($scope.blob.length != 2){
+                $scope.form_error = true;
+                $scope.message = 'Houve um problema ao processar o ficheiro.';
+                return false;
+            }
+            
+            $scope.blob = $scope.blob[1];
+            //return false;
+            //$scope.encoded = $base64.encode(unescape(encodeURIComponent($scope.file2)));
+
+            //console.log('Encoded Data',$scope.blob);
+            try {
+                $scope.data = $scope.process($scope.blob);
+            }
+            catch(err) {
+                $scope.form_error = true;
+                $scope.message = 'Formato de ficheiro não suportado.';
+                return false;
+            }
+            
+            console.log('JSON Data',$scope.data);
+            console.log('JSON type', typeof $scope.data);
+            //return false;
+            
             //console.log('checking file',$scope.data);
-            if(!$scope.hasOwnProperty('data')){return false;}
             //console.log('found data',$scope.data);
 
             var keys = ['cursos','disciplinas','professores','horarios','estudantes'];
@@ -571,14 +671,22 @@ $scope.insertSubjects = function(courses) {
             
             for (var i = 0; i < keys.length; i++) {
                 //console.log('Validating ',keys[i]);
-                if(fields.indexOf(keys[i]) == -1 || $scope.data[keys[i]].length == 0 ){ return false;}
+                if(fields.indexOf(keys[i]) == -1 || $scope.data[keys[i]].length == 0 ){
+                    $scope.message = 'O documento precisa de folhas com os nomes cursos, disciplinas, professores, horarios e estudantes';
+                    $scope.form_error = true;
+                    return false;
+                }
                 //console.log('Validated ',keys[i]);
             };
 
-
+            console.log('made it here');
             valid = $scope.validate_courses();
-            //console.log('VALID: ',valid);
+            console.log('VALID: ',valid);
+            $scope.valid = valid;
+            $scope.form_error = !valid;
             return valid;
+            };
+            reader.readAsDataURL(file);
         };    
         
         $scope.submitForm = function() {
@@ -599,3 +707,5 @@ $scope.insertSubjects = function(courses) {
 
 
 })();
+
+

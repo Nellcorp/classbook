@@ -27,7 +27,7 @@
     "angular-resource": "^1.5.0",
     "angular-random-string": "^0.1.0",
     "angular-cookies": "^1.5.0",
-    "xlsx-model": "angular-xlsx-model#*"
+    "js-xlsx": "^0.8.0"
   },
   "devDependencies": {
     "bourbon": "~4.2.0",

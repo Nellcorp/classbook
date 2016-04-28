@@ -4,9 +4,7 @@
     angular.module('app.service', ['ngCookies','ngStorage'])
         .config(['$localStorageProvider', function ($localStorageProvider) { $localStorageProvider.setKeyPrefix('classbook-'); }])
         .config(['$sessionStorageProvider', function ($sessionStorageProvider) { $sessionStorageProvider.setKeyPrefix('classbook-'); }])
-        .factory("UserService", function ($resource, $state){
-          console.log($state);
-          return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
+        .factory("UserService", function ($resource, $state){ return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SchoolService", function ($resource){return $resource(api+"/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("CourseService", function ($resource){return $resource(api+"/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .factory("SubjectService", function ($resource){return $resource(api+"/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});})
@@ -49,30 +47,46 @@
 
           return utility;
         })
-        .factory("StatsService", function ($resource, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService){
+        .factory("StatsService", function ($resource, $q, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService){
           var stats = {};
-          StorageService.load();
-          var users = StorageService.users();
-
-          console.log('users',users);
+          var users = [];
           var students = 0;
           var professors = 0;
           var admins = 0;
-          for (var i = 0; i < users.length; i++) {
+          var users_by_id = {};
+          var schools = [];
+          var subjects = [];
+          var courses = [];
+          var schedules = [];
+          var absences = [];
+          var professor_absences = [];
+          var student_absences = [];
+          var sessions = [];
+
+          StorageService.load();
+          
+          var temp = StorageService.users();
+          if(typeof temp != 'undefined'){
+            users = temp;
+          }
+
+          //console.log('users',users);
+          
+            for (var i = 0; i < users.length; i++) {
             if(users[i].type == 'student'){students +=1;}
             if(users[i].type == 'professor'){professors +=1;}
             if(users[i].type == 'admin'){admins +=1;}
           };
 
-          var users_by_id = StorageService.users_by_id();
-          var schools = StorageService.schools();
-          var subjects = StorageService.subjects();
-          var courses = StorageService.courses();
-          var schedules = StorageService.schedules();
-          var absences = [];
-          var professor_absences = [];
-          var student_absences = [];
-          var sessions = [];
+          users_by_id = StorageService.users_by_id();
+          schools = StorageService.schools();
+          subjects = StorageService.subjects();
+          courses = StorageService.courses();
+          schedules = StorageService.schedules();
+          absences = [];
+          professor_absences = [];
+          student_absences = [];
+          sessions = [];
           SessionService.query({},function(response) { sessions = response; });
           AbsenceService.query({},function(response) {
             absences = response;
@@ -85,7 +99,6 @@
               //if(response[i].){}
             };
           });
-          
           
 
           stats.users = function(){ return users.length;};
@@ -169,29 +182,57 @@
 
           return options;
         })
-        .factory("StorageService", function ($resource, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
+        .factory("StorageService", function ($resource, $q, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
           var session = {};
           var user = $cookies.getObject('user');
           session.load = function () {
+            if(typeof $sessionStorage.schools == 'undefined'){ $sessionStorage.schools = []; }
+            if(typeof $sessionStorage.courses == 'undefined'){ $sessionStorage.courses = []; }
+            if(typeof $sessionStorage.users == 'undefined'){ $sessionStorage.users = []; }
+            if(typeof $sessionStorage.subjects == 'undefined'){ $sessionStorage.subjects = []; }
+            
+            var promises = [];
             if(!!user){
               if(user.type == 'admin'){
                 //console.log(JSON.stringify(response));
-                SchoolService.query({},function(response) { $sessionStorage.schools = response; });
-                CourseService.query({},function(response) { $sessionStorage.courses = response; });
-                SubjectService.query({},function(response) { $sessionStorage.subjects = response; });
-                UserService.query({},function(response) { $sessionStorage.users = response; });
                 $sessionStorage.schedules = [];
+                SchoolService.query({},function(response) {
+                  $sessionStorage.schools = response;
+                  CourseService.query({},function(response) {
+                    $sessionStorage.courses = response;
+                    SubjectService.query({},function(response) {
+                      $sessionStorage.subjects = response;
+                      UserService.query({},function(response) {
+                        $sessionStorage.users = response;
+                        return response;
+                      });
+                    });
+                  });
+                });
               }else if(user.type == 'manager' || user.type == 'professor' || user.type == 'student') {
-                SchoolService.get({id: user.school},function(response) { $sessionStorage.schools = [response];});
-                CourseService.query({school: user.school},function(response) { $sessionStorage.courses = response; });
-                SubjectService.query({school: user.school},function(response) { $sessionStorage.subjects = response; });
-                UserService.query({school: user.school},function(response) { $sessionStorage.users = response; });
-                ScheduleService.query({school: user.school},function(response) { $sessionStorage.schedules = response; });
+                SchoolService.get({id: user.school},function(response) {
+                  $sessionStorage.schools = [response];
+                   CourseService.query({school: user.school},function(response) {
+                      $sessionStorage.courses = response;
+                      SubjectService.query({school: user.school},function(response) {
+                        $sessionStorage.subjects = response;
+                        UserService.query({school: user.school},function(response) {
+                          $sessionStorage.users = response;
+                          ScheduleService.query({school: user.school},function(response) {
+                            $sessionStorage.schedules = response;
+                            return response;
+                          });
+                        });
+                      });
+                    });
+                  });
             }
           }
           };
 
           session.clear = function () { $sessionStorage.$reset();};
+
+          session.me = function () { return user;};
 
           session.error = function (error) { return ErrorService.parse(error); };
 
@@ -211,6 +252,12 @@
           session.courses_by_name = function () {
             var result = {};
             for(var i = 0; i < $sessionStorage.courses.length;i++){ result[$sessionStorage.courses[i].name] = $sessionStorage.courses[i]; }
+            return result;
+         };
+
+         session.courses_by_id = function () {
+            var result = {};
+            for(var i = 0; i < $sessionStorage.courses.length;i++){ result[$sessionStorage.courses[i]._id] = $sessionStorage.courses[i]; }
             return result;
          };
 
@@ -238,9 +285,24 @@
             return result;
          };
 
+         session.subjects_by_coursename = function () {
+            var result = {};
+            var courses = session.courses_by_id();
+            for(var i = 0; i < $sessionStorage.subjects.length;i++){
+              result[courses[$sessionStorage.subjects[i].course].name+'_'+$sessionStorage.subjects[i].name] = $sessionStorage.subjects[i];
+            }
+            return result;
+         };
+
          session.users_by_phone = function () {
             var result = {};
             for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i].phone] = $sessionStorage.users[i]; }
+            return result;
+         };
+
+         session.users_by_email = function () {
+            var result = {};
+            for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i].email] = $sessionStorage.users[i]; }
             return result;
          };
 
@@ -279,17 +341,17 @@
 
         })
         .factory("AuthService", function ($resource, $cookies, $location, StorageService) {
-  			var authService = {};
+        var authService = {};
         authService.register = $resource(api+"/auth/register");
-  			authService.login = $resource(api+"/auth/login");
-  			authService.logout = $resource(api+"/auth/logout");
-  			authService.auth = $resource(api+"/auth/valid");
+        authService.login = $resource(api+"/auth/login");
+        authService.logout = $resource(api+"/auth/logout");
+        authService.auth = $resource(api+"/auth/valid");
         authService.password = $resource(api+"/auth/password");
         authService.reset = $resource(api+"/auth/reset");
         authService.restore = $resource(api+"/auth/restore");
         authService.token = $resource(api+"/auth/tokens/:id",{Id: "@id" });
  
-  			authService.isAuthenticated = function () { return (!!$cookies.get('auth')); };
+        authService.isAuthenticated = function () { return (!!$cookies.get('auth')); };
 
         authService.clear = function () {
           $cookies.putObject('user',{ id: '', email: '', firstname: '', lastname: '', school: '', phone: '', type: '' });
@@ -297,11 +359,11 @@
           StorageService.clear();
         };
 
-  			authService.checkSession = function () {
-  				var exp = new Date();
-            	exp.setDate(exp.getDate() + 1);
-  				authService.auth.get(function(user) {
-  					$cookies.putObject('user',{
+        authService.checkSession = function () {
+          var exp = new Date();
+              exp.setDate(exp.getDate() + 1);
+          authService.auth.get(function(user) {
+            $cookies.putObject('user',{
                         id: user._id,
                         email: user.email,
                         firstname: user.firstname,
@@ -318,8 +380,8 @@
                 authService.clear();
                 $location.url('/page/signin');
             });
-		};
+    };
  
-  			return authService;
-		});
+        return authService;
+    });
 })(); 
