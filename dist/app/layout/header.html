@@ -23,7 +23,7 @@
         <span class="icon-bar"></span>
     </div>
 
-    <div class="top-nav" ng-controller="headerCtrl" ng-init="init()">
+    <div class="top-nav" ng-controller="headerCtrl">
         <ul class="nav-right pull-right list-unstyled">
 
             <li class="dropdown text-normal nav-profile"    uib-dropdown is-open="status.isopenProfile">
@@ -31,7 +31,7 @@
                     <!--<img src="images/g1.jpg" alt="" class="img-circle img30_30">-->
                     <img src="images/logo.png" alt="" class="img-circle img30_30">
                     <span class="hidden-xs">
-                        <span data-translate="{{main.user.firstname}} {{main.user.lastname}}"></span>
+                        <span data-translate="{{user.firstname}} {{user.lastname}}"></span>
                     </span>
                 </a>
                 <ul class="uib-dropdown-menu with-arrow pull-right dropdown-menu-scaleIn">

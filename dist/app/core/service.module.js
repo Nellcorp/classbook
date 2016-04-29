@@ -319,14 +319,14 @@
 
          session.users_by_id = function () {
             var result = {};
-            console.log($sessionStorage.users);
+            //console.log($sessionStorage.users);
             for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i]._id] = $sessionStorage.users[i]; }
             return result;
          };
 
          session.schedules_by_user = function () {
             var result = {};
-            console.log($sessionStorage.schedules);
+            //console.log($sessionStorage.schedules);
             for(var i = 0; i < $sessionStorage.schedules.length;i++){
               if(result.hasOwnProperty($sessionStorage.schedules[i].professor)){
                 result[$sessionStorage.schedules[i].professor].push($sessionStorage.schedules[i]);  

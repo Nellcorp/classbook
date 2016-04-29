@@ -53,6 +53,7 @@
                     $location.url('/page/profile/'+user.type);
 
                 }, function(error) {
+                    console.log('Init Login',error);
                     AuthService.clear();
                 });
                 
@@ -61,6 +62,7 @@
             $scope.login = function() {
             //console.log('login',$cookies.getObject('user'));
                     AuthService.clear();
+                    //console.log('Login Clear',$cookies.getObject('user'));
                     $cookies.remove('auth');
                     $cookies.remove('user');
                 AuthService.login.save($scope.credentials,function(user) {
@@ -75,6 +77,8 @@
                         type: user.type
                     }, {'expires': $scope.exp});
 
+                    //console.log('After Login: User',user);
+                    //console.log('After Login: Cookie',$cookies.getObject('user'));
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     StorageService.load();
                     

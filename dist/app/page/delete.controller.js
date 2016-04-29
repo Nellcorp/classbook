@@ -21,22 +21,15 @@
 function removeSchoolSubjectCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var temp = StorageService.subjects();
-        var subjects = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].school == $scope.id){
-                subjects.push(temp[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODAS AS DISCIPLINAS DA ESCOLA';
         $scope.message = '';
 
+        SchoolService.get({id: $scope.id},
+            function(response) {
+            $scope.school = response;
+            SubjectService.query({school: $scope.school._id},
+                function(response) {
+                    $scope.subjects = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.id)){
@@ -47,7 +40,7 @@ function removeSchoolSubjectCtrl ($scope, $location, $cookies, $q, UserService, 
                 return false;
             }
 
-            if(subjects.length == 0){
+            if($scope.subjects.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem disciplinas nesta escola';
                 return false;
@@ -62,33 +55,36 @@ function removeSchoolSubjectCtrl ($scope, $location, $cookies, $q, UserService, 
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < subjects.length; i++){
-                    SubjectService.delete({id: subjects[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.subjects.length; i++){
+                    SubjectService.delete({id: $scope.subjects[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/school/subjects/'+$scope.id);
             });
-        };                    
+        };
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
 }
 
 function removeSchoolCourseCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {        $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var temp = StorageService.courses();
-        var courses = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].school == $scope.id){
-                courses.push(temp[i]);
-            }
-        };
         
         $scope.button = 'ELIMINAR TODOS OS CURSOS DA ESCOLA';
         $scope.message = '';
 
+        SchoolService.get({id: $scope.id},
+            function(response) {
+            $scope.school = response;
+            CourseService.query({school: $scope.school._id},
+                function(response) {
+                    $scope.courses = response;
+        
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.id)){
@@ -99,7 +95,7 @@ function removeSchoolCourseCtrl ($scope, $location, $cookies, $q, UserService, S
                 return false;
             }
 
-            if(courses.length == 0){
+            if($scope.courses.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem cursos nesta escola';
                 return false;
@@ -114,34 +110,35 @@ function removeSchoolCourseCtrl ($scope, $location, $cookies, $q, UserService, S
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < courses.length; i++){
-                    CourseService.delete({id: courses[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.courses.length; i++){
+                    CourseService.delete({id: $scope.courses[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/school/courses/'+$scope.id);
             });
         };                    
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
 }
 
 function removeSchoolScheduleCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var temp = StorageService.schedules();
-        var schedules = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].school == $scope.id){
-                schedules.push(temp[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODOS OS HORÁRIOS DA ESCOLA';
         $scope.message = '';
 
+        SchoolService.get({id: $scope.id},
+            function(response) {
+            $scope.school = response;
+            ScheduleService.query({school: $scope.school._id},
+                function(response) {
+                    $scope.schedules = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.id)){
@@ -152,7 +149,7 @@ function removeSchoolScheduleCtrl ($scope, $location, $cookies, $q, UserService,
                 return false;
             }
 
-            if(schedules.length == 0){
+            if($scope.schedules.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem professores nesta escola';
                 return false;
@@ -167,38 +164,37 @@ function removeSchoolScheduleCtrl ($scope, $location, $cookies, $q, UserService,
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < schedules.length; i++){
-                    ScheduleService.delete({id: schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.schedules.length; i++){
+                    ScheduleService.delete({id: $scope.schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/school/schedules/'+$scope.id);
             });
         };                    
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
 }
 
 function removeCourseSubjectCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.course = StorageService.course_by_id($scope.id);
-        //if(!$scope.course){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.course){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
-        $scope.school = StorageService.school_by_id($scope.course.school);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var temp = StorageService.subjects();
-        var subjects = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].course == $scope.id){
-                subjects.push(temp[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODAS AS DISCIPLINAS DO CURSO';
         $scope.message = '';
 
+        CourseService.get({id: $scope.id},
+            function(response) {
+            $scope.course = response;
+            SchoolService.get({id: $scope.course.school},
+                function(response) {
+                    $scope.school = response;
+                    SubjectService.query({school: $scope.school._id, course: $scope.course._id},
+                        function(response) {
+                            $scope.subjects = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
@@ -209,7 +205,7 @@ function removeCourseSubjectCtrl ($scope, $location, $cookies, $q, UserService, 
                 return false;
             }
 
-            if(subjects.length == 0){
+            if($scope.subjects.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem disciplinas neste curso';
                 return false;
@@ -226,34 +222,40 @@ function removeCourseSubjectCtrl ($scope, $location, $cookies, $q, UserService, 
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < subjects.length; i++){
-                    SubjectService.delete({id: subjects[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.subjects.length; i++){
+                    SubjectService.delete({id: $scope.subjects[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/course/subjects/'+$scope.id);
             });
         };   
+                        },function(error) {
+                            $location.url('/page/profile/'+$cookies.getObject('user').type);
+                        });
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
 }
 function removeSubjectScheduleCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.subject = StorageService.subject_by_id($scope.id);
-        //if(!$scope.subject){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.subject){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
-        $scope.school = StorageService.school_by_id($scope.subject.school);
-        var temp = StorageService.schedules();
-        var schedules = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].subject == $scope.id){ schedules.push(temp[i]); }
-        };
-        
         $scope.button = 'ELIMINAR HORÁRIOS DA DISCIPLINA';
         $scope.message = '';
 
-        $scope.canDelete = function() {
+        SubjectService.get({id: $scope.id},
+            function(response) {
+            $scope.subject = response;
+            SchoolService.get({id: $scope.subject.school},
+                function(response) {
+                    $scope.school = response;
+                    ScheduleService.query({school: $scope.school._id, subject: $scope.subject._id},
+                        function(response) {
+                            $scope.schedules = response;
+                                    $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
                 //all good
@@ -263,7 +265,7 @@ function removeSubjectScheduleCtrl ($scope, $location, $cookies, $q, UserService
                 return false;
             }
 
-            if(schedules.length == 0){
+            if($scope.schedules.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem horários para esta disciplina';
                 return false;
@@ -280,34 +282,41 @@ function removeSubjectScheduleCtrl ($scope, $location, $cookies, $q, UserService
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < schedules.length; i++){
-                    ScheduleService.delete({id: schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.schedules.length; i++){
+                    ScheduleService.delete({id: $scope.schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/subject/schedules/'+$scope.id);
             });
         };
+                        },function(error) {
+                            $location.url('/page/profile/'+$cookies.getObject('user').type);
+                        });
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
 }
 function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.professor = StorageService.user_by_id($scope.id);
-        //if(!$scope.professor){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.professor){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
-        $scope.school = StorageService.school_by_id($scope.professor.school);
-        var temp = StorageService.schedules();
-        var schedules = [];
-
-        for (var i = 0; i < temp.length; i++) {
-            if(temp[i].professor == $scope.id){ schedules.push(temp[i]); }
-        };
-        
         $scope.button = 'ELIMINAR HORÁRIOS DO PROFESSOR';
         $scope.message = '';
 
-        $scope.canDelete = function() {
+        UserService.get({id: $scope.id},
+            function(response) {
+            $scope.professor = response;
+            SchoolService.get({id: $scope.professor.school},
+                function(response) {
+                    $scope.school = response;
+                    ScheduleService.query({school: $scope.school._id, professor: $scope.professor._id},
+                        function(response) {
+                            $scope.schedules = response;
+                                    $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
                 //all good
@@ -317,7 +326,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
                 return false;
             }
 
-            if(schedules.length == 0){
+            if($scope.schedules.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem horários para este professor';
                 return false;
@@ -332,13 +341,24 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < schedules.length; i++){
-                    ScheduleService.delete({id: schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.schedules.length; i++){
+                    ScheduleService.delete({id: $scope.schedules[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/professor/schedules/'+$scope.id);
             });
         };   
+                        },function(error) {
+                            $location.url('/page/profile/'+$cookies.getObject('user').type);
+                        });
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
 }
 
     
@@ -351,14 +371,11 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
         $scope.id = $stateParams.id;
         $scope.form_error = false;
         $scope.message = '';
-        StorageService.load();
-        $scope.schedules = StorageService.schedules_by_user();
-        $scope.users = StorageService.users_by_id();
+        $scope.button = 'ELIMINAR UTILIZADOR';
         
-        //if(!$scope.users.hasOwnProperty($scope.id)){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.users.hasOwnProperty($scope.id)){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        $scope.user = $scope.users[$scope.id];
-
+        UserService.get({id: $scope.id},
+                function(response) {
+                    $scope.user = response;
         $scope.button = 'ELIMINAR '+$scope.user.firstname+' '+$scope.user.lastname;
         
         $scope.canDelete = function() {
@@ -398,7 +415,9 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             });
 
         };           
-        
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+        });
         
     }
 
@@ -406,23 +425,16 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
         //Must warn user
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var users = StorageService.users();
-        var professors = [];
-
-        for (var i = 0; i < users.length; i++) {
-            if(users[i].type == 'professor' && users[i].school == $scope.id){
-                professors.push(users[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODOS OS PROFESSORES E HORÁRIOS DA ESCOLA';
         $scope.message = '';
 
-        $scope.canDelete = function() {
+        SchoolService.get({id: $scope.id},
+            function(response) {
+            $scope.school = response;
+            UserService.query({school: $scope.school._id, type: 'professor'},
+                function(response) {
+                    $scope.professors = response;
+            $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.id)){
                 //all good
@@ -432,7 +444,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
                 return false;
             }
 
-            if(professors.length == 0){
+            if($scope.professors.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem professores nesta escola';
                 return false;
@@ -447,34 +459,34 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < professors.length; i++){
-                    UserService.delete({id: professors[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.professors.length; i++){
+                    UserService.delete({id: $scope.professors[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/school/professors/'+$scope.id);
             });
         };                    
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
     }
 
     function removeSchoolStudentCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var users = StorageService.users();
-        var students = [];
-
-        for (var i = 0; i < users.length; i++) {
-            if(users[i].type == 'student' && users[i].school == $scope.id){
-                students.push(users[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODOS OS ESTUDANTES DA ESCOLA';
         $scope.message = '';
 
+        SchoolService.get({id: $scope.id},
+            function(response) {
+            $scope.school = response;
+            UserService.query({school: $scope.school._id, type: 'student'},
+                function(response) {
+                    $scope.students = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.id)){
@@ -485,7 +497,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
                 return false;
             }
 
-            if(students.length == 0){
+            if($scope.students.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem estudantes nesta escola';
                 return false;
@@ -500,38 +512,38 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < students.length; i++){
-                    UserService.delete({id: students[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.students.length; i++){
+                    UserService.delete({id: $scope.students[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/school/students/'+$scope.id);
             });
         };                    
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
     }
 
     function removeCourseStudentCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.course = StorageService.course_by_id($scope.id);
-        //if(!$scope.course){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.course){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
-        $scope.school = StorageService.school_by_id($scope.course.school);
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-        var users = StorageService.users();
-        var students = [];
-
-        for (var i = 0; i < users.length; i++) {
-            if(users[i].type == 'student' && users[i].school == $scope.course.school && users[i].course == $scope.id){
-                students.push(users[i]);
-            }
-        };
-        
         $scope.button = 'ELIMINAR TODOS OS ESTUDANTES DO CURSO';
         $scope.message = '';
 
+        CourseService.get({id: $scope.id},
+            function(response) {
+            $scope.course = response;
+            SchoolService.get({id: $scope.course.school},
+                function(response) {
+                    $scope.school = response;
+                    UserService.query({school: $scope.school._id, course: $scope.course._id, type: 'student'},
+                        function(response) {
+                            $scope.students = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
@@ -542,7 +554,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
                 return false;
             }
 
-            if(students.length == 0){
+            if($scope.students.length == 0){
                 $scope.form_error = true;
                 $scope.message = 'Não existem estudantes neste curso';
                 return false;
@@ -559,36 +571,39 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
 
             var chain = $q.when();
             chain = chain.then(function(){
-                for(var i = 0; i < students.length; i++){
-                    UserService.delete({id: students[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
+                for(var i = 0; i < $scope.students.length; i++){
+                    UserService.delete({id: $scope.students[i]._id},function(response){},function(error){  $scope.form_error = true; $scope.message = error.message; });}
             });
             chain.then(function(){
                $location.url('/page/course/students/'+$scope.id);
             });
         };   
+                        },function(error) {
+                            $location.url('/page/profile/'+$cookies.getObject('user').type);
+                        });
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
     }
 
     function removeSchoolCtrl ($scope, $location, $cookies, SchoolService, UserService, StorageService, $stateParams) {
         //Must warn user
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.school = StorageService.school_by_id($scope.id);
-        var users = StorageService.users();
-        //if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
-        for (var i = 0; i < users.length; i++) {
-            if(users[i].type == 'manager' && users[i].school == $scope.id){
-                $scope.manager = users[i]; break;
-            }
-        };
-        
-        //if(!$scope.manager){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.manager){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
+        //StorageService.load();
+        //$scope.school = StorageService.school_by_id($scope.id);
         $scope.message = '';
         $scope.button = 'ELIMINAR ESCOLA';
+
+        SchoolService.get({id: $scope.id},function(response) {
+           $scope.school = response;
+           UserService.query({school: $scope.school._id, type: 'manager'},function(response) {
+                            $scope.manager = response[0];
 
         $scope.canDelete = function() {
 
@@ -612,21 +627,28 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             });
 
         };                   
+
+                          },function(error) {
+                                if(!$scope.school){console.log('no manager');$location.url('/page/profile/'+$cookies.getObject('user').type);}
+                          });
+                            
+        },function(error) {
+           if(!$scope.school){console.log('no school');$location.url('/page/profile/'+$cookies.getObject('user').type);}
+        });
     }
 
     function removeCourseCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.course = StorageService.course_by_id($scope.id);
-        $scope.school = StorageService.school_by_id($scope.course.school);
-        
-        //if(!$scope.course || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.course || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
         $scope.message = '';
         $scope.button = 'ELIMINAR CURSO';
 
+        CourseService.get({id: $scope.id},
+            function(response) {
+            $scope.course = response;
+            SchoolService.get({id: $scope.course.school},
+                function(response) {
+                    $scope.school = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
@@ -650,21 +672,27 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             });
 
         };
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
     }
 
     function removeSubjectCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.subject = StorageService.subject_by_id($scope.id);
-        $scope.school = StorageService.school_by_id($scope.subject.school);
-        
-        //if(!$scope.subject || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.subject || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
         $scope.message = '';
         $scope.button = 'ELIMINAR DISCIPLINA';
 
+        SubjectService.get({id: $scope.id},
+            function(response) {
+            $scope.subject = response;
+            SchoolService.get({id: $scope.subject.school},
+                function(response) {
+                    $scope.school = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
@@ -688,21 +716,27 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             });
 
         };
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
     }
 
     function removeScheduleCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.form_error = false;
-        StorageService.load();
-        $scope.schedule = StorageService.schedule_by_id($scope.id);
-        $scope.school = StorageService.school_by_id($scope.schedule.school);
-        
-        //if(!$scope.schedule || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').id);}
-        if(!$scope.schedule || !$scope.school){$location.url('/page/profile/'+$cookies.getObject('user').type);}
-
         $scope.message = '';
         $scope.button = 'ELIMINAR HORÁRIO';
 
+        ScheduleService.get({id: $scope.id},
+            function(response) {
+            $scope.schedule = response;
+            SchoolService.get({id: $scope.schedule.school},
+                function(response) {
+                    $scope.school = response;
         $scope.canDelete = function() {
 
             if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.school._id)){
@@ -726,5 +760,14 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             });
 
         };
+                },function(error) {
+                    $location.url('/page/profile/'+$cookies.getObject('user').type);
+                });
+            },
+            function(error) {
+                $location.url('/page/profile/'+$cookies.getObject('user').type);
+            });
+
+
     }
 })(); 

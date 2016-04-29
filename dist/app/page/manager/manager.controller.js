@@ -110,25 +110,43 @@
 
     function importCtrl ($scope,$q,$location,randomString,UserService,AuthService,SchoolService,CourseService,SubjectService,ScheduleService,SessionService,AbsenceService,ErrorService,StorageService,$stateParams) {
         $scope.id = StorageService.me().school;
+        //get school, courses_name, subjects_coursename,users_phone,users_email
         $scope.message = '';
         $scope.form_error = false;
-        
-        if(!$scope.id){ $scope.message = "Escola inválida."; }
-        
-        SchoolService.get({id: $scope.id},function(school) {$scope.school = school;},function(error) {
-            $scope.message = "Escola inválida.";
-        });
-        
-        StorageService.load();
-
-            $scope.existing_courses = StorageService.courses_by_name();
-            $scope.existing_subjects = StorageService.subjects_by_coursename();
-            $scope.existing_users = StorageService.users_by_phone();
-            $scope.existing_emails = StorageService.users_by_email(); 
+        $scope.valid = false;
+        $scope.existing_courses = {};
+        $scope.courses_id = {};
+        $scope.existing_subjects = {};
+        $scope.existing_users = {};
+        $scope.existing_emails = {}; 
             //console.log('Existing Courses',$scope.existing_courses);   
         
         
+        if(!$scope.id){ $scope.message = "Escola inválida."; }
         
+        SchoolService.get({id: $scope.id},
+            function(school) {
+                
+                $scope.school = school;
+                
+                CourseService.query({school: $scope.school._id}, function(courses) {
+                    $scope.courses = courses;
+                    for(var i = 0; i < courses.length;i++){
+                        $scope.existing_users[courses[i].name] = courses[i];
+                        $scope.courses_id[courses[i]._id] = courses[i];
+                    }
+    
+                    SubjectService.query({school: $scope.school._id}, function(subjects) {
+                        $scope.subjects = subjects;
+                        for(var i = 0; i < subjects.length;i++){ $scope.existing_subjects[$scope.courses_id[subjects[i].course].name+_+subjects[i].name] = subjects[i]; }
+                        
+                        UserService.query({}, function(users) {
+                            $scope.users = users;
+                            for(var i = 0; i < users.length;i++){
+                                $scope.existing_users[users[i].phone] = users[i];
+                                $scope.existing_emails[users[i].email] = users[i];
+                            }
+                            //CODE START
         $scope.courses = {}; $scope.subjects = {}; $scope.professors = {}; $scope.students = {}; $scope.schedules = {};
         $scope.courses_valid = false; $scope.subjects_valid = false; $scope.professors_valid = false; $scope.students_valid = false; $scope.schedules_valid = false;
         $scope.courses_done = false; $scope.subjects_done = false; $scope.professors_done = false; $scope.students_done = false; $scope.schedules_done = false;
@@ -146,7 +164,7 @@
                 return false;
             }
             var keys = ['curso','nome','apelido','email','telefone','descricao'];
-            console.log(data,$scope.data[data].length);
+            //console.log(data,$scope.data[data].length);
 
             for( var i = 0; i < $scope.data[data].length; i++ ) {
 
@@ -527,7 +545,7 @@ $scope.insertSubjects = function(courses) {
         $scope.validate_students = function() {
             //Assume $scope.courses is ready
             var data = 'estudantes';
-            console.log('validating students', $scope.data[data]);
+            //console.log('validating students', $scope.data[data]);
 
             if(!$scope.data.hasOwnProperty(data)){ return false;}
             var keys = ['nome','apelido','email','telefone','nome_encarregado','apelido_encarregado','email_encarregado','telefone_encarregado','curso','ano'];
@@ -608,9 +626,13 @@ $scope.insertSubjects = function(courses) {
     return result;
     };
 
-        $scope.canImport = function() { return $scope.valid;}    
 
+        
+        
         $scope.canSubmit = function(event) {
+            $scope.runs+=1;
+            
+            $scope.valid = false;
             var formats = ['application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
             if(event.target.files.length == 0){ return false; }
             var file = event.target.files[0];
@@ -630,7 +652,7 @@ $scope.insertSubjects = function(courses) {
             }
             var reader  = new FileReader();
             
-            console.log('File',file);
+            //console.log('File',file);
             
             reader.onload = function(event) {
             
@@ -656,8 +678,8 @@ $scope.insertSubjects = function(courses) {
                 return false;
             }
             
-            console.log('JSON Data',$scope.data);
-            console.log('JSON type', typeof $scope.data);
+            //console.log('JSON Data',$scope.data);
+            //console.log('JSON type', typeof $scope.data);
             //return false;
             
             //console.log('checking file',$scope.data);
@@ -667,7 +689,7 @@ $scope.insertSubjects = function(courses) {
             var fields = Object.keys($scope.data);
 
             //console.log('available fields',fields);
-            var valid = false;
+            
             
             for (var i = 0; i < keys.length; i++) {
                 //console.log('Validating ',keys[i]);
@@ -679,12 +701,9 @@ $scope.insertSubjects = function(courses) {
                 //console.log('Validated ',keys[i]);
             };
 
-            console.log('made it here');
-            valid = $scope.validate_courses();
-            console.log('VALID: ',valid);
-            $scope.valid = valid;
-            $scope.form_error = !valid;
-            return valid;
+            $scope.valid = $scope.validate_courses();
+            $scope.form_error = false;
+            $scope.$apply();
             };
             reader.readAsDataURL(file);
         };    
@@ -699,8 +718,16 @@ $scope.insertSubjects = function(courses) {
                 });
                 
             });
-        };           
-        
+        };
+                            //CODE END
+                        }, function(error) { $scope.message = "Não Existem Utilizadores"; } );
+                    }, function(error) { $scope.message = "Não Existem Disciplinas."; } );
+                }, function(error) { $scope.message = "Não Existem Cursos"; } );
+            },
+            function(error) {
+                $scope.message = "Escola inválida.";
+            }
+        );
         
     }
 

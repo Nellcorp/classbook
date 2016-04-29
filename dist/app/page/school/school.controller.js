@@ -23,11 +23,6 @@
 
                 UserService.query({school: school._id,type: 'manager'},function(users) {
                     $scope.user = users[0];
-                });
-            }); 
-        
-        
-
         var orig_user = angular.copy($scope.user);
         var orig_school = angular.copy($scope.school);
 
@@ -52,7 +47,17 @@
             });
            
 
-        };           
+        };
+                },function(error){
+                    //no manager
+                });
+            }, function(error){
+                //no school
+            }); 
+        
+        
+
+           
         
         
     }

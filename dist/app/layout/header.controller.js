@@ -2,10 +2,10 @@
     'use strict';
 
     angular.module('app.header',['app.service','app.context','ngCookies'])
-    .controller('headerCtrl', ['$scope', '$window', '$location', '$cookies', 'AuthService', '$state','$stateParams', '$rootScope', headerCtrl]);
+    .controller('headerCtrl', ['$scope','$timeout', '$window', '$location', '$cookies', 'AuthService', '$state','$stateParams', '$rootScope', headerCtrl]);
     
-    function headerCtrl($scope, $window, $location, $cookies, AuthService, $state, $stateParams, $rootScope) {
-            $scope.user = $cookies.getObject('user');
+    function headerCtrl($scope, $timeout, $window, $location, $cookies, AuthService, $state, $stateParams, $rootScope) {
+            $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) { $scope.user = $cookies.getObject('user'); });
 
             $scope.logout = function() {
                 AuthService.logout.get(function(success) {
