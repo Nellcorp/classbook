@@ -74,6 +74,13 @@ user.use('list schedule', function (req) {if (req.user.type === 'admin' || req.u
 user.use('delete schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 user.use('update schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
 
+//Groups
+user.use('list groups', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
+user.use('create groups', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('list schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
+user.use('delete schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+user.use('update schedule', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
+
 //Coursenames
 user.use('list coursenames', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {return true;}});
 user.use('create coursenames', function (req) {if (req.user.type === 'admin' || req.user.type === 'manager') {return true;}});
@@ -148,6 +155,12 @@ app.get('/schedules/:id', user.can('list schedule'), function (req, res, next) {
 app.put('/schedules/:id', user.can('update schedule'), function (req, res, next) {next();});
 app.delete('/schedules/:id', user.can('delete schedule'), function (req, res, next) {next();});
 
+//Group Authorization Control
+app.get('/groups', user.can('list groups'), function (req, res, next) {next();});
+app.post('/groups', user.can('create groups'), function (req, res, next) {next();});
+app.get('/groups/:id', user.can('list schedule'), function (req, res, next) {next();});
+app.put('/groups/:id', user.can('update schedule'), function (req, res, next) {next();});
+app.delete('/groups/:id', user.can('delete schedule'), function (req, res, next) {next();});
 
 //Coursename Authorization Control
 app.get('/coursenames', user.can('list coursenames'), function (req, res, next) {next();});

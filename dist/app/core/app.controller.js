@@ -38,6 +38,7 @@
         }, true);
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            StorageService.load();
             //console.log('stateChangeStart',$cookies.getObject('user'));
                 //console.log('from',fromState);
                 //console.log('to',toState);

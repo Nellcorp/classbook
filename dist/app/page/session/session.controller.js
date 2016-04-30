@@ -41,7 +41,7 @@
                     $scope.subject = subject;
                     CourseService.get({id: subject.course},function(course){
                         $scope.course = course;
-                        UserService.query({course: course._id,type: 'student', year: subject.year},function(students){
+                        UserService.query({course: course._id,type: 'student', year: subject.year, group: schedule.group},function(students){
                             $scope.students = students;
 
         var start_str = $scope.schedule.schedule[$scope.weekday_str].start.split( ":" );

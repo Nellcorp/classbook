@@ -39,10 +39,13 @@
     function managerDashboardCtrl($scope, $q, $cookies, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService) {
 
         var user = $cookies.getObject('user');
+        console.log('Page Profile',JSON.stringify($cookies.getObject('user')));
         var school = user.school;
         var promises = [];
 
         promises.push(UserService.query({school: school},function(response) {
+            console.log('user',JSON.stringify(user));
+            console.log('users',JSON.stringify(response));
             $scope.school_users  = response.length;
             $scope.school_students = 0;
             $scope.school_professors = 0;
@@ -96,16 +99,44 @@
     }
 
     function professorDashboardCtrl($scope, $q, $cookies, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService) {
+
+        var user = $cookies.getObject('user');
+        //console.log('Page Profile',JSON.stringify($cookies.getObject('user')));
+        var school = user.school;
+        var promises = [];
+        $scope.absences = [];
+        $scope.sessions = [];
+        $scope.subjects = {};
+        $scope.subject_names = [];
+
+        promises.push(AbsenceService.query({user: user.id},function(response) { $scope.absences  = response; }).$promise);
+        promises.push(SessionService.query({professor: user.id},function(response) { $scope.sessions  = response;}).$promise);
+        
+        promises.push(SubjectService.query({school: school},function(subjects) {
+            for (var i = 0; i < subjects.length; i++) { $scope.subjects[subjects[i]._id] = subjects[i].name; };
+            
+            promises.push(ScheduleService.query({professor: user.id},function(schedules) {
+                for (var i = 0; i < schedules.length; i++) {
+                    $scope.subject_names.push($scope.subjects[schedules[i].subject]);
+                };
+            }).$promise);
+        }).$promise);
+        
+
+    $q.all(promises).then(function(){
+        if($scope.sessions.length == 0){
+            $scope.ratio = 0;
+        }else{
+            $scope.ratio = ($scope.absences.length / $scope.sessions.length)*100;
+        }
+
         $scope.stats = [
-            { name: 'UTILIZADORES', icon: 'zmdi-local-airport', value: StatsService.users(), unit: '', color: 'color-success' },
-            { name: 'ESTUDANTES', icon: 'zmdi-graduation-cap', value: StatsService.students(), unit: '', color: 'color-info' },
-            { name: 'PROFESSORES', icon: 'zmdi-accounts-alt', value: StatsService.professors(), unit: '', color: 'color-warning' },
-            { name: 'ESCOLAS', icon: 'zmdi-home', value: StatsService.schools(), unit: '', color: 'color-danger' },
-            { name: 'FALTAS', icon: 'zmdi-calendar-close', value: StatsService.absences(), unit: '', color: 'color-success' },
-            { name: 'AULAS', icon: 'zmdi-edit', value: StatsService.sessions(), unit: '', color: 'color-info' },
-            { name: 'CURSOS', icon: 'zmdi-puzzle-piece', value: StatsService.courses(), unit: '', color: 'color-warning' },
-            { name: 'DISCIPLINAS', icon: 'zmdi-library', value: StatsService.subjects(), unit: '', color: 'color-danger' }
+            { name: 'MINHAS DISCIPLINAS', icon: 'zmdi-library', value: $scope.subject_names.length, unit: '', color: 'color-danger' },
+            { name: 'AULAS DADAS', icon: 'zmdi-edit', value: $scope.sessions.length, unit: '', color: 'color-info' },
+            { name: 'MINHAS FALTAS', icon: 'zmdi-calendar-close', value: $scope.absences.length, unit: '', color: 'color-success' },
+            { name: 'FALTAS POR AULA', icon: 'zmdi-calendar-close', value: $scope.ratio, unit: '%', color: 'color-success' }
         ];
+        });
     }
 
     function studentDashboardCtrl($scope, $q, $cookies, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService) {

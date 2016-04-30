@@ -10,8 +10,9 @@
             $scope.logout = function() {
                 AuthService.logout.get(function(success) {
                     AuthService.clear();
-                    $cookies.remove('auth');
-                    $cookies.remove('user');
+                    $cookies.remove('auth',{domain: 'classbook.co'});
+                    $cookies.remove('user',{domain: 'classbook.co'});
+                    console.log('Logout Clear',JSON.stringify($cookies.getObject('user')));
                     $location.url('/page/signin');
 
                 }, function(error) {

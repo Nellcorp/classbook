@@ -19,6 +19,7 @@ var UserSchema = new mongoose.Schema({
     phone: { type: String, lowercase: true, trim: true }
   },
   course: { type: String, lowercase: true, trim: true},
+  group: { type: String, lowercase: true, trim: true},
   type: { type: String, required: true, lowercase: true, trim: true},
   year: { type: Number, min: 1, max: 6 },
   updated_at: { type: Date, default: Date.now }

@@ -14,8 +14,8 @@
                 
             $scope.items = [
                     {
-                        name: 'Minha Conta',
-                        route: '#/page/profile/' + $scope.user.id,
+                        name: 'Painel',
+                        route: '#/page/profile/' + $scope.user.type,
                         items: [
                             { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
                             { name: 'Standby', route: '#/page/lock-screen' },

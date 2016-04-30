@@ -4,7 +4,7 @@
     angular.module('app.manager', ['app.service','validation.match','angularRandomString'])
         .controller('createManagerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', 'StorageService', createManagerCtrl])
         .controller('managerCtrl', ['$scope','$location','randomString', 'UserService','SchoolService', 'AuthService', '$stateParams',managerCtrl])
-        .controller('importCtrl', ['$scope','$q','$location','randomString','UserService','AuthService','SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','ErrorService','StorageService','$stateParams',importCtrl]);
+        .controller('importCtrl', ['$scope','$q','$location','randomString','UserService','AuthService','SchoolService','CourseService','GroupService','SubjectService','ScheduleService','SessionService','AbsenceService','ErrorService','StorageService','$stateParams',importCtrl]);
 
 
     function createManagerCtrl ($scope, $location, randomString, UserService, SchoolService, AuthService, StorageService) {
@@ -108,7 +108,7 @@
         
     }
 
-    function importCtrl ($scope,$q,$location,randomString,UserService,AuthService,SchoolService,CourseService,SubjectService,ScheduleService,SessionService,AbsenceService,ErrorService,StorageService,$stateParams) {
+    function importCtrl ($scope,$q,$location,randomString,UserService,AuthService,SchoolService,CourseService,GroupService,SubjectService,ScheduleService,SessionService,AbsenceService,ErrorService,StorageService,$stateParams) {
         $scope.id = StorageService.me().school;
         //get school, courses_name, subjects_coursename,users_phone,users_email
         $scope.message = '';
@@ -119,6 +119,7 @@
         $scope.existing_subjects = {};
         $scope.existing_users = {};
         $scope.existing_emails = {}; 
+        $scope.existing_groups = {}; 
             //console.log('Existing Courses',$scope.existing_courses);   
         
         
@@ -130,91 +131,150 @@
                 $scope.school = school;
                 
                 CourseService.query({school: $scope.school._id}, function(courses) {
-                    $scope.courses = courses;
                     for(var i = 0; i < courses.length;i++){
-                        $scope.existing_users[courses[i].name] = courses[i];
+                        $scope.existing_courses[courses[i].name] = courses[i];
                         $scope.courses_id[courses[i]._id] = courses[i];
                     }
+
+                    GroupService.query({school: $scope.school._id}, function(groups) {
+                    for(var i = 0; i < groups.length;i++){ $scope.existing_groups[groups[i].name] = groups[i]; }
     
                     SubjectService.query({school: $scope.school._id}, function(subjects) {
-                        $scope.subjects = subjects;
                         for(var i = 0; i < subjects.length;i++){ $scope.existing_subjects[$scope.courses_id[subjects[i].course].name+_+subjects[i].name] = subjects[i]; }
                         
                         UserService.query({}, function(users) {
-                            $scope.users = users;
                             for(var i = 0; i < users.length;i++){
                                 $scope.existing_users[users[i].phone] = users[i];
                                 $scope.existing_emails[users[i].email] = users[i];
                             }
-                            //CODE START
-        $scope.courses = {}; $scope.subjects = {}; $scope.professors = {}; $scope.students = {}; $scope.schedules = {};
-        $scope.courses_valid = false; $scope.subjects_valid = false; $scope.professors_valid = false; $scope.students_valid = false; $scope.schedules_valid = false;
-        $scope.courses_done = false; $scope.subjects_done = false; $scope.professors_done = false; $scope.students_done = false; $scope.schedules_done = false;
+                                //CODE START
+                                $scope.courses = {}; $scope.groups = {}; $scope.subjects = {}; $scope.professors = {}; $scope.students = {}; $scope.schedules = {};
+                                $scope.courses_valid = false; $scope.groups_valid = false; $scope.subjects_valid = false; $scope.professors_valid = false; $scope.students_valid = false; $scope.schedules_valid = false;
+                                $scope.courses_done = false; $scope.groups_done = false; $scope.subjects_done = false; $scope.professors_done = false; $scope.students_done = false; $scope.schedules_done = false;
         
-        var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        var phone = /^\d{9}$/; var school = /^[0-9a-fA-F]{24}$/; var time = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
+                                var email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                var phone = /^\d{9}$/; var school = /^[0-9a-fA-F]{24}$/; var time = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
-        $scope.validate_courses = function() {
-            var data = 'cursos';
-            //console.log('validating courses', $scope.data[data]);
-            //debugger;
+                                $scope.validate_courses = function() {
+                                    var data = 'cursos';
+                                    console.log('validating courses', $scope.data[data]);
+                                    //debugger;
 
-            if(!$scope.data.hasOwnProperty(data)){
-                $scope.message = 'O documento não possui uma folha com cursos';
-                return false;
-            }
-            var keys = ['curso','nome','apelido','email','telefone','descricao'];
-            //console.log(data,$scope.data[data].length);
+                                    if(!$scope.data.hasOwnProperty(data)){
+                                    $scope.message = 'O documento não possui uma folha com cursos';
+                                    return false;
+                                    }
+                                    var keys = ['curso','nome','apelido','email','telefone','descricao'];
+                                    console.log(data,$scope.data[data].length);
 
-            for( var i = 0; i < $scope.data[data].length; i++ ) {
-
-                var temp = $scope.data[data][i];
-                var fields = Object.keys(temp);
+                                    for( var i = 0; i < $scope.data[data].length; i++ ) {
+                                    var temp = $scope.data[data][i];
+                                    var fields = Object.keys(temp);
                 
-                for (var j = 0; j < keys.length; j++) {
-                    if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                    if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
-                };
+                                    for (var j = 0; j < keys.length; j++) {
+                                        if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                    };
 
-                //console.log('validated course fields', temp);
+                                    console.log('validated course fields', temp);
 
-                if($scope.existing_courses.hasOwnProperty(temp.curso)){$scope.message = 'O curso '+temp.curso+' já existe.'; return false;}
+                                    if($scope.existing_courses.hasOwnProperty(temp.curso)){$scope.message = 'O curso '+temp.curso+' já existe.'; return false;}
                 
-                //console.log('course is unique', $scope.existing_courses);
+                                    console.log('course is unique', $scope.existing_courses);
 
-                $scope.courses[temp.curso] = {
-                                    name: temp.curso, school: $scope.id, description: temp.descricao,
-                                    supervisor: { firstname: temp.nome, lastname: temp.apelido, email: temp.email, phone: temp.telefone }
-                            };
-            }
-            //console.log('validated courses', $scope.data[data]);
-            $scope.courses_valid = true;
-            return $scope.validate_subjects();
-        };
+                                    $scope.courses[temp.curso] = {
+                                        name: temp.curso, school: $scope.id, description: temp.descricao,
+                                        supervisor: { firstname: temp.nome, lastname: temp.apelido, email: temp.email, phone: temp.telefone }
+                                    };
+                                    }
+                                    console.log('validated courses', $scope.data[data]);
+                                    $scope.courses_valid = true;
+                                    return $scope.validate_groups();
+                                };
 
-        $scope.insertCourses = function() {
+                                $scope.insertCourses = function() {
+                                    var promises = [];
+                                    var courses = {};
+                                    angular.forEach($scope.courses, function(value, key) {
+                                        promises.push(CourseService.save(value,function(response){ courses[response.name] = response; }).$promise);
+                                    });
+            
+                                    $q.all(promises).then(function(){
+                                        $scope.courses_done = true;
+                                        return $scope.insertGroups(courses);
+                
+                                    });
+                                };
+
+
+                                //Groups
+                                $scope.validate_groups = function() {
+                                    var data = 'turmas';
+                                    console.log('validating groups', $scope.data[data]);
+                                    //debugger;
+
+                                    if(!$scope.data.hasOwnProperty(data)){
+                                        $scope.message = 'O documento não possui uma folha com turmas';
+                                        return false;
+                                    }
+                                    
+                                    var keys = ['nome'];
+                                    console.log(data,$scope.data[data].length);
+
+                                    for( var i = 0; i < $scope.data[data].length; i++ ) {
+
+                                        var temp = $scope.data[data][i];
+                                        var fields = Object.keys(temp);
+                
+                                        for (var j = 0; j < keys.length; j++) {
+                                            if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'telefone_professor' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'telefone_encarregado' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'email_encarregado' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'email' && !email.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                            if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
+                                        };
+
+                                        console.log('validated group fields', temp);
+
+                                        if($scope.existing_groups.hasOwnProperty(temp.nome)){$scope.message = 'A turma '+temp.nome+' já existe.'; return false;}
+                
+                                        console.log('group is unique', $scope.existing_groups);
+
+                                        $scope.groups[temp.nome] = {name: temp.nome, school: $scope.id};
+                                    }
+                                
+                                    //console.log('validated courses', $scope.data[data]);
+                                    $scope.groups_valid = true;
+                                    return $scope.validate_subjects();
+                                };
+
+                                $scope.insertGroups = function(courses) {
             var promises = [];
-            var courses = {};
-                angular.forEach($scope.courses, function(value, key) {
-                    promises.push(CourseService.save(value,function(response){ courses[response.name] = response; }).$promise);
+            var groups = {};
+                angular.forEach($scope.groups, function(value, key) {
+                    promises.push(GroupService.save(value,function(response){ groups[response.name] = response; }).$promise);
                 });
             
             $q.all(promises).then(function(){
-                    $scope.courses_done = true;
-                    return $scope.insertSubjects(courses);
+                    $scope.groups_done = true;
+                    return $scope.insertSubjects(courses, groups);
                 
             });
-        };
+                                };
+                            
+                                //Groups END
 
-        $scope.validate_subjects = function() {
+                                $scope.validate_subjects = function() {
             //Assume $scope.courses is ready
             var data = 'disciplinas';
-            //console.log('validating subjects', $scope.data[data]);
+            console.log('validating subjects', $scope.data[data]);
 
             if(!$scope.data.hasOwnProperty(data)){$scope.message = 'O documento não possui uma folha de disciplinas'; return false;}
             var keys = ['disciplina','curso','ano','descricao'];
@@ -234,7 +294,7 @@
                 };
                 
                 if(temp.ano < 1 || temp.ano > 5){$scope.message = 'Erro na disciplina de '+temp.disciplina+': use apeas anos de 1 a 5'; return false;}
-                //console.log('validated subject fields', temp);
+                console.log('validated subject fields', temp);
 
                 //Ensure course exists
                 if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){
@@ -251,12 +311,12 @@
                 $scope.subjects[temp.curso+'_'+temp.disciplina] = {name: temp.disciplina, school: $scope.id, description: temp.descricao, year: temp.ano, course: temp.curso };
             }
             
-            //console.log('validated subjects', $scope.data[data]);
+            console.log('validated subjects', $scope.data[data]);
             $scope.subjects_valid = true;
             return $scope.validate_professors();
-        };    
+                                };    
         
-$scope.insertSubjects = function(courses) {
+                                $scope.insertSubjects = function(courses, groups) {
             //Assume courses have already been inserted
             $scope.existing_courses = courses;
 
@@ -275,17 +335,17 @@ $scope.insertSubjects = function(courses) {
             
             $q.all(promises).then(function(){
                 $scope.subjects_done = true;
-                return $scope.insertProfessors(courses, subjects);
+                return $scope.insertProfessors(courses, groups, subjects);
             });
-        };
+                                };
 
-        $scope.validate_professors = function() {
-            var data = 'professores';
-            //console.log('validating professors', $scope.data[data]);
-            if(!$scope.data.hasOwnProperty(data)){ return false;}
-            var keys = ['nome','apelido','email','telefone','descricao'];
+                                $scope.validate_professors = function() {
+                                    var data = 'professores';
+                                    console.log('validating professors', $scope.data[data]);
+                                    if(!$scope.data.hasOwnProperty(data)){ return false;}
+                                    var keys = ['nome','apelido','email','telefone','descricao'];
 
-            for( var i = 0; i < $scope.data[data].length; i++ ) {
+                                    for( var i = 0; i < $scope.data[data].length; i++ ) {
                 var temp = $scope.data[data][i];
                 var fields = Object.keys(temp);
                 
@@ -319,13 +379,13 @@ $scope.insertSubjects = function(courses) {
                     type: 'professor',
                     password: randomString()
                 };
-            }
-            //console.log('validated professors', $scope.data[data]);
-            $scope.professors_valid = true;
-            return $scope.validate_schedules();
-        };    
+                                    }
+                                    console.log('validated professors', $scope.data[data]);
+                                    $scope.professors_valid = true;
+                                    return $scope.validate_schedules();
+                                };    
 
-        $scope.insertProfessors = function(courses, subjects) {
+                                $scope.insertProfessors = function(courses, groups, subjects) {
             var users = {};
             var promises = [];
                 //Check if I really have the course ID
@@ -338,16 +398,17 @@ $scope.insertSubjects = function(courses) {
             
             $q.all(promises).then(function(){
                 $scope.professors_done = true;
-                return $scope.insertSchedules(users, courses, subjects);
+                console.log('inserted professors');
+                return $scope.insertSchedules(courses, groups, subjects, users);
             });
-        };
+                                };
 
-        $scope.validate_schedules = function() {
+          $scope.validate_schedules = function() {
             //Assume $scope.professors, $scope.courses and $scope.subjects are ready
             var data = 'horarios';
-            //console.log('validating schedules', $scope.data[data]);
+            console.log('validating schedules', $scope.data[data]);
             if(!$scope.data.hasOwnProperty(data)){ return false;}
-            var keys = ['curso','disciplina','telefone_professor','segunda1','segunda2','terca1','terca2','quarta1','quarta2','quinta1','quinta2','sexta1','sexta2'];
+            var keys = ['curso','turma','disciplina','telefone_professor','segunda1','segunda2','terca1','terca2','quarta1','quarta2','quinta1','quinta2','sexta1','sexta2'];
             
 
             //course,subject,phone,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
@@ -356,6 +417,7 @@ $scope.insertSubjects = function(courses) {
                 var fields = Object.keys(temp);
                 var subject = {};
                 var course = {};
+                var group = {};
                 var professor = {};
                 
                 for (var j = 0; j < keys.length; j++) {
@@ -368,7 +430,7 @@ $scope.insertSubjects = function(courses) {
                     if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
                 
-                //console.log('validated schedule fields', temp);
+                console.log('validated schedule fields', temp);
                 
                 //Ensure professor exists
                 if($scope.existing_users.hasOwnProperty(temp.telefone_professor)){
@@ -380,7 +442,7 @@ $scope.insertSubjects = function(courses) {
                     return false;
                 }
 
-                //console.log('validated schedule professor', temp);
+                console.log('validated schedule professor', temp);
 
                 //Ensure subject
                 if($scope.existing_subjects.hasOwnProperty(temp.curso+'_'+temp.disciplina)){
@@ -392,7 +454,7 @@ $scope.insertSubjects = function(courses) {
                     return false;
                 }
 
-                //console.log('validated schedule subject', temp);
+                console.log('validated schedule subject', temp);
 
                 //Ensure course
                 if($scope.existing_courses.hasOwnProperty(temp.curso)){
@@ -404,13 +466,24 @@ $scope.insertSubjects = function(courses) {
                     return false;
                 }
 
+                //Ensure group
+                if($scope.existing_groups.hasOwnProperty(temp.turma)){
+                    group = $scope.existing_groups[temp.turma];
+                }else if($scope.courses.hasOwnProperty(temp.curso)){
+                    group = $scope.groups[temp.turma];
+                }else{
+                    $scope.message = 'Erro (Horários): não existe nenhuma turma chamada '+temp.turma;
+                    return false;
+                }
+
                 
-                //console.log('validated schedule course', temp);
+                console.log('validated schedule course', temp);
 
                 var temp_schedule = {
                     subject: temp.disciplina,
                     professor: temp.telefone_professor,
                     school: $scope.id,
+                    group: temp.turma,
                     course: temp.curso,
                     absences: [],
                     schedule: {
@@ -498,29 +571,34 @@ $scope.insertSubjects = function(courses) {
                 
                 $scope.schedules[temp_schedule.course+'_'+temp_schedule.subject+'_'+temp_schedule.professor] = temp_schedule;
             }
-            //console.log('validated schedules', $scope.data[data]);
+            console.log('validated schedules', $scope.data[data]);
             $scope.schedules_valid = true;
             return $scope.validate_students();
-        };
+                                };
         
-        $scope.insertSchedules = function(users, courses, subjects) {
+                                $scope.insertSchedules = function(courses, groups, subjects, users) {
+                                    console.log('inserting schedules');
             //Assume courses, subjects and professors have been inserted
             $scope.existing_users = users;
             $scope.existing_subjects = subjects;
             $scope.existing_courses = courses;
+            $scope.existing_groups = groups;
             //console.log('Schedule Users',users);
             //course,subject,email,08:00,10:00,00:00,00:00,08:00,10:00,08:00,10:00,08:00,10:00
             var promises = [];
+            console.log('GROUPS: ',$scope.existing_groups);
                 //Check if I really have the course ID
                 angular.forEach($scope.schedules, function(schedule, key) {
+                    console.log('GROUP: ',schedule.group);
                     var absences = schedule.absences;
                     //console.log(absences);
                     delete schedule.absences;
 
                     //Get subject, professor and course ids
-                    schedule.professor = $scope.existing_users[schedule.professor];
-                    schedule.subject = $scope.existing_subjects[schedule.course+'_'+schedule.subject];
-                    schedule.course = $scope.existing_courses[schedule.course];
+                    schedule.professor = $scope.existing_users[schedule.professor]._id;
+                    schedule.subject = $scope.existing_subjects[schedule.course+'_'+schedule.subject]._id;
+                    schedule.course = $scope.existing_courses[schedule.course]._id;
+                    schedule.group = $scope.existing_groups[schedule.group.toLowerCase()]._id;
                     promises.push(ScheduleService.save(schedule,function(response){
                         console.log(response);
 
@@ -538,17 +616,18 @@ $scope.insertSubjects = function(courses) {
             $q.all(promises).then(function(){
                 StorageService.load();
                 $scope.schedules_done = true;
-                return $scope.insertStudents(users, courses);
+                console.log('inserted schedules');
+                return $scope.insertStudents(courses, groups, users);
             });
-        };
+                                };
         
-        $scope.validate_students = function() {
+                                $scope.validate_students = function() {
             //Assume $scope.courses is ready
             var data = 'estudantes';
             //console.log('validating students', $scope.data[data]);
 
             if(!$scope.data.hasOwnProperty(data)){ return false;}
-            var keys = ['nome','apelido','email','telefone','nome_encarregado','apelido_encarregado','email_encarregado','telefone_encarregado','curso','ano'];
+            var keys = ['nome','apelido','email','telefone','nome_encarregado','apelido_encarregado','email_encarregado','telefone_encarregado','curso','turma','ano'];
 
             for( var i = 0; i < $scope.data[data].length; i++ ) {
                 var temp = $scope.data[data][i];
@@ -567,31 +646,40 @@ $scope.insertSubjects = function(courses) {
                 if(temp.ano < 1 || temp.ano > 5){ return false;}
                 
                 //Ensure course exists
-                if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){ return false; }
+                if(!$scope.existing_courses.hasOwnProperty(temp.curso) && !$scope.courses.hasOwnProperty(temp.curso)){
+                    $scope.message = 'Erro: o curso '+temp.curso+' não existe';
+                    return false;
+                }
+
+                //Ensure group exists
+                if(!$scope.existing_groups.hasOwnProperty(temp.turma) && !$scope.groups.hasOwnProperty(temp.turma)){
+                    $scope.message = 'Erro: a turma '+temp.turma+' não existe';
+                    return false;
+                }
 
                 //Ensure user does not yet exist
                 if($scope.existing_users.hasOwnProperty(temp.telefone)){
-                    $scope.message = 'Erro: o telefone'+temp.telefone+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
+                    $scope.message = 'Erro: o telefone '+temp.telefone+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
                     return false;
                 }
                 if($scope.existing_emails.hasOwnProperty(temp.email)){
-                    $scope.message = 'Erro: o email'+temp.email+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
+                    $scope.message = 'Erro: o email '+temp.email+': do estudante '+temp.nome+' '+temp.apelido+' já existe';
                     return false;
                 }
                 
                 $scope.students[temp.telefone] = {
                         firstname: temp.nome, lastname: temp.apelido, school: $scope.id, course: temp.curso, phone: temp.telefone, email: temp.email, type: 'student',
                         year: temp.ano, supervisor:{firstname: temp.nome_encarregado, lastname: temp.apelido_encarregado,email: temp.email_encarregado,
-                        phone: temp.telefone_encarregado},password: randomString()
+                        phone: temp.telefone_encarregado},group: temp.turma,password: randomString()
                 };
             }
 
             //console.log('validated students', $scope.data[data]);
             $scope.students_valid = true;
             return $scope.students_valid;
-        }; 
+                                }; 
 
-        $scope.insertStudents = function(users, courses) {
+                                $scope.insertStudents = function(courses, groups, users) {
             
             $scope.existing_users = users;
             $scope.existing_courses = courses;
@@ -599,41 +687,41 @@ $scope.insertSubjects = function(courses) {
             //Assume courses exist
                 angular.forEach($scope.students, function(student, key) {
                     student.course = $scope.existing_courses[student.course];
+                    student.group = $scope.existing_groups[student.group];
                     promises.push(UserService.save(student,function(response){console.log(response);}).$promise);
                 });
             $q.all(promises).then(function(){
                 $scope.students_done = true;
                 return $scope.students_done;
             });
-        };              
+                                };              
         
-    var XLX = XLSX;
-    $scope.process = function (data) {
+                                var XLX = XLSX;
+                                $scope.process = function (data) {
         var workbook = XLS.read(data, {type: 'base64'});
         var output = $scope.to_json(workbook);
         return output;
-    };
+                                };
 
 
-    $scope.to_json = function (workbook) {
-        var result = {};
-        workbook.SheetNames.forEach(function(sheetName) {
-            var roa = XLS.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
-            if(roa.length > 0){
-                result[sheetName] = roa;
-            }
-        });
-    return result;
-    };
+                                $scope.to_json = function (workbook) {
+                                var result = {};
+                                workbook.SheetNames.forEach(function(sheetName) {
+                                    var roa = XLS.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+                                    if(roa.length > 0){
+                                        result[sheetName] = roa;
+                                    }
+                                });
+                                return result;
+                                };
 
 
         
         
-        $scope.canSubmit = function(event) {
-            $scope.runs+=1;
+                                $scope.canSubmit = function(event) {
             
             $scope.valid = false;
-            var formats = ['application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+            var formats = ['application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','xls','xlsx'];
             if(event.target.files.length == 0){ return false; }
             var file = event.target.files[0];
             
@@ -644,7 +732,16 @@ $scope.insertSubjects = function(courses) {
             };
             
             var type = file.type;
-            
+            if(type == ''){
+                var fname = file.name.split('.');
+                if(fname.length < 2){
+                    $scope.message = 'Formato de ficheiro não suportado. Use apenas .XLS ou .XLSX';
+                    $scope.form_error = true;
+                    return false;
+                }
+                type = fname[fname.length-1];
+            }
+
             if(formats.indexOf(type) == -1){
                 $scope.message = 'Formato de ficheiro não suportado. Use apenas .XLS ou .XLSX';
                 $scope.form_error = true;
@@ -685,7 +782,7 @@ $scope.insertSubjects = function(courses) {
             //console.log('checking file',$scope.data);
             //console.log('found data',$scope.data);
 
-            var keys = ['cursos','disciplinas','professores','horarios','estudantes'];
+            var keys = ['cursos','turmas','disciplinas','professores','horarios','estudantes'];
             var fields = Object.keys($scope.data);
 
             //console.log('available fields',fields);
@@ -694,7 +791,7 @@ $scope.insertSubjects = function(courses) {
             for (var i = 0; i < keys.length; i++) {
                 //console.log('Validating ',keys[i]);
                 if(fields.indexOf(keys[i]) == -1 || $scope.data[keys[i]].length == 0 ){
-                    $scope.message = 'O documento precisa de folhas com os nomes cursos, disciplinas, professores, horarios e estudantes';
+                    $scope.message = 'O documento precisa de folhas com os nomes cursos, turmas, disciplinas, professores, horarios e estudantes';
                     $scope.form_error = true;
                     return false;
                 }
@@ -702,13 +799,13 @@ $scope.insertSubjects = function(courses) {
             };
 
             $scope.valid = $scope.validate_courses();
-            $scope.form_error = false;
+            $scope.form_error = !$scope.valid;
             $scope.$apply();
             };
             reader.readAsDataURL(file);
-        };    
+                                };    
         
-        $scope.submitForm = function() {
+                                $scope.submitForm = function() {
             var done = $scope.insertCourses();
             $scope.$watch('students_done', function(newValue, oldValue) {
                 var promises = StorageService.load();
@@ -718,17 +815,14 @@ $scope.insertSubjects = function(courses) {
                 });
                 
             });
-        };
+                                };
                             //CODE END
-                        }, function(error) { $scope.message = "Não Existem Utilizadores"; } );
-                    }, function(error) { $scope.message = "Não Existem Disciplinas."; } );
+                            }, function(error) { $scope.message = "Não Existem Utilizadores"; } );
+                        }, function(error) { $scope.message = "Não Existem Disciplinas."; } );
+                    }, function(error) { $scope.message = "Não Existem Turmas"; } );
                 }, function(error) { $scope.message = "Não Existem Cursos"; } );
             },
-            function(error) {
-                $scope.message = "Escola inválida.";
-            }
-        );
-        
+            function(error) { $scope.message = "Escola inválida."; } );
     }
 
 

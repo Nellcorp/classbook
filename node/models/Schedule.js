@@ -7,6 +7,7 @@ var ScheduleSchema = new mongoose.Schema({
   professor: { type: String, required: true, lowercase: true, trim: true },
   school: { type: String, required: true, lowercase: true, trim: true },
   course: { type: String, required: true, trim: true},
+  group: { type: String, required: true, trim: true},
   schedule: {
     monday: {
       start: { type: String, lowercase: true, trim: true },

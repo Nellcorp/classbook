@@ -9,6 +9,7 @@ var Schedule = require('../models/Schedule.js');
 var Subject = require('../models/Subject.js');
 var Course = require('../models/Course.js');
 var School = require('../models/School.js');
+var Group = require('../models/Group.js');
 var Absence = require('../models/Absence.js');
 var kue = require('kue');
 
@@ -82,9 +83,13 @@ router.delete('/:id', function(req, res, next) {
         
               User.remove({ school: school }, function (err, success) {
                 if (err) return res.status(500).json(err);
-                School.findByIdAndRemove(school, function (err, success) {
-                  if (err) return res.status(500).json({message: "Não foi possível eliminar a escola"});
-                  res.json(success); });
+                Group.remove({ school: school }, function (err, success) {
+                  if (err) return res.status(500).json(err);
+                  School.findByIdAndRemove(school, function (err, success) {
+                    if (err) return res.status(500).json({message: "Não foi possível eliminar a escola"});
+                    res.json(success);
+                  });
+                });
               });
             });
           });

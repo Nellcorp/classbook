@@ -59,6 +59,7 @@ var subjects = require('./routes/subjects');
 var coursenames = require('./routes/coursenames');
 var subjectnames = require('./routes/subjectnames');
 var schedules = require('./routes/schedules');
+var groups = require('./routes/groups');
 var sessions = require('./routes/sessions');
 
 var app = express();
@@ -137,6 +138,7 @@ app.use('/subjects', subjects);
 app.use('/coursenames', coursenames);
 app.use('/subjectnames', subjectnames);
 app.use('/schedules', schedules);
+app.use('/groups', groups);
 app.use('/sessions', sessions);
 
 
