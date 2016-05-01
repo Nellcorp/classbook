@@ -277,12 +277,13 @@
             console.log('validating subjects', $scope.data[data]);
 
             if(!$scope.data.hasOwnProperty(data)){$scope.message = 'O documento não possui uma folha de disciplinas'; return false;}
-            var keys = ['disciplina','curso','ano','descricao'];
-
+            var keys = ['disciplina','curso','ano','semestre','descricao'];
+            var terms = ['1','2','anual'];
+            
             for( var i = 0; i < $scope.data[data].length; i++ ) {
                 var temp = $scope.data[data][i];
                 var fields = Object.keys(temp);
-                
+                var term = {};
                 for (var j = 0; j < keys.length; j++) {
                     if(fields.indexOf(keys[j]) == -1 || !temp[keys[j]]){$scope.message = 'Campo inexistente ou vazio: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                     if(keys[j] == 'telefone' && !phone.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
@@ -293,7 +294,11 @@
                     if(keys[j] == 'time' && !time.test(temp[keys[j]])){$scope.message = 'Campo inválido: tabela ['+data+'], fila ['+i+'], coluna: ['+keys[j]+']';return false;}
                 };
                 
-                if(temp.ano < 1 || temp.ano > 5){$scope.message = 'Erro na disciplina de '+temp.disciplina+': use apeas anos de 1 a 5'; return false;}
+                if(temp.ano < 1 || temp.ano > 5){$scope.message = 'Erro na disciplina de '+temp.disciplina+': use apenas anos de 1 a 5'; return false;}
+
+                if(terms.indexOf(temp.semestre) == -1){
+                    $scope.message = 'Erro na disciplina de '+temp.disciplina+': use semestres 1, 2 ou anual'; return false;
+                }
                 console.log('validated subject fields', temp);
 
                 //Ensure course exists
@@ -302,13 +307,24 @@
                     return false;
                 }
 
+                //Configure term
+                if(temp.semestre == '1'){
+                    term = {name: 'first', start: $scope.school.semesters.first.start, end: $scope.school.semesters.first.end};
+                }else if(temp.semestre == '2'){
+                    term = {name: 'second', start: $scope.school.semesters.second.start, end: $scope.school.semesters.second.end};
+                }else if(temp.semestre == 'anual'){
+                    term = {name: 'year', start: $scope.school.semesters.first.start, end: $scope.school.semesters.second.end};
+                }else{
+                    $scope.message = 'Erro na disciplina de '+temp.disciplina+': use semestres 1, 2 ou anual'; return false;
+                }
+
                 //Ensure subject does not yet exist for this course
                 if($scope.existing_subjects.hasOwnProperty(temp.curso+'_'+temp.disciplina)){
                     $scope.message = 'Erro: a disciplina de '+temp.disciplina+' já existe';
                     return false;
                 }
                 
-                $scope.subjects[temp.curso+'_'+temp.disciplina] = {name: temp.disciplina, school: $scope.id, description: temp.descricao, year: temp.ano, course: temp.curso };
+                $scope.subjects[temp.curso+'_'+temp.disciplina] = {name: temp.disciplina, school: $scope.id, description: temp.descricao, year: temp.ano, semester: term, course: temp.curso };
             }
             
             console.log('validated subjects', $scope.data[data]);
@@ -505,20 +521,19 @@
                 }
 
                 var schedule = temp_schedule.schedule;
-                var first_start = new Date($scope.school.semesters.first.start);
-                var first_end = new Date($scope.school.semesters.first.end);
-                var second_start = new Date($scope.school.semesters.second.start);
-                var second_end = new Date($scope.school.semesters.second.end);
+
+                var term = subject.semester.name;
+                var start = new Date(subject.semester.start);
+                var end = new Date(subject.semester.end);
+                var break_start, break_end;
+                
+                if(term == 'year'){
+                    var break_start = new Date($scope.school.semesters.first.end);
+                    var break_end = new Date($scope.school.semesters.second.start);
+                }
+                
                 var locale = today.toLocaleString();
                 
-                if(today < first_end){
-                    var start = first_start;
-                    var end = first_end;
-                } else if (today >= first_end && today < second_end ){
-                    var start = second_start;
-                    var end = second_end;
-                }
-
                 var sessions = [];
                 
                 for (var k = 1; k <= 5; k++) {
@@ -553,7 +568,13 @@
                                     time: []
                                 };
 
-                            while( next <= end ){
+                            while( current <= end ){
+                                if(typeof break_start != 'undefined' && typeof break_end != 'undefined' && ( current >= break_start || current < break_end)){
+                                    current = next;
+                                    next = new Date(current.setTime( current.getTime() + 7 * 86400000 ));
+                                    continue;
+                                }
+
                                 var current_locale = current.toLocaleString();
                                 var message = 'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name;
                                 var supervisor_message = 'O professor '+professor.firstname+' '+professor.lastname+' faltou à aula de '+subject.name;
@@ -561,8 +582,8 @@
                                 end_time.setHours(parseInt(end_str[0]), parseInt(end_str[1]));
                                 absence.time.push({ start: current, end: end_time, late: 20, message: message, supervisor_message: supervisor_message });
 
-                                var current = next;
-                                var next = new Date(current.setTime( current.getTime() + 7 * 86400000 ));
+                                current = next;
+                                next = new Date(current.setTime( current.getTime() + 7 * 86400000 ));
                             }
 
                             temp_schedule.absences.push(absence);

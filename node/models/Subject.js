@@ -7,6 +7,7 @@ var SubjectSchema = new mongoose.Schema({
   school: { type: String, required: true, lowercase: true, trim: true },
   description: { type: String, required: true, trim: true },
   course: { type: String, required: true, lowercase: true, trim: true },
+  semester: {name: String, start: Date, end: Date},
   year: { type: Number, min: 1, max: 5 },
   updated_at: { type: Date, default: Date.now }
 });

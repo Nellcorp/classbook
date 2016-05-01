@@ -13,16 +13,11 @@
                 
                 
             $scope.items = [
-                    {
-                        name: 'Painel',
-                        route: '#/page/profile/' + $scope.user.type,
-                        items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
-                            { name: 'Standby', route: '#/page/lock-screen' },
-                            { name: 'Alterar Perfil', route: '#/page/edit-profile' }
-                        ]
-                    }
+                { name: 'Painel', route: '#/page/profile/' + $scope.user.type },
+                { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id }//,
             ];
+
+            console.log('Items',$scope.items);
 
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
                 console.log('success on sidebar');

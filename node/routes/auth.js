@@ -85,6 +85,16 @@ router.get('/tokens/:id', function(req, res, next) {
   });
 });
 
+router.get('/tokens', function(req, res, next) {
+  Token.find(req.query, function (err, tokens) {
+    if (err) return res.status(500).json(err);
+    
+    if (tokens.length == 0) return res.status(404).json(tokens);
+    
+    res.json(tokens);
+  });
+});
+
 router.post('/reset', function(req, res, next) {
 
   User.find({phone: req.body.phone},function (err, users) {

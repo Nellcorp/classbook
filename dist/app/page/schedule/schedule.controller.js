@@ -446,6 +446,7 @@
         console.log($stateParams);
         //console.log(GroupService);
         $scope.id = $stateParams.id;
+        $scope.schedules = [];
         //$scope.user = $cookies.getObject('user');
         
         $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
@@ -489,6 +490,13 @@
                             for (var j = 0; j < subjects.length; j++) {
                                 if(schedules[i].subject == subjects[j]._id){
                                     schedules[i].subject_name = subjects[j].name;
+                                    schedules[i].start = new Date(subjects[j].semester.start);
+                                    schedules[i].end = new Date(subjects[j].semester.end);
+                                    schedules[i].show = true;
+                                    if($scope.d > schedules[i].end || $scope.d < schedules[i].start){
+                                        schedules[i].show = false;
+                                    }
+
                                 }
                             };
 
@@ -568,7 +576,11 @@
                                 }
                             }
                         };
-                        $scope.schedules = schedules;
+
+                        for (var i = 0; i < schedules.length; i++) {
+                            if(schedules[i].show){ $scope.schedules.push(schedules[i]); }
+                        };
+                        
                         //console.log($scope.schedules);
                         });
                     });
@@ -585,6 +597,9 @@
         $scope.id = $cookies.getObject('user').id;
         //$scope.user = $cookies.getObject('user');
         
+        $scope.schedules = [];
+        //$scope.user = $cookies.getObject('user');
+        
         $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
         
         var temp = new Date();
@@ -626,6 +641,13 @@
                             for (var j = 0; j < subjects.length; j++) {
                                 if(schedules[i].subject == subjects[j]._id){
                                     schedules[i].subject_name = subjects[j].name;
+                                    schedules[i].start = new Date(subjects[j].semester.start);
+                                    schedules[i].end = new Date(subjects[j].semester.end);
+                                    schedules[i].show = true;
+                                    if($scope.d > schedules[i].end || $scope.d < schedules[i].start){
+                                        schedules[i].show = false;
+                                    }
+
                                 }
                             };
 
@@ -705,7 +727,11 @@
                                 }
                             }
                         };
-                        $scope.schedules = schedules;
+
+                        for (var i = 0; i < schedules.length; i++) {
+                            if(schedules[i].show){ $scope.schedules.push(schedules[i]); }
+                        };
+                        
                         //console.log($scope.schedules);
                         });
                     });
