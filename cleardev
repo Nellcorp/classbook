@@ -1,0 +1,20 @@
+#!/bin/bash
+# use $1
+# db.users.remove({"type": "manager"})
+# db.schools.drop()
+mongo <<EOF
+use dev
+db.absences.drop()
+db.coursenames.drop()
+db.courses.drop()
+db.schedules.drop()
+db.groups.drop()
+db.sessions.drop()
+db.subjectnames.drop()
+db.subjects.drop()
+db.tokens.drop()
+db.users.remove({"type": "professor"})
+db.users.remove({"type": "student"})
+quit()
+exit
+EOF
