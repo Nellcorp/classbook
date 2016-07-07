@@ -1,7 +1,7 @@
 (function () {
     'use strict';
     var api ='http://classbook.co:3002';
-    angular.module('app.service', ['ngCookies','ngStorage'])
+    angular.module('app.service')
         .config(['$localStorageProvider', function ($localStorageProvider) { $localStorageProvider.setKeyPrefix('classbook-'); }])
         .config(['$sessionStorageProvider', function ($sessionStorageProvider) { $sessionStorageProvider.setKeyPrefix('classbook-'); }])
         .factory("UserService", [ "$resource", "$state", function ($resource, $state){ return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});}])

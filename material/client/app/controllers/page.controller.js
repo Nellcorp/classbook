@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.page',['app.service','ngCookies'])
+    angular.module('app.page')
     .controller('authCtrl', ['$scope', '$window', '$location', '$cookies', 'UserService', 'AuthService', 'StorageService','$stateParams', authCtrl]);
 
     function authCtrl($scope, $window, $location, $cookies, UserService, AuthService, StorageService, $stateParams) {

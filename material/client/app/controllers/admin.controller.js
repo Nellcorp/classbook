@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.admin', ['app.service','ngCookies','validation.match','angularRandomString'])
+    angular.module('app.admin')
         .controller('createAdminCtrl', ['$scope','$location','randomString', 'UserService','AuthService',createAdminCtrl])
         .controller('adminListCtrl', ['$scope','$location','randomString', 'UserService','$stateParams',adminListCtrl])
         .controller('adminCtrl', ['$scope','$location','randomString', 'UserService','AuthService','$stateParams',adminCtrl]);

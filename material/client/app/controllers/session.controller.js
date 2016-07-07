@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.session', ['app.service','validation.match','angularRandomString'])
+    angular.module('app.session')
         .controller('createSessionCtrl', ['$scope', '$q', '$cookies','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',createSessionCtrl])
         .controller('sessionCtrl', ['$scope','$location', 'UserService', 'SchoolService','CourseService','SubjectService','ScheduleService','SessionService','AbsenceService','$stateParams',sessionCtrl]);
 

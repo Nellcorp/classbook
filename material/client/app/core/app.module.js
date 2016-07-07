@@ -13,6 +13,7 @@
         ,'app.page'
         ,'app.delete'
         ,'app.manager'
+        ,'app.import'
         ,'app.student'
         ,'app.professor'
         ,'app.school'

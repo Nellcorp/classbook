@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.professor', ['app.service','validation.match','angularRandomString'])
+    angular.module('app.professor')
         .controller('createProfCtrl', ['$scope','$location','randomString', 'UserService','AuthService', 'SchoolService','$stateParams',createProfCtrl])
         .controller('batchProfCtrl', ['$scope','$q','$location','randomString', 'UserService','AuthService','SchoolService','CourseService','StorageService','$stateParams',batchProfCtrl])
         .controller('profCtrl', ['$scope','$location','randomString', 'UserService', 'SchoolService','$stateParams',profCtrl]);

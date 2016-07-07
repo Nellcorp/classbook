@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.group', ['app.service','validation.match','angularRandomString'])
+    angular.module('app.group')
         .controller('groupCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','CourseNameService','$stateParams',groupCtrl])
         .controller('groupStudentCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','CourseService','CourseNameService','$stateParams',groupStudentCtrl]);
 

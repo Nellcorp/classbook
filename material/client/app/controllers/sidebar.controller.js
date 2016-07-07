@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.sidebar',['app.service','app.context','ngCookies'])
+    angular.module('app.sidebar')
     .controller('sidebarCtrl', ['$scope','$timeout', '$window', '$location', '$cookies', 'UserService', 'SchoolService', 'CourseService', 'SubjectService',
         'ScheduleService', 'SessionService', 'AuthService','ContextService', '$state','$stateParams', '$rootScope', sidebarCtrl]);
     

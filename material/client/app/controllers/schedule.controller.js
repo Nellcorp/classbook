@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.schedule', ['app.service','validation.match','angularRandomString'])
+    angular.module('app.schedule')
         .controller('createScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','AbsenceService','SchoolService','CourseService','$stateParams',createScheduleCtrl])
         .controller('subjectScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',subjectScheduleCtrl])
         .controller('schoolScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', 'SchoolService', 'StorageService','$stateParams',schoolScheduleCtrl])

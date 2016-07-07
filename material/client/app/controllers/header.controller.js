@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.header',['app.service','app.context','ngCookies'])
+    angular.module('app.header')
     .controller('headerCtrl', ['$scope','$timeout', '$window', '$location', '$cookies', 'AuthService', '$state','$stateParams', '$rootScope', headerCtrl]);
     
     function headerCtrl($scope, $timeout, $window, $location, $cookies, AuthService, $state, $stateParams, $rootScope) {

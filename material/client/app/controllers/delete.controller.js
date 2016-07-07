@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('app.delete', ['app.service','validation.match','angularRandomString','ngCookies'])
+    angular.module('app.delete')
 /*DONE*/.controller('removeUserCtrl', ['$scope','$location','$cookies','$q','UserService','SchoolService','CourseService','SubjectService','ScheduleService','SessionService','StorageService','$stateParams',removeUserCtrl])
 /*DONE*/.controller('removeSchoolCtrl', ['$scope','$location','$cookies','SchoolService','UserService','StorageService','$stateParams',removeSchoolCtrl])
 /*DONE*/.controller('removeSchoolProfCtrl', ['$scope','$location','$cookies','$q','UserService','SchoolService','CourseService','SubjectService','ScheduleService','SessionService','StorageService','$stateParams',removeSchoolProfCtrl])
