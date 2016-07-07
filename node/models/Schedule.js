@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
 
 var ScheduleSchema = new mongoose.Schema({
-  subject: { type: String, unique: true, required: true, lowercase: true, trim: true },
+  subject: { type: String, required: true, lowercase: true, trim: true },
   professor: { type: String, required: true, lowercase: true, trim: true },
   school: { type: String, required: true, lowercase: true, trim: true },
   course: { type: String, required: true, trim: true},
@@ -33,6 +33,7 @@ var ScheduleSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
+ScheduleSchema.index({subject: 1, group: 1}, {unique: true});
 ScheduleSchema.plugin(uniqueValidator);
 module.exports = mongoose.model('Schedule', ScheduleSchema);
 

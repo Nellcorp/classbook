@@ -5,6 +5,7 @@ var config = require('./gulp.config')();
 var del = require('del');
 
 var debug = require('gulp-debug');
+var gzip = require('gulp-gzip');
 var $ = require('gulp-load-plugins')({lazy: true});
 
 gulp.task('help', $.taskListing);
@@ -127,40 +128,60 @@ gulp.task('optimize', ['inject', 'sass-min'], function() {
         .src(config.index)
         .pipe($.plumber({errorHandler: swallowError}))
         .pipe($.useref())
-        .pipe(debug({title: 'Debug before Vendor:'}))
-        //.pipe($.if('scripts/vendor.js', $.uglify()))
-        //.pipe(gzip())
-        .pipe(debug({title: 'Debug before UI:'}))
-        //.pipe($.if('scripts/ui.js', $.uglify()))
-        //.pipe(gzip())
-        .pipe(debug({title: 'Debug before App:'}))
+        .pipe($.if('scripts/vendor.js', $.uglify()))
+        .pipe($.if('scripts/vendor.js', $.gzip()))
+        .pipe($.if('scripts/ui.js', $.uglify()))
+        .pipe($.if('scripts/ui.js', $.gzip()))
         .pipe($.if('scripts/app.js', $.uglify()))
-        //.pipe(gzip())
-        .pipe(debug({title: 'Debug after App:'}))
+        .pipe($.if('scripts/app.js', $.gzip()))
+        .pipe(gulp.dest( config.dist ));
+
+});
+
+gulp.task('optimize-dev', ['inject', 'sass-min'], function() {
+    log('Optimizing the js, css, html');
+
+    return gulp
+        .src(config.index)
+        .pipe($.plumber({errorHandler: swallowError}))
+        .pipe($.useref())
+        .pipe(debug({title: 'USEREF:'}))
+        .pipe(debug({title: 'vendor.js:'}))
+        .pipe(debug({title: 'ui.js:'}))
+        .pipe($.if('scripts/app.js', $.uglify()))
+        .pipe(debug({title: 'app.js:'}))
         .pipe(gulp.dest( config.dist ));
 
 });
 
 
+gulp.task('build', ['optimize', 'copy'], function() {
+    startBrowserSync('dist');
+});
+
+gulp.task('build-dist', ['optimize-dev', 'copy'], function() {
+    startBrowserSync('dist');
+});
+
+gulp.task('build-prod', ['optimize', 'copy'], function() {
+    //startBrowserSync('dist');
+});
+
+//Build and serve from client
 gulp.task('serve', ['inject', 'sass'], function() {
     startBrowserSync('serve');
 });
 
-gulp.task('build', ['optimize', 'copy'], function() {
-    startBrowserSync('dist');
-})
+//Build and serve from dist
+gulp.task('serve-dist', function() { gulp.run('build-dist');});
 
-gulp.task('build-prod', ['optimize'], function() {
-    //startBrowserSync('dist');
-})
-
-gulp.task('serve-dist', function() { gulp.run('build')})
-
+//Build, minify, gzip and serve from dist
+//run this from ~/classbook/ng-deploy
 gulp.task('serve-prod', ['build-prod']);
 
 gulp.task('serve-docs', ['jade-docs'], function() {
     startBrowserSync('docs');
-})
+});
 
 
 

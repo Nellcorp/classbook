@@ -1,4 +1,5 @@
+cd ~/classbook/material && gulp build-prod
 sudo cp -R ~/classbook/material/dist/* ~/www/
-sudo chmod -R 775 www
-sudo chown -R www-data:www-data www
+sudo chmod -R 775 ~/www
+sudo chown -R www-data:www-data ~/www
 # sudo service nginx restart
