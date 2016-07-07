@@ -15,8 +15,8 @@
                                         <img alt="" src="images/g1.jpg" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/professor/profile/{{user._id}}">{{user.firstname}} {{user.lastname}}</a></h4>
-                                        <p>{{user.bio}}</p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/professor/profile/{{user._id}}">{{user.firstname | ucfirst}} {{user.lastname | ucfirst}}</a></h4>
+                                        <p>{{user.bio | sentence}}</p>
                                     </div>
                                 </div>
                             </div>

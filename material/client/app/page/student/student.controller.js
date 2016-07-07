@@ -188,7 +188,7 @@ function courseStudentCtrl ($scope, $location, randomString, UserService, Course
                 $scope.subject = subject;
                 
                 CourseService.get({id: $scope.subject.course},function(course) {$scope.course = course;});
-                UserService.query({course: $scope.subject.course, type: 'student'},function(users) {$scope.users = users; console.log(users)});
+                UserService.query({course: $scope.subject.course, group: $scope.schedule.group, type: 'student'},function(users) {$scope.users = users; console.log(users)});
 
             });
 

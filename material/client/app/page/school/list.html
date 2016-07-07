@@ -15,8 +15,8 @@
                                         <img alt="" src="images/g1.jpg" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/school/profile/{{school._id}}">{{school.name}}</a></h4>
-                                        <p><a class="media-left" href="#/page/school/professors/{{school._id}}">Professores</a> <a class="media-left" href="#/page/school/students/{{school._id}}">Estudantes</a> <a class="media-left" href="#/page/school/courses/{{school._id}}">Cursos</a> <a class="media-left" href="#/page/school/subjects/{{school._id}}">Disciplinas</a> </p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/school/profile/{{school._id}}">{{school.name | ucfirst}}</a></h4>
+                                        <p><a class="media-left" href="#/page/manager/profile/{{school.manager._id}}">Gerente</a> <a class="media-left" href="#/page/school/professors/{{school._id}}">Professores</a> <a class="media-left" href="#/page/school/students/{{school._id}}">Estudantes</a> <a class="media-left" href="#/page/school/courses/{{school._id}}">Cursos</a> <a class="media-left" href="#/page/school/subjects/{{school._id}}">Disciplinas</a> </p>
                                     </div>
                                 </div>
                             </div>

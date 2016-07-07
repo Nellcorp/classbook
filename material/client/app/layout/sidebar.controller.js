@@ -2,39 +2,49 @@
     'use strict';
 
     angular.module('app.sidebar',['app.service','app.context','ngCookies'])
-    .controller('sidebarCtrl', ['$scope', '$window', '$location', '$cookies', 'UserService', 'SchoolService', 'CourseService', 'SubjectService',
+    .controller('sidebarCtrl', ['$scope','$timeout', '$window', '$location', '$cookies', 'UserService', 'SchoolService', 'CourseService', 'SubjectService',
         'ScheduleService', 'SessionService', 'AuthService','ContextService', '$state','$stateParams', '$rootScope', sidebarCtrl]);
     
-    function sidebarCtrl($scope, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, ContextService, $state, $stateParams, $rootScope) {
-            $scope.user = $cookies.getObject('user');
+    function sidebarCtrl($scope, $timeout, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, ContextService, $state, $stateParams, $rootScope) {
             
+                $timeout(function() {
+                    //console.log('sidebar ctrl',$cookies.getObject('user'));
+                    $scope.user = $cookies.getObject('user');
+                
+                var init_route = { name: 'Ver Escolas', route: '#/page/school/list' }
+                if($scope.user.type != 'admin'){
+                    init_route = { name: 'Minha Escola', route: '#/page/school/profile/' + $scope.user.school };
+                }
 
-            //console.log('sidebar ctrl',$cookies.getObject('user'));
-            
-            
+            $scope.items = [
+                { name: 'Painel', route: '#/page/profile/' + $scope.user.type },
+                init_route
+                //{ name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id }//,
+            ];
+
+            console.log('Items',$scope.items);
+
+        $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
+                console.log('success on sidebar');
+                $scope.user = $cookies.getObject('user');
+
+                $scope.name = $scope.user.firstname.substring(0, 1).toUpperCase() + $scope.user.firstname.substring(1) +
+                ' ' + $scope.user.lastname.substring(0, 1).toUpperCase() + $scope.user.lastname.substring(1);
+
+                
             //console.log('user here', $scope.user);
             $scope.state = $state;
             $scope.params = $stateParams;
-            $scope.hideOptions = true;
+            //$scope.hideOptions = true;
+            $scope.hideOptions = false;
             
             //if(!$scope.user){
             //$scope.items = [];
             //$scope.roles = {};
             //}
             //else{
-            $scope.items = [
-                    {
-                        name: 'Minha Conta',
-                        route: '#/page/profile/' + $scope.user.id,
-                        items: [
-                            { name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id },
-                            { name: 'Standby', route: '#/page/lock-screen' },
-                            { name: 'Alterar Perfil', route: '#/page/edit-profile' }
-                        ]
-                    }
-            ];
 
-            $scope.roles = {
+                $scope.roles = {
                 admin: [
                     {
                         name: 'Início',
@@ -111,11 +121,16 @@
 
                 ]
             };
-        //}
 
+            if(AuthService.isAuthenticated()){
+                    //$scope.user = $cookies.getObject('user');
+                    if(!!$scope.user && ['admin','student','professor'].indexOf($scope.user.type) > -1){
+                        $scope.items = $scope.roles[$scope.user.type][0].items;
+                        //console.log($scope.items);
+                    }
+                    
+                }            
 
-            $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
-                $scope.user = $cookies.getObject('user');
                 if(!!$scope.user && ['admin','student','professor','manager'].indexOf($scope.user.type) > -1){
                         $scope.items = $scope.roles[$scope.user.type][0].items; 
                         //console.log('manager',$scope.user.type);
@@ -162,39 +177,9 @@
                 }
                 //console.log('After Change',$cookies.getObject('user').type,$scope.context);
         });
+    }, 3000);
 
 
-
-            $scope.init =  function() {
-                //console.log('sidebar init',$cookies.getObject('user'));
-                //console.log(AuthService.isAuthenticated());
-                
-                //console.log($location);
-                
-                //setTimeout(function(){ console.log($state.current);}, 1000);
-
-                
-
-                //console.log(path);
-
-                //console.log(id);
-                //console.log($cookies.getObject('user').type);
-                $scope.user = $cookies.getObject('user');
-
-                $scope.name = $scope.user.firstname.substring(0, 1).toUpperCase() + $scope.user.firstname.substring(1) +
-                ' ' + $scope.user.lastname.substring(0, 1).toUpperCase() + $scope.user.lastname.substring(1);
-
-                if(AuthService.isAuthenticated()){
-                    //$scope.user = $cookies.getObject('user');
-                    if(!!$scope.user && ['admin','student','professor'].indexOf($scope.user.type) > -1){
-                        $scope.items = $scope.roles[$scope.user.type][0].items;
-                        //console.log($scope.items);
-                    }
-                    
-                }
-
-                //console.log('Sidebar User',$scope.user);
-            };
 
             //$state.current.name
             //$state.includes('stateName'); 

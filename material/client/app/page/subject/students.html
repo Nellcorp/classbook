@@ -2,7 +2,7 @@
 
     <div class="row ui-section" ng-controller="subjectStudentCtrl" >
         <div class="col-lg-8 clearfix">
-            <h2 class="section-header">Estudantes de {{subject.name}}, {{course.name}}</h2>
+            <h2 class="section-header">Estudantes de {{subject.name | ucfirst}}, {{course.name | ucfirst}}</h2>
         </div>
         <div class="col-md-16">
             <div class="row">
@@ -15,8 +15,8 @@
                                         <img alt="" src="images/g1.jpg" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/student/profile/{{user._id}}">{{user.firstname}} {{user.lastname}}</a></h4>
-                                        <p>Encarregado: {{user.supervisor.firstname}} {{user.supervisor.lastname}} - Telefone {{user.supervisor.phone}} - Email: <a href="mailto:{{user.supervisor.email}}">{{user.supervisor.email}}</a></p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/student/profile/{{user._id}}">{{user.firstname | ucfirst}} {{user.lastname | ucfirst}}</a></h4>
+                                        <p>Encarregado: {{user.supervisor.firstname | ucfirst}} {{user.supervisor.lastname | ucfirst}} - Telefone {{user.supervisor.phone}} - Email: <a href="mailto:{{user.supervisor.email}}">{{user.supervisor.email}}</a></p>
                                     </div>
                                 </div>
                             </div>

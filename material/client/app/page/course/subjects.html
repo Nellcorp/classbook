@@ -2,7 +2,7 @@
 
     <div class="row ui-section" ng-controller="courseSubjectCtrl" >
         <div class="col-lg-8 clearfix">
-            <h2 class="section-header">Disciplinas de {{course.name}}</h2>
+            <h2 class="section-header">Disciplinas de {{course.name | ucfirst}}</h2>
         </div>
         <div class="col-md-16">
             <div class="row">
@@ -15,8 +15,8 @@
                                         <img alt="" src="images/g1.jpg" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/subject/profile/{{subject._id}}">{{subject.name}} - {{subject.year}}<sup>o</sup> ano</a></h4>
-                                        <p>{{subject.description}}</p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/subject/profile/{{subject._id}}">{{subject.name | ucfirst}} - {{subject.year}}<sup>o</sup> ano</a></h4>
+                                        <p>{{subject.description | sentence}}</p>
                                     </div>
                                 </div>
                             </div>

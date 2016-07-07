@@ -37,12 +37,16 @@
 
             ScheduleService.get({id: $scope.id},function(schedule){
                 $scope.schedule = schedule;
+                console.log('schedule', schedule);
                 SubjectService.get({id: schedule.subject},function(subject){
                     $scope.subject = subject;
+                    console.log('subject', subject);
                     CourseService.get({id: subject.course},function(course){
                         $scope.course = course;
-                        UserService.query({course: course._id,type: 'student', year: subject.year},function(students){
+                        console.log('course', course);
+                        UserService.query({course: course._id,type: 'student', year: subject.year, group: schedule.group},function(students){
                             $scope.students = students;
+                            console.log('students', students);
 
         var start_str = $scope.schedule.schedule[$scope.weekday_str].start.split( ":" );
         var start = new Date(year,month,day,start_str[0],start_str[1]);
@@ -50,13 +54,13 @@
         var end = new Date(year,month,day,start_str[0],end_str[1]);
 
         SessionService.query({start: start,end: end,schedule: $scope.schedule._id},function(sessions){
-                    if(sessions.length > 0){$location.url('/page/profile/'+$scope.user.id);}
+                    if(sessions.length > 0){$location.url('/page/profile/'+$scope.user.type);}
         });
 
 
         $scope.late = 1200;//20 minutes
         $scope.early = 600;//10 minutes
-        //$scope.late = 36000;
+        $scope.late = 360000;
         //$scope.early = 36000;
                                 console.log('start = ',start);
                                 console.log('now = ',$scope.d);
@@ -68,7 +72,7 @@
                                 console.log('is late?',$scope.d.getTime() - start.getTime() > $scope.late*1000);
 
         if(start.getTime() - $scope.d.getTime() > $scope.early*1000 || $scope.d.getTime() - start.getTime() > $scope.late*1000){
-                   $location.url('/page/profile/'+$scope.user.id);
+                   $location.url('/page/profile/'+$scope.user.type);
         }
         
         
@@ -76,7 +80,7 @@
         $scope.session = {
             title: $scope.subject.name,
             school: $scope.user.school,
-            professor: $scope.user._id,
+            professor: $scope.user.id,
             schedule: $scope.schedule._id,
             course: $scope.course._id,
             subject: $scope.subject._id,
@@ -86,6 +90,7 @@
             started: $scope.d,
             missing: []
         };
+
 
         var orig;
 
@@ -114,7 +119,7 @@
         
         $scope.canSubmit = function() {
             //return $scope.session.summary != '';
-            return !!$scope.students;
+            return !!$scope.students && $scope.session.summary != '';
         };    
         
         $scope.submitForm = function() {
@@ -131,7 +136,7 @@
             //console.log(missing);
             
             $scope.session.missing = missing;
-
+            
             SessionService.save($scope.session,function(response){
                 console.log(response);
                 var session_id = response._id;

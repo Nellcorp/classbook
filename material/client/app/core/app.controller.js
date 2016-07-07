@@ -2,6 +2,37 @@
     'use strict';
 
     angular.module('app')
+    .filter('ucfirst', function() {
+        return function (input) {
+        var smallWords = /^(a|e|de|do|da|para|como?\.?|via)$/i;
+        if (input!=null){
+        input = input.toLowerCase();
+        return input.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-]*/g, function(match, index, title) {
+            if (index > 0 && index + match.length !== title.length &&
+                match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" &&
+                (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') &&
+                title.charAt(index - 1).search(/[^\s-]/) < 0) {
+                return match.toLowerCase();
+            }
+
+            if (match.substr(1).search(/[A-Z]|\../) > -1) {
+                return match;
+            }
+
+            return match.charAt(0).toUpperCase() + match.substr(1);
+        });
+        }
+    }
+    })
+   .filter('upper', function() { return function(input, scope) { if (input!=null) return input.toUpperCase(); } })
+   .filter('lower', function() { return function(input, scope) { if (input!=null) return input.toLowerCase(); } })
+   .filter('sentence', function() {
+        return function(input, scope) {
+            if (input!=null)
+            input = input.toLowerCase();
+            return input.substring(0,1).toUpperCase()+input.substring(1);
+        }
+    })
     .controller('AppCtrl', [ '$scope', '$rootScope', '$state', '$document', 'appConfig', 'AuthService','StorageService','$cookies', AppCtrl]) // overall control
     
     function AppCtrl($scope, $rootScope, $state, $document, appConfig, AuthService, StorageService, $cookies) {
@@ -38,9 +69,10 @@
         }, true);
     
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
+            StorageService.load();
             //console.log('stateChangeStart',$cookies.getObject('user'));
-                //console.log(fromState);
-                //console.log(toState);
+                //console.log('from',fromState);
+                //console.log('to',toState);
                 //console.log(AuthService.isAuthenticated());
                 var school = /^\/page\/school(\/([A-Za-z]*)){0,1}\/:id$/.test(toState.url);
                 var profile = /\/page\/profile\/:id$/.test(toState.url);
@@ -62,6 +94,7 @@
                 if(profile && $cookies.getObject('user').type != 'admin' && toParams.id != $cookies.getObject('user').id){
                     var params = toParams;
                     params.id = $cookies.getObject('user').id;
+                    //console.log('updating');
                     $state.transitionTo(toState.name, params, {resume: true});
                     //$state.go('page/profile', { id: $cookies.getObject('user').id });  
                     //event.preventDefault();
@@ -83,6 +116,7 @@
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     if(StorageService.isEmpty()){ StorageService.load();}
                 }, function(error) {
+                    //console.log('App Controller',error);
                     AuthService.clear();
                     
                     $state.transitionTo('page/signin');
@@ -95,7 +129,7 @@
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
             $cookies.putObject('state',currentRoute);
             if (currentRoute.authenticate && !AuthService.isAuthenticated()){
-            
+                //console.log('stateChangeError: not auth');
                 AuthService.clear();
                 $state.transitionTo('page/signin');
                 event.preventDefault(); 

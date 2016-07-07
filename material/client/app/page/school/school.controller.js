@@ -3,7 +3,7 @@
 
     angular.module('app.school', ['app.service','validation.match','angularRandomString'])
         .controller('schoolCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','$stateParams',schoolCtrl])
-        .controller('schoolListCtrl', ['$scope','$location','randomString','SchoolService','$stateParams',schoolListCtrl])
+        .controller('schoolListCtrl', ['$scope','$location','randomString','SchoolService','UserService','$stateParams',schoolListCtrl])
         .controller('schoolProfCtrl', ['$scope','$location','randomString', 'UserService','SchoolService','$stateParams',schoolProfCtrl])
         .controller('schoolCourseCtrl', ['$scope','$location','randomString', 'CourseService','SchoolService','$stateParams',schoolCourseCtrl])
         .controller('schoolSubjectCtrl', ['$scope','$location','SchoolService','CourseService','SubjectService','$stateParams',schoolSubjectCtrl])
@@ -23,11 +23,6 @@
 
                 UserService.query({school: school._id,type: 'manager'},function(users) {
                     $scope.user = users[0];
-                });
-            }); 
-        
-        
-
         var orig_user = angular.copy($scope.user);
         var orig_school = angular.copy($scope.school);
 
@@ -36,8 +31,9 @@
             var validate_second = $scope.school.semesters.second.end > $scope.school.semesters.second.start;
             var validate_first = $scope.school.semesters.first.end > $scope.school.semesters.first.start;
             var validate_semesters = $scope.school.semesters.first.end < $scope.school.semesters.second.start;
-            var validate_form = $scope.userForm.$valid && !angular.equals($scope.user, orig_user) && !angular.equals($scope.school, orig_school);
+            var validate_form = !angular.equals($scope.user, orig_user) || !angular.equals($scope.school, orig_school);
             return validate_first && validate_second && validate_semesters && validate_form;
+            //return validate_first && validate_second && validate_semesters;
         };    
         
         $scope.submitForm = function() {
@@ -52,16 +48,35 @@
             });
            
 
-        };           
+        };
+                },function(error){
+                    //no manager
+                });
+            }, function(error){
+                //no school
+            }); 
+        
+        
+
+           
         
         
     }
 
-    function schoolListCtrl ($scope, $location, randomString, SchoolService, $stateParams) {
+    function schoolListCtrl ($scope, $location, randomString, SchoolService, UserService, $stateParams) {
         
         SchoolService.query(function(schools) {
                 $scope.schools = schools;
-                //console.log($scope.schools);
+                $scope.managers = {};
+                UserService.query({type: 'manager'},function(managers) {
+                    for (var i = 0; i < managers.length; i++) {
+                        for (var j = 0; j < $scope.schools.length; j++) {
+                            if(managers[i].school == $scope.schools[j]._id){
+                                $scope.schools[j].manager = managers[i];
+                            }
+                        };    
+                    };
+                }); 
             }); 
     }
 

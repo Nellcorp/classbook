@@ -3,6 +3,8 @@ var args = require('yargs').argv;
 var browserSync = require('browser-sync');
 var config = require('./gulp.config')();
 var del = require('del');
+
+var debug = require('gulp-debug');
 var $ = require('gulp-load-plugins')({lazy: true});
 
 gulp.task('help', $.taskListing);
@@ -93,6 +95,7 @@ gulp.task('sass-min', function() {
         .src(config.sass)
         .pipe($.plumber({errorHandler: swallowError}))
         .pipe($.sass(sassOptions))
+        .pipe($.autoprefixer())
         .pipe(gulp.dest(config.tmp + '/styles'));    
 })
 
@@ -120,28 +123,22 @@ gulp.task('copy', function() {
 gulp.task('optimize', ['inject', 'sass-min'], function() {
     log('Optimizing the js, css, html');
 
-    var assets = $.useref.assets({
-        searchPath: [config.client, config.tmp]
-    });
-    var cssFilter = $.filter('**/*.css', {restore: true});
-    var jsFilter = $.filter('**/*.js', {restore: true});
-
     return gulp
         .src(config.index)
         .pipe($.plumber({errorHandler: swallowError}))
-        .pipe(assets)
-
-        .pipe(cssFilter)
-        .pipe($.concat('styles/main.css'))
-        .pipe(cssFilter.restore)
-
-        .pipe(jsFilter)
-        .pipe($.uglify())
-        .pipe(jsFilter.restore)
-
-        .pipe(assets.restore())
         .pipe($.useref())
+        .pipe(debug({title: 'Debug before Vendor:'}))
+        //.pipe($.if('scripts/vendor.js', $.uglify()))
+        //.pipe(gzip())
+        .pipe(debug({title: 'Debug before UI:'}))
+        //.pipe($.if('scripts/ui.js', $.uglify()))
+        //.pipe(gzip())
+        .pipe(debug({title: 'Debug before App:'}))
+        .pipe($.if('scripts/app.js', $.uglify()))
+        //.pipe(gzip())
+        .pipe(debug({title: 'Debug after App:'}))
         .pipe(gulp.dest( config.dist ));
+
 });
 
 
@@ -153,8 +150,8 @@ gulp.task('build', ['optimize', 'copy'], function() {
     startBrowserSync('dist');
 })
 
-gulp.task('build-prod', ['copy'], function() {
-    startBrowserSync('dist');
+gulp.task('build-prod', ['optimize'], function() {
+    //startBrowserSync('dist');
 })
 
 gulp.task('serve-dist', function() { gulp.run('build')})

@@ -18,13 +18,11 @@
                                             <md-input-container flex>
                                                 <input type="file" name="file" ngf-select ng-model="file" ngf-max-size="20MB" onchange="angular.element(this).scope().canSubmit(event)">
                                             </md-input-container>
-                                            <!--<md-input-container flex> <input type="file" name="data" xlsx-model="data" onchange="angular.element(this).scope().canSubmit()"></md-input-container>-->
                                         </div>
-                                        <!--<pre ng-show="data">{{data | json}}</pre>-->
                                         <md-input-container class="md-block">
                                             <md-button type="submit"
                                                class="md-raised btn-w-md md-primary btn-block btn-lg"
-                                               data-ng-disabled="!canImport()">Importar</md-button>
+                                               data-ng-disabled="!valid">{{button}}</md-button>
                                         </md-input-container>
                                         <div class="callout callout-info" ng-hide="!form_error"><span>{{message}}</span></div>
                                     </form>

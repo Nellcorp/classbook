@@ -4,16 +4,17 @@
     angular.module('app.service', ['ngCookies','ngStorage'])
         .config(['$localStorageProvider', function ($localStorageProvider) { $localStorageProvider.setKeyPrefix('classbook-'); }])
         .config(['$sessionStorageProvider', function ($sessionStorageProvider) { $sessionStorageProvider.setKeyPrefix('classbook-'); }])
-        .factory("UserService", function ($resource, $state){ return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SchoolService", function ($resource){return $resource(api+"/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("CourseService", function ($resource){return $resource(api+"/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SubjectService", function ($resource){return $resource(api+"/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("ScheduleService", function ($resource){return $resource(api+"/schedules/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SessionService", function ($resource){return $resource(api+"/sessions/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("CourseNameService", function ($resource){return $resource(api+"/coursenames/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("SubjectNameService", function ($resource){return $resource(api+"/subjectnames/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("AbsenceService", function ($resource){return $resource(api+"/absences/:id",{Id: "@id" },{"update": {method: "PUT"}});})
-        .factory("ErrorService", function ($resource){
+        .factory("UserService", [ "$resource", "$state", function ($resource, $state){ return $resource(api+"/users/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("SchoolService", [ "$resource", function ($resource){return $resource(api+"/schools/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("CourseService", [ "$resource", function ($resource){return $resource(api+"/courses/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("GroupService", [ "$resource", function ($resource){return $resource(api+"/groups/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("SubjectService", [ "$resource", function ($resource){return $resource(api+"/subjects/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("ScheduleService", [ "$resource", function ($resource){return $resource(api+"/schedules/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("SessionService", [ "$resource", function ($resource){return $resource(api+"/sessions/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("CourseNameService", [ "$resource", function ($resource){return $resource(api+"/coursenames/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("SubjectNameService", [ "$resource", function ($resource){return $resource(api+"/subjectnames/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("AbsenceService", [ "$resource", function ($resource){return $resource(api+"/absences/:id",{Id: "@id" },{"update": {method: "PUT"}});}])
+        .factory("ErrorService", [ "$resource", function ($resource){
           var error = {};
           error.parse = function(err){
             var message = 'Houve um erro no seu pedido.';
@@ -39,15 +40,15 @@
           }
           return error;
           
-        })
-        .factory("UtilityService", function ($resource){
+        }])
+        .factory("UtilityService", [ "$resource", function ($resource){
           var utility = {};
           String.prototype.ucfirst = function(){ return this.charAt(0).toUpperCase() + this.substr(1);};
           //utility.ucfirst = function (string) { return string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase(); };
 
           return utility;
-        })
-        .factory("StatsService", function ($resource, $q, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService){
+        }])
+        .factory("StatsService", [ "$resource", "$q", "StorageService", "CourseService", "UserService", "SchoolService", "SubjectService", "ScheduleService", "SessionService", "AbsenceService", function ($resource, $q, StorageService, CourseService, UserService, SchoolService, SubjectService, ScheduleService, SessionService, AbsenceService){
           var stats = {};
           var users = [];
           var students = 0;
@@ -151,8 +152,8 @@
           };
           
           return stats;
-        })
-        .factory("ChartService", function ($resource){
+        }])
+        .factory("ChartService", [ "$resource", function ($resource){
           var options = {};
 
           var color = {
@@ -181,8 +182,8 @@
 
 
           return options;
-        })
-        .factory("StorageService", function ($resource, $q, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
+        }])
+        .factory("StorageService", [ "$resource", "$q", "$cookies", "$sessionStorage", "CourseService", "UserService", "SchoolService", "SubjectService", "ScheduleService", "ErrorService", function ($resource, $q, $cookies, $sessionStorage, CourseService, UserService, SchoolService, SubjectService, ScheduleService, ErrorService){
           var session = {};
           var user = $cookies.getObject('user');
           session.load = function () {
@@ -319,14 +320,14 @@
 
          session.users_by_id = function () {
             var result = {};
-            console.log($sessionStorage.users);
+            //console.log($sessionStorage.users);
             for(var i = 0; i < $sessionStorage.users.length;i++){ result[$sessionStorage.users[i]._id] = $sessionStorage.users[i]; }
             return result;
          };
 
          session.schedules_by_user = function () {
             var result = {};
-            console.log($sessionStorage.schedules);
+            //console.log($sessionStorage.schedules);
             for(var i = 0; i < $sessionStorage.schedules.length;i++){
               if(result.hasOwnProperty($sessionStorage.schedules[i].professor)){
                 result[$sessionStorage.schedules[i].professor].push($sessionStorage.schedules[i]);  
@@ -339,8 +340,8 @@
 
           return session;
 
-        })
-        .factory("AuthService", function ($resource, $cookies, $location, StorageService) {
+        }])
+        .factory("AuthService", [ "$resource", "$cookies", "$location", "StorageService", function ($resource, $cookies, $location, StorageService) {
         var authService = {};
         authService.register = $resource(api+"/auth/register");
         authService.login = $resource(api+"/auth/login");
@@ -383,5 +384,5 @@
     };
  
         return authService;
-    });
+    }]);
 })(); 

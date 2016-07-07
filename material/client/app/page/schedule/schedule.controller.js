@@ -5,7 +5,8 @@
         .controller('createScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','AbsenceService','SchoolService','CourseService','$stateParams',createScheduleCtrl])
         .controller('subjectScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',subjectScheduleCtrl])
         .controller('schoolScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', 'SchoolService', 'StorageService','$stateParams',schoolScheduleCtrl])
-        .controller('profScheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService', '$stateParams',profScheduleCtrl])
+        .controller('profScheduleCtrl', ['$scope','$cookies','$location','UserService','SubjectService','ScheduleService', 'GroupService','$stateParams',profScheduleCtrl])
+        .controller('profScheduleCtrl_noID', ['$scope','$cookies','$location','UserService','SubjectService','ScheduleService', 'GroupService','$stateParams',profScheduleCtrl_noID])
         .controller('scheduleSessionCtrl', ['$scope','$location','randomString', 'SchoolService','CourseService', 'SubjectService','$stateParams',scheduleSessionCtrl])
         .controller('createScheduleSessionCtrl', ['$scope','$location','SubjectService','SessionService','$stateParams',createScheduleSessionCtrl])
         .controller('scheduleCtrl', ['$scope','$location','UserService','SubjectService','ScheduleService','$stateParams',scheduleCtrl])
@@ -441,8 +442,12 @@
         
     }
 
-    function profScheduleCtrl ($scope, $location, UserService, SubjectService, ScheduleService, $stateParams) {
+    function profScheduleCtrl ($scope, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, $stateParams) {
+        console.log($stateParams);
+        //console.log(GroupService);
         $scope.id = $stateParams.id;
+        $scope.schedules = [];
+        //$scope.user = $cookies.getObject('user');
         
         $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
         
@@ -479,10 +484,25 @@
                 ScheduleService.query({professor: $scope.id},function(schedules) {
                    
                     SubjectService.query({school: $scope.user.school},function(subjects){
+                        GroupService.query({school: $scope.user.school},function(groups){
+                            
                         for (var i = 0; i < schedules.length; i++) {
                             for (var j = 0; j < subjects.length; j++) {
                                 if(schedules[i].subject == subjects[j]._id){
                                     schedules[i].subject_name = subjects[j].name;
+                                    schedules[i].start = new Date(subjects[j].semester.start);
+                                    schedules[i].end = new Date(subjects[j].semester.end);
+                                    schedules[i].show = true;
+                                    if($scope.d > schedules[i].end || $scope.d < schedules[i].start){
+                                        schedules[i].show = false;
+                                    }
+
+                                }
+                            };
+
+                            for (var j = 0; j < groups.length; j++) {
+                                if(schedules[i].group == groups[j]._id){
+                                    schedules[i].group_name = groups[j].name;
                                 }
                             };
 
@@ -556,8 +576,166 @@
                                 }
                             }
                         };
+
+                        for (var i = 0; i < schedules.length; i++) {
+                            if(schedules[i].show){ $scope.schedules.push(schedules[i]); }
+                        };
+                        
+                        //console.log($scope.schedules);
+                        });
+                    });
+                    
+
+                    
+                    //console.log($scope.schedules[i]);
+                });
+            });
+        
+    }
+
+    function profScheduleCtrl_noID ($scope, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, $stateParams) {
+        $scope.id = $cookies.getObject('user').id;
+        //$scope.user = $cookies.getObject('user');
+        //console.log('User: ',$scope.id);
+        $scope.schedules = [];
+        //$scope.user = $cookies.getObject('user');
+        
+        $scope.weekdays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+        
+        var temp = new Date();
+        
+        var offset = -60;
+
+        if(temp.getTimezoneOffset() == offset){
+            $scope.d = temp;
+        }else{
+            var utc = temp.getTime() + (temp.getTimezoneOffset() * 60000);
+            $scope.d = new Date(utc - (3600000*offset));
+        }
+
+        
+
+        var year = $scope.d.getFullYear();
+        var month = $scope.d.getMonth();
+        var day = $scope.d.getDate();
+        var hours = $scope.d.getHours();
+        var min = $scope.d.getMinutes();
+        $scope.weekday = $scope.weekdays[$scope.d.getDay()];
+        //console.log($scope.d.toDateString());
+        //console.log($scope.d.getDay());
+        //console.log($scope.weekday);
+
+        
+        $scope.late = 1200;
+        $scope.early = 600;
+        $scope.late = 360000;
+        //$scope.early = 36000;
+    
+        UserService.get({id: $scope.id},function(user) {
+                $scope.user = user;
+                
+                ScheduleService.query({professor: $scope.id},function(schedules) {
+                   
+                    SubjectService.query({school: $scope.user.school},function(subjects){
+                        GroupService.query({school: $scope.user.school},function(groups){
+                            
+                        for (var i = 0; i < schedules.length; i++) {
+                            for (var j = 0; j < subjects.length; j++) {
+                                if(schedules[i].subject == subjects[j]._id){
+                                    schedules[i].subject_name = subjects[j].name;
+                                    schedules[i].start = new Date(subjects[j].semester.start);
+                                    schedules[i].end = new Date(subjects[j].semester.end);
+                                    schedules[i].show = true;
+                                    if($scope.d > schedules[i].end || $scope.d < schedules[i].start){
+                                        schedules[i].show = false;
+                                    }
+
+                                }
+                            };
+
+                            for (var j = 0; j < groups.length; j++) {
+                                if(schedules[i].group == groups[j]._id){
+                                    schedules[i].group_name = groups[j].name;
+                                }
+                            };
+
+                            schedules[i].schedule.monday.show = false;
+                            schedules[i].schedule.monday.hide = true;
+                            schedules[i].schedule.tuesday.show = false;
+                            schedules[i].schedule.tuesday.hide = true;
+                            schedules[i].schedule.wednesday.show = false;
+                            schedules[i].schedule.wednesday.hide = true;
+                            schedules[i].schedule.thursday.show = false;
+                            schedules[i].schedule.thursday.hide = true;
+                            schedules[i].schedule.friday.show = false;
+                            schedules[i].schedule.friday.hide = true;
+
+                            if($scope.weekday == 'monday'){
+                                var start_str = schedules[i].schedule.monday.start.split( ":" );
+                                var start = new Date(year,month,day,start_str[0],start_str[1]);
+                                //console.log(start_str);
+                                //console.log(start);
+                                //console.log($scope.d);
+                                //console.log(start.getTime());
+                                //console.log($scope.d.getTime());
+                                console.log('start - now = ',start.getTime() - $scope.d.getTime());
+                                console.log('scope early x 1000 = ',$scope.early*1000);
+                                console.log('now - start = ',$scope.d.getTime() - start.getTime());
+                                console.log('scope late x 1000 = ',$scope.late*1000);
+                                console.log('is not early?',start.getTime() - $scope.d.getTime() <= $scope.early*1000)
+                                console.log('is not late?',$scope.d.getTime() - start.getTime() <= $scope.late*1000)
+                                
+                            if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
+                                    schedules[i].schedule.monday.show = true;
+                                    schedules[i].schedule.monday.hide = false;
+                                }
+                                //console.log($scope.d.getTime() - start.getTime());
+                            
+                            }
+                            if($scope.weekday == 'tuesday'){
+                                var start_str = schedules[i].schedule.tuesday.start.split( ":" );
+                                var start = new Date(year,month,day,start_str[0],start_str[1]);
+
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
+                                    schedules[i].schedule.tuesday.show = true;
+                                    schedules[i].schedule.tuesday.hide = false;
+                                }
+                            }
+                        if($scope.weekday == 'wednesday'){
+                                var start_str = schedules[i].schedule.wednesday.start.split( ":" );
+                                var start = new Date(year,month,day,start_str[0],start_str[1]);
+
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
+                                    schedules[i].schedule.wednesday.show = true;
+                                    schedules[i].schedule.wednesday.hide = false;
+                                }
+                            }
+                        if($scope.weekday == 'thursday'){
+                                var start_str = schedules[i].schedule.thursday.start.split( ":" );
+                                var start = new Date(year,month,day,start_str[0],start_str[1]);
+
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
+                                    schedules[i].schedule.thursday.show = true;
+                                    schedules[i].schedule.thursday.hide = false;
+                                }
+                            }
+                        if($scope.weekday == 'friday'){
+                                var start_str = schedules[i].schedule.friday.start.split( ":" );
+                                var start = new Date(year,month,day,start_str[0],start_str[1]);
+
+                                if(start.getTime() - $scope.d.getTime() <= $scope.early*1000 && $scope.d.getTime() - start.getTime() <= $scope.late*1000){
+                                    schedules[i].schedule.friday.show = true;
+                                    schedules[i].schedule.friday.hide = false;
+                                }
+                            }
+                        };
+
+                        for (var i = 0; i < schedules.length; i++) {
+                            if(schedules[i].show){ $scope.schedules.push(schedules[i]); }
+                        };
                         $scope.schedules = schedules;
                         //console.log($scope.schedules);
+                        });
                     });
                     
 

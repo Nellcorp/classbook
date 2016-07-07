@@ -25,8 +25,8 @@
                 <tbody>
                 <tr ng-repeat="schedule in schedules">
                     <td class="numeric"><a href="#/page/schedule/delete/{{schedule._id}}">Eliminar</a></td>
-                    <td class="numeric"><a href="#/page/professor/profile/{{schedule.professor}}">{{schedule.professor_name}}</a></td>
-                    <td class="numeric"><a href="#/page/subject/profile/{{schedule.subject}}">{{schedule.subject_name}}</a></td>
+                    <td class="numeric"><a href="#/page/professor/profile/{{schedule.professor}}">{{schedule.professor_name | ucfirst}}</a></td>
+                    <td class="numeric"><a href="#/page/subject/profile/{{schedule.subject}}">{{schedule.subject_name | ucfirst}}</a></td>
                     <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
                     <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>
                     <td class="numeric">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</td>

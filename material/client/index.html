@@ -49,7 +49,7 @@
           data-ng-controller="AppCtrl"
           data-ng-class=" { 'layout-boxed': main.layout === 'boxed', 
                             'nav-collapsed-min': main.menu === 'collapsed'
-          } ">
+          } " ng-strict-di>
         <!--[if lt IE 9]>
             <div class="lt-ie9-bg">
                 <p class="browsehappy">You are using an <strong>outdated</strong> browser.</p>
@@ -97,6 +97,7 @@
         <!-- build:js scripts/vendor.js -->
         <script src="bower_components/jquery/dist/jquery.min.js"></script>
         <script src="bower_components/angular/angular.min.js"></script>
+        <script src="bower_components/angular-route/angular-route.min.js"></script>
         <script src="bower_components/ngstorage/ngStorage.min.js"></script>
         <script src="bower_components/angular-resource/angular-resource.min.js"></script>
         <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
@@ -168,8 +169,9 @@
         <script src="app/ui/material.controller.js"></script>
         <script src="app/ui/ui.controller.js"></script>
         <script src="app/ui/ui.directive.js"></script>
-        <script src="app/page/course/course.controller.js"></script>
         <script src="app/page/admin/admin.controller.js"></script>
+        <script src="app/page/course/course.controller.js"></script>
+        <script src="app/page/group/group.controller.js"></script>
         <script src="app/page/manager/manager.controller.js"></script>
         <script src="app/page/professor/professor.controller.js"></script>
         <script src="app/page/schedule/schedule.controller.js"></script>

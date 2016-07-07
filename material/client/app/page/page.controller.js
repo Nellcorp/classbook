@@ -32,8 +32,8 @@
 
                 AuthService.auth.get(function(user) {
                     AuthService.clear();
-                    $cookies.remove('auth');
-                    $cookies.remove('user');
+                    $cookies.remove('auth',{domain: 'classbook.co'});
+                    $cookies.remove('user',{domain: 'classbook.co'});
 
                     $cookies.putObject('user',{
                         id: user._id,
@@ -53,6 +53,7 @@
                     $location.url('/page/profile/'+user.type);
 
                 }, function(error) {
+                    //console.log('Init Login',error);
                     AuthService.clear();
                 });
                 
@@ -61,8 +62,10 @@
             $scope.login = function() {
             //console.log('login',$cookies.getObject('user'));
                     AuthService.clear();
-                    $cookies.remove('auth');
-                    $cookies.remove('user');
+                    console.log('Login Clear',JSON.stringify($cookies.getObject('user')));
+                    $cookies.remove('auth',{domain: 'classbook.co'});
+                    $cookies.remove('user',{domain: 'classbook.co'});
+                    console.log('Login Clear2',JSON.stringify($cookies.getObject('user')));
                 AuthService.login.save($scope.credentials,function(user) {
 
                     $cookies.putObject('user',{
@@ -75,9 +78,11 @@
                         type: user.type
                     }, {'expires': $scope.exp});
 
+                    //console.log('After Login: User',user);
+                    console.log('After Login',JSON.stringify($cookies.getObject('user')));
                     $cookies.put('auth','true', {'expires': $scope.exp});
                     StorageService.load();
-                    
+                    console.log('After Load',JSON.stringify($cookies.getObject('user')));
                     //$location.url('/page/profile/'+user._id);
                     $location.url('/page/profile/'+user.type);
                     //$location.url('/page/profile');
@@ -94,8 +99,8 @@
             //LOGOUT
             $scope.logout = function() {
                 AuthService.logout.get(function(success) {
-                    $cookies.remove('auth');
-                    $cookies.remove('user');
+                    $cookies.remove('auth',{domain: 'classbook.co'});
+                    $cookies.remove('user',{domain: 'classbook.co'});
                     $location.url('/page/signin');
 
                 }, function(error) {

@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app.context', ['ngCookies'])
-        .factory('ContextService', function ($resource, $cookies, $location, $state) {
+        .factory('ContextService', [ "$resource", "$cookies", "$location", "$state", function ($resource, $cookies, $location, $state) {
   			var contextService = {};
             
         //var id = $state.params.id;
@@ -18,7 +18,7 @@
         {name: 'Disciplinas', url: 'page/course/subjects/'+id, roles: ['manager','professor','admin']},
         {name: 'Estudantes', url: 'page/course/students/'+id, roles: ['manager','professor']},
         {name: 'todos os Cursos', url: 'page/school/courses/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Horários', url: 'page/course/schedule/batch/'+id, roles: ['manager','professor','admin']},
+        //{name: 'Adicionar Horários', url: 'page/course/schedule/batch/'+id, roles: ['manager','professor','admin']},
         {name: 'Eliminar Curso', url: 'page/course/delete/'+id, roles: ['admin','manager']},
         {name: 'Eliminar Disciplinas', url: 'page/course/subject/delete/'+id, roles: ['manager']},
         {name: 'Eliminar Estudantes', url: 'page/course/student/delete/'+id, roles: ['manager']}
@@ -52,11 +52,11 @@
         {name: 'Professor', url: 'page/professor/profile/'+id, roles: ['manager','professor','admin']}
         ],
 'page/school/courses/:id': [
-        {name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Cursos', url: 'page/school/course/batch/'+id, roles: ['manager']},
         {name: 'Eliminar Cursos', url: 'page/school/course/delete/'+id, roles: ['manager']}
         ],
 'page/school/professors/:id': [
-        {name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Professores', url: 'page/school/professor/batch/'+id, roles: ['manager']},
         {name: 'Eliminar Professores', url: 'page/school/professor/delete/'+id, roles: ['manager']}
         ],
 'page/school/profile/:id': [
@@ -113,12 +113,12 @@
         ],
 'page/school/students/:id': [
         //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Estudantes', url: 'page/school/student/batch/'+id, roles: ['manager']},
         {name: 'Eliminar Estudantes', url: 'page/school/student/delete/'+id, roles: ['manager']}
         ],
 'page/school/subjects/:id': [
         //{name: 'Escola', url: 'page/school/profile/'+id, roles: ['manager','professor','admin']},
-        {name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
+        //{name: 'Adicionar Disciplinas', url: 'page/school/subject/batch/'+id, roles: ['manager']},
         {name: 'Eliminar Disciplinas', url: 'page/school/subject/delete/'+id, roles: ['manager']}
         ],
 'page/session/profile/:id': [
@@ -163,5 +163,5 @@
 
  contextService.items = items;
  return contextService;
-		});
+		}]);
 })(); 

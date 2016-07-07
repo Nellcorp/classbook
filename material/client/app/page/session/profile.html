@@ -2,7 +2,7 @@
 
     <div class="row ui-section" ng-controller="sessionCtrl" >
         <div class="col-lg-8 clearfix">
-            <h2 class="section-header">Aula de: {{subject.name}} - {{date}}</h2>
+            <h2 class="section-header">Aula de: {{subject.name | ucfirst}} - {{date}}</h2>
         </div>
         <div class="col-md-16">
             <div class="row">
@@ -16,8 +16,8 @@
                                         <img alt="" src="images/g1.jpg" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/student/profile/{{student._id}}">{{student.firstname}} - {{student.lastname}}</a></h4>
-                                        <p>Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce cfelis in faucibus.</p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/student/profile/{{student._id}}">{{student.firstname | ucfirst}} - {{student.lastname | ucfirst}}</a></h4>
+                                        <p>Encarregado: {{student.supervisor.firstname | ucfirst}} {{student.supervisor.lastname | ucfirst}} - Telefone {{student.supervisor.phone}} - Email: <a href="mailto:{{student.supervisor.email}}">{{student.supervisor.email}}</a></p>
                                     </div>
                                 </div>
                             </div>

@@ -2,16 +2,17 @@
     'use strict';
 
     angular.module('app.header',['app.service','app.context','ngCookies'])
-    .controller('headerCtrl', ['$scope', '$window', '$location', '$cookies', 'AuthService', '$state','$stateParams', '$rootScope', headerCtrl]);
+    .controller('headerCtrl', ['$scope','$timeout', '$window', '$location', '$cookies', 'AuthService', '$state','$stateParams', '$rootScope', headerCtrl]);
     
-    function headerCtrl($scope, $window, $location, $cookies, AuthService, $state, $stateParams, $rootScope) {
-            $scope.user = $cookies.getObject('user');
+    function headerCtrl($scope, $timeout, $window, $location, $cookies, AuthService, $state, $stateParams, $rootScope) {
+            $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) { $scope.user = $cookies.getObject('user'); });
 
             $scope.logout = function() {
                 AuthService.logout.get(function(success) {
                     AuthService.clear();
-                    $cookies.remove('auth');
-                    $cookies.remove('user');
+                    $cookies.remove('auth',{domain: 'classbook.co'});
+                    $cookies.remove('user',{domain: 'classbook.co'});
+                    console.log('Logout Clear',JSON.stringify($cookies.getObject('user')));
                     $location.url('/page/signin');
 
                 }, function(error) {
