@@ -129,6 +129,20 @@ gulp.task('optimize', ['inject', 'sass-min'], function() {
         .pipe($.plumber({errorHandler: swallowError}))
         .pipe($.useref())
         .pipe($.if('scripts/vendor.js', $.uglify()))
+        .pipe($.if('scripts/ui.js', $.uglify()))
+        .pipe($.if('scripts/app.js', $.uglify()))
+        .pipe(gulp.dest( config.dist ));
+
+});
+
+gulp.task('optimize-gzip', ['inject', 'sass-min'], function() {
+    log('Optimizing the js, css, html');
+
+    return gulp
+        .src(config.index)
+        .pipe($.plumber({errorHandler: swallowError}))
+        .pipe($.useref())
+        .pipe($.if('scripts/vendor.js', $.uglify()))
         .pipe($.if('scripts/vendor.js', $.gzip()))
         .pipe($.if('scripts/ui.js', $.uglify()))
         .pipe($.if('scripts/ui.js', $.gzip()))
@@ -163,7 +177,7 @@ gulp.task('build-dist', ['optimize-dev', 'copy'], function() {
     startBrowserSync('dist');
 });
 
-gulp.task('build-prod', ['optimize', 'copy'], function() {
+gulp.task('build-prod', ['optimize', 'optimize-gzip', 'copy'], function() {
     //startBrowserSync('dist');
 });
 
