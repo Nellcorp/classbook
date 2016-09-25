@@ -1,8 +1,11 @@
 var express = require('express');
 var passport = require('passport');
 var pako = require('pako');
+var moment = require('moment');
+var momentz = require('moment-timezone');
 var generatePassword = require('password-generator');
 var async = require("async");
+var kue = require('kue');
 
 var sendgrid = require('sendgrid')(process.env.sendgrid_key);
 
@@ -25,16 +28,48 @@ var School = require('../models/School.js');
 var Group = require('../models/Group.js');
 var Token = require('../models/Token.js');
 
+
+var jobs = kue.createQueue({
+    prefix: 'q',
+    jobEvents: false,
+    redis: {
+        port: 6379,
+        host: process.env.redis_host,
+        auth: process.env.redis_pass,
+        options: { /* see https://github.com/mranney/node_redis#rediscreateclient */ }
+    }
+});
+
+jobs
+    .on('job enqueue', function(id, type) {
+        console.log('Enqueued %s job %s', type, id);
+    })
+    .on('job failed', function(id, type) {
+        console.log('%s job %s failed', type, id);
+    })
+    .on('error', function(err) {
+        console.log('Queue Error... ', err);
+    })
+    .on('job complete', function(id, result) {
+        kue.Job.get(id, function(err, job) {
+            if (err) return;
+            job.remove(function(err) {
+                if (err) throw err;
+                console.log('Removed complete absence notification job #%d', job.id);
+            });
+        });
+    });
+
 function register(object, callback) {
     User.register(object, generatePassword(10), function(err, user) {
-        if (err) return calback(err);
+        if (err) return callback(err);
 
         Token.create({
             user: user._id
         }, function(err, token) {
-            if (err) return calback(err);
-            message.html = user.firstname + ' ' + user.lastname + '! Bem vindo/a ao Classbook! Clique no link abaixo para criar a sua senha: <br/><a href="http://www.classbook.co/#/page/reset/' + token._id + '">Activar Conta</a>';
-            message.text = user.firstname + ' ' + user.lastname + '! Bem vindo ao Classbook! Clique no link para criar a sua senha: http://www.classbook.co/#/page/reset/' + token._id;
+            if (err) return callback(err);
+            message.html = user.firstname + ' ' + user.lastname + '! Bem vindo/a ao Classbook! Clique no link abaixo para criar a sua senha: <br/><a href="http://www.classbook.co/#/page/activate/' + token._id + '">Activar Conta</a>';
+            message.text = user.firstname + ' ' + user.lastname + '! Bem vindo ao Classbook! Clique no link para criar a sua senha: http://www.classbook.co/#/page/activate/' + token._id;
             message.to = user.email;
             message.toname = user.firstname + ' ' + user.lastname;
             sendgrid.send(message, function(err, result) {
@@ -44,7 +79,7 @@ function register(object, callback) {
                 //res.json(token);
                 delete user.hash;
                 delete user.salt;
-                return calback(null, user);
+                return callback(null, user);
             });
         });
     });
@@ -56,27 +91,41 @@ router.post('/', function(req, res, next) {
         res.status(401).send();
     }
 
-    var school = req.body.school;
+    //var school = req.body.school;
+    //console.log(req.body.data);
     var user = req.user._id;
-    var data = pako.ungzip(req.body.data);
-    var errors;
-    var i, j, k, temp;
+    //var data = pako.ungzip(req.body.data);
+    var data = req.body.data;
+    //var data = JSON.parse(pako.inflate(req.body, { to: 'string' }));
+    //console.log(data);
+
+    var errors = [];
+    var i, j, k, l, temp;
 
     Course.insertMany(data.courses, function(err, courses) {
-        if (err) {
-            return res.status(500).json(err);
+        if (err && data.courses.length > 0) {
+            console.log(err);
+            next(err);
+            return;
         }
         Group.insertMany(data.groups, function(err, groups) {
-            if (err) {
-                return res.status(500).json(err);
+            if (err && data.groups.length > 0) {
+                console.log(err);
+                next(err);
+                return;
             }
 
             for (i = 0; i < data.subjects.length; i++) {
                 var name = data.subjects[i].course;
 
-                for (j = 0; j < courses.length; j++) {
-                    if ($courses[j].name == name) {
-                        data.subjects[i].course = $courses[j]._id;
+                if (data.subjects[i].hasOwnProperty('course_id')) {
+                    data.subjects[i].course = data.subjects[i].course_id;
+                    delete data.subjects[i].course_id;
+                } else {
+                    for (j = 0; j < courses.length; j++) {
+                        if (courses[j].name == name) {
+                            data.subjects[i].course = courses[j]._id;
+                        }
                     }
                 }
                 if (data.subjects[i].course == name) {
@@ -90,46 +139,68 @@ router.post('/', function(req, res, next) {
             }
 
             Subject.insertMany(data.subjects, function(err, subjects) {
-                if (err) {
-                    return res.status(500).json(err);
+                if (err && data.subjects.length > 0) {
+                    console.log(err);
+                    next(err);
+                    return;
                 }
 
                 async.map(data.professors, register, function(err, professors) {
                     if (err) {
-                        return res.status(500).json(err);
+                        console.log(err);
+                        next(err);
+                        return;
                     }
 
-                    var temp_absences;
-                    for (i = 0; i < data.schedules.length; i++) {
-                        temp_absences.push(data.schedules[i].absences);
-                        delete data.schedules[i].absences;
+                    var temp_absences = [];
+                    for (i = data.schedules.length - 1; i >= 0; i--) {
 
                         var professor = data.schedules[i].professor;
                         var subject = data.schedules[i].subject;
                         var course = data.schedules[i].course;
                         var group = data.schedules[i].group;
 
-                        for (j = 0; j < professors.length; j++) {
-                            if ($professors[j].phone == professor) {
-                                data.schedules[i].professor = $professors[j]._id;
+                        if (data.schedules[i].hasOwnProperty('professor_id')) {
+                            data.schedules[i].professor = data.schedules[i].professor_id;
+                            delete data.schedules[i].professor_id;
+                        } else {
+                            for (j = 0; j < professors.length; j++) {
+                                if (professors[j].phone == professor) {
+                                    data.schedules[i].professor = professors[j]._id;
+                                }
                             }
                         }
 
-                        for (j = 0; j < courses.length; j++) {
-                            if ($courses[j].name == course) {
-                                data.schedules[i].course = $courses[j]._id;
+                        if (data.schedules[i].hasOwnProperty('course_id')) {
+                            data.schedules[i].course = data.schedules[i].course_id;
+                            delete data.schedules[i].course_id;
+                        } else {
+                            for (j = 0; j < courses.length; j++) {
+                                if (courses[j].name == course) {
+                                    data.schedules[i].course = courses[j]._id;
+                                }
                             }
                         }
 
-                        for (j = 0; j < subjects.length; j++) {
-                            if ($subjects[j].name == subject) {
-                                data.schedules[i].subject = $subjects[j]._id;
+                        if (data.schedules[i].hasOwnProperty('subject_id')) {
+                            data.schedules[i].subject = data.schedules[i].subject_id;
+                            delete data.schedules[i].subject_id;
+                        } else {
+                            for (j = 0; j < subjects.length; j++) {
+                                if (subjects[j].name == subject) {
+                                    data.schedules[i].subject = subjects[j]._id;
+                                }
                             }
                         }
 
-                        for (j = 0; j < groups.length; j++) {
-                            if ($groups[j].name == group) {
-                                data.schedules[i].group = $groups[j]._id;
+                        if (data.schedules[i].hasOwnProperty('group_id')) {
+                            data.schedules[i].group = data.schedules[i].group_id;
+                            delete data.schedules[i].group_id;
+                        } else {
+                            for (j = 0; j < groups.length; j++) {
+                                if (groups[j].name == group) {
+                                    data.schedules[i].group = groups[j]._id;
+                                }
                             }
                         }
 
@@ -140,41 +211,98 @@ router.post('/', function(req, res, next) {
                                 object: temp[0],
                                 reason: 'O curso, disciplina, turma ou professor não foram encontrados'
                             });
+                        } else {
+                            for (var k = 0; k < data.schedules[i].absences.length; k++) {
+                                data.schedules[i].absences[k].course = data.schedules[i].course;
+                                data.schedules[i].absences[k].subject = data.schedules[i].subject;
+                                data.schedules[i].absences[k].professor = data.schedules[i].professor;
+                            }
+                            temp_absences.push(data.schedules[i].absences);
+                            delete data.schedules[i].absences;
                         }
                     }
 
                     Schedule.insertMany(data.schedules, function(err, schedules) {
-                        if (err) {
-                            return res.status(500).json(err);
+                        if (err && data.schedules.length > 0) {
+                            console.log(err);
+                            next(err);
+                            return;
                         }
 
-                        var course = data.students[i].course;
-                        var group = data.students[i].group;
+                        for (i = 0; i < temp_absences.length; i++) {
+                            var temp_absence = temp_absences[i];
+                            //console.log(temp_absence);
+                            for (k = 0; k < temp_absence.length; k++) {
+                                for (j = 0; j < temp_absence[k].time.length; j++) {
+                                    var start = moment(new Date(temp_absence[k].time[j].start)).tz('Africa/Luanda');
+                                    var delay = start.add(temp_absence[k].time[j].late, 'minutes');
+                                    var today = moment(new Date()).tz('Africa/Luanda');
 
-                        for (j = 0; j < courses.length; j++) {
-                            if ($courses[j].name == course) {
-                                data.students[i].course = $courses[j]._id;
+                                    if (today.isAfter(start)) {
+                                        continue;
+                                    }
+
+                                    var schedule = temp_absence[k].schedule;
+
+                                    for (l = 0; l < schedules.length; l++) {
+                                        if (schedules[l].subject == temp_absence[k].subject && schedules[l].course == temp_absence[k].course && schedules[l].professor == temp_absence[k].professor) {
+                                            schedule = schedules[l]._id;
+                                        }
+                                    }
+                                    var job = jobs.create('absence check', {
+                                        user: temp_absence[k].professor,
+                                        phone: temp_absence[k].phone,
+                                        school: temp_absence[k].school,
+                                        course: temp_absence[k].course,
+                                        year: temp_absence[k].year,
+                                        subject: temp_absence[k].subject,
+                                        schedule: schedule,
+                                        time: temp_absence[k].time[j],
+                                        start: start.format(),
+                                        message: temp_absence[k].time[j].message,
+                                        supervisor_phone: temp_absence[k].supervisor_phone,
+                                        supervisor_message: temp_absence[k].time[j].supervisor_message,
+                                    }).delay(delay.toDate()).removeOnComplete(true).save();
+                                }
                             }
                         }
 
-                        for (j = 0; j < groups.length; j++) {
-                            if ($groups[j].name == group) {
-                                data.students[i].group = $groups[j]._id;
-                            }
-                        }
+                        for (i = data.students.length - 1; i >= 0; i--) {
 
-                        if (data.students[i].course == course || data.students[i].group == group) {
-                            temp = data.students.splice(i, 1);
-                            errors.push({
-                                type: 'student',
-                                object: temp[0],
-                                reason: 'O curso ou turma não foram encontrados'
-                            });
+                            var course = data.students[i].course;
+                            var group = data.students[i].group;
+
+                            if (data.students[i].hasOwnProperty('course_id')) {
+                                data.students[i].course = data.students[i].course_id;
+                                delete data.students[i].course_id;
+                            } else {
+                                for (j = 0; j < courses.length; j++) {
+                                    if (courses[j].name == course) {
+                                        data.students[i].course = courses[j]._id;
+                                    }
+                                }
+                            }
+
+                            if (data.students[i].hasOwnProperty('group_id')) {
+                                data.students[i].group = data.students[i].group_id;
+                                delete data.students[i].group_id;
+                            } else {
+                                for (j = 0; j < groups.length; j++) {
+                                    if (groups[j].name == group) {
+                                        data.students[i].group = groups[j]._id;
+                                    }
+                                }
+                            }
+                            if (data.students[i].course == course || data.students[i].group == group) {
+                                temp = data.students.splice(i, 1);
+                            }
                         }
 
                         User.insertMany(data.students, function(err, students) {
-                            if (err) {
-                                return res.status(500).json(err);
+                            if (err && data.students.length > 0) {
+                                console.log(err);
+                                next(err);
+                                return;
                             }
                             res.json({
                                 result: 'Informação importada com sucesso'
@@ -185,10 +313,12 @@ router.post('/', function(req, res, next) {
             });
         });
     });
-
-
-
-    res.json(post);
+    /*
+    res.status(500).json({
+        result: 'A importação falhou. Por favor tente novamente.',
+        errors: errors
+    });
+    */
 });
 
 module.exports = router;

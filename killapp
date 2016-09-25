@@ -1,0 +1,5 @@
+forever stopall
+sudo kill `sudo lsof -t -i:3000`
+sudo kill `sudo lsof -t -i:3001`
+sudo kill `sudo lsof -t -i:3002`
+sudo kill `sudo lsof -t -i:3003`

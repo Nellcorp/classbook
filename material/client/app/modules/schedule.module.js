@@ -1,5 +1,5 @@
-(function () {
+(function() {
     'use strict';
 
-    angular.module('app.schedule', ['app.service','validation.match','angularRandomString']);
-})(); 
+    angular.module('app.schedule', ['app.service', 'validation.match', 'angularRandomString', 'angularMoment']);
+})();

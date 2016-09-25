@@ -1,5 +1,5 @@
-(function () {
+(function() {
     'use strict';
 
-    angular.module('app.page', []);
-})(); 
+    angular.module('app.page', ['angularMoment']);
+})();

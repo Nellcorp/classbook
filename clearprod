@@ -19,3 +19,6 @@ db.users.remove({"type": "student"})
 quit()
 exit
 EOF
+
+source $(dirname $0)/api.keys
+redis-cli -a $redis_pass flushdb

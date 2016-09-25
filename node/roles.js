@@ -294,6 +294,13 @@ user.use('import data', function(req) {
     }
 });
 
+//Export data
+user.use('export data', function(req) {
+    if (req.user.type === 'admin' || req.user.type === 'manager') {
+        return true;
+    }
+});
+
 
 user.use(function(req) {
     if (req.user.type === 'admin') {
@@ -495,5 +502,10 @@ app.delete('/subjectnames/:id', user.can('delete subjectname'), function(req, re
 
 //Import Authorization Control
 app.post('/import', user.can('import data'), function(req, res, next) {
+    next();
+});
+
+//Export Authorization Control
+app.get('/export', user.can('export data'), function(req, res, next) {
     next();
 });

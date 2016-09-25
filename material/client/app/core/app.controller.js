@@ -76,24 +76,24 @@
                 //console.log(AuthService.isAuthenticated());
                 var school = /^\/page\/school(\/([A-Za-z]*)){0,1}\/:id$/.test(toState.url);
                 var profile = /\/page\/profile\/:id$/.test(toState.url);
-
+                var user = ($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined')? $rootScope.user : $cookies.getObject('user');
                 //console.log(profile);
                 //console.log($cookies.getObject('user').id);
 
-                
+                var params;
                 if(toState.authenticate){
 
-                if(school && $cookies.getObject('user').type != 'admin' && toParams.id != $cookies.getObject('user').school){
+                if(school && user.type != 'admin' && toParams.id != user.school){
                     //$state.go('page/profile', { id: $cookies.getObject('user').id });
-                    var params = toParams;
+                    params = toParams;
                     params.id = $cookies.getObject('user').school;
                     $state.transitionTo(toState.name, params, {resume: true});
                     //event.preventDefault();
                 }
 
-                if(profile && $cookies.getObject('user').type != 'admin' && toParams.id != $cookies.getObject('user').id){
-                    var params = toParams;
-                    params.id = $cookies.getObject('user').id;
+                if(profile && user.type != 'admin' && toParams.id != user.id){
+                    params = toParams;
+                    params.id = user.id;
                     //console.log('updating');
                     $state.transitionTo(toState.name, params, {resume: true});
                     //$state.go('page/profile', { id: $cookies.getObject('user').id });  
@@ -114,10 +114,22 @@
                     }, {'expires': $scope.exp});
 
                     $cookies.put('auth','true', {'expires': $scope.exp});
+
+                    $rootScope.user = {
+                        id: user._id,
+                        email: user.email,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        school: user.school,
+                        phone: user.phone,
+                        type: user.type
+                    };
+
                     if(StorageService.isEmpty()){ StorageService.load();}
                 }, function(error) {
                     //console.log('App Controller',error);
                     AuthService.clear();
+                    delete $rootScope.user;
                     
                     $state.transitionTo('page/signin');
                     event.preventDefault(); 
@@ -128,9 +140,11 @@
     
         $rootScope.$on("$stateChangeSuccess", function (event, currentRoute, previousRoute) {
             $cookies.putObject('state',currentRoute);
-            if (currentRoute.authenticate && !AuthService.isAuthenticated()){
+            if (currentRoute.authenticate && !AuthService.isAuthenticated() && !$rootScope.hasOwnProperty('user')){
                 //console.log('stateChangeError: not auth');
                 AuthService.clear();
+                delete $rootScope.user;
+                
                 $state.transitionTo('page/signin');
                 event.preventDefault(); 
             }else{

@@ -21,8 +21,10 @@
     "kerberos": "0.0.18",
     "kue": "^0.10.5",
     "mandrill-api": "^1.0.45",
-    "mongodb": ">= 0.9.6-7",
-    "mongoose": "^4.4.2",
+    "moment": "^2.14.1",
+    "moment-timezone": "^0.5.5",
+    "mongodb": ">= 2.2.5",
+    "mongoose": "^4.5.7",
     "mongoose-unique-validator": "^1.0.0",
     "morgan": "~1.6.1",
     "nodemailer": "^2.3.0",
@@ -31,7 +33,7 @@
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.0.0",
     "password-generator": "^2.0.2",
-    "sendgrid": "^3.0.7",
+    "sendgrid": "^1.9.2",
     "serve-favicon": "~2.3.0"
   },
   "devDependencies": {

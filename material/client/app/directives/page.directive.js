@@ -1,4 +1,4 @@
-(function () {
+(function() {
     'use strict';
 
     angular.module('app.page')
@@ -17,11 +17,13 @@
         function customPageCtrl($scope, $element, $location, $state) {
             var addBg, path;
 
-            path = function() { return $state.current.name; };
+            path = function() {
+                return $state.current.name;
+            };
 
             addBg = function(path) {
                 $element.removeClass('body-wide body-err body-lock body-auth');
-                
+
                 switch (path) {
                     case '404':
                     case 'page/404':
@@ -31,6 +33,7 @@
                     case 'page/signup':
                     case 'page/reset':
                     case 'page/forgot-password':
+                    case 'page/activate':
                     case 'page/activate-account':
                         return $element.addClass('body-wide body-auth');
                     case 'page/lock-screen':
@@ -46,9 +49,7 @@
                 }
                 return addBg(path());
             });
-        }        
+        }
     }
- 
-})(); 
 
-
+})();

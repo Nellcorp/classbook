@@ -25,11 +25,11 @@
                 <tr ng-repeat="schedule in schedules">
                     <td class="numeric"><a href="#/page/schedule/delete/{{schedule._id}}">Eliminar</a></td>
                     <td class="numeric"><a href="#/page/subject/profile/{{schedule.subject}}">{{schedule.subject_name | ucfirst}}</a></td>
-                    <td class="numeric">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</td>
-                    <td class="numeric">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</td>
-                    <td class="numeric">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</td>
-                    <td class="numeric">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</td>
-                    <td class="numeric">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</td>
+                    <td class="numeric"><span ng-hide="schedule.schedule.monday.start == '0:00' || schedule.schedule.monday.end == '0:00'">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</span></td>
+                    <td class="numeric"><span ng-hide="schedule.schedule.tuesday.start == '0:00' || schedule.schedule.tuesday.end == '0:00'">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</span></td>
+                    <td class="numeric"><span ng-hide="schedule.schedule.wednesday.start == '0:00' || schedule.schedule.wednesday.end == '0:00'">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</span></td>
+                    <td class="numeric"><span ng-hide="schedule.schedule.thursday.start == '0:00' || schedule.schedule.thursday.end == '0:00'">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</span></td>
+                    <td class="numeric"><span ng-hide="schedule.schedule.friday.start == '0:00' || schedule.schedule.friday.end == '0:00'">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</span></td>
                 </tr>
                 </tbody>
             </table>

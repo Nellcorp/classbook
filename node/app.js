@@ -55,7 +55,8 @@ var subjectnames = require('./routes/subjectnames');
 var schedules = require('./routes/schedules');
 var groups = require('./routes/groups');
 var sessions = require('./routes/sessions');
-var data = require('./routes/import');
+var data_import = require('./routes/import');
+var data_export = require('./routes/export');
 
 var app = express();
 app.use(compress());
@@ -92,9 +93,12 @@ app.set('view engine', 'jade');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({
+    limit: '1mb'
+}));
 app.use(bodyParser.urlencoded({
-    extended: false
+    extended: false,
+    limit: '1mb'
 }));
 app.use(cookieParser());
 var session = require('express-session');
@@ -147,7 +151,8 @@ app.use('/subjectnames', subjectnames);
 app.use('/schedules', schedules);
 app.use('/groups', groups);
 app.use('/sessions', sessions);
-app.use('/import', data);
+app.use('/import', data_import);
+app.use('/export', data_export);
 
 
 
@@ -165,7 +170,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.json({
             message: err.message,
             error: err
         });
@@ -176,7 +181,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.json({
         message: err.message,
         error: {}
     });

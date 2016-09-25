@@ -47,24 +47,24 @@
                     <td class="numeric">{{schedule.subject_name | ucfirst}}</td>
                     <td class="numeric">{{schedule.group_name | upper}}</td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.monday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</a>
-                        <span ng-if="schedule.schedule.monday.hide">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</span>
+                        <a ng-if="schedule.schedule.monday.show && !schedule.schedule.monday.hide" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</a>
+                        <span ng-if="!schedule.schedule.monday.show && !schedule.schedule.monday.hide">{{schedule.schedule.monday.start}} - {{schedule.schedule.monday.end}}</span>
                     </td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.tuesday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</a>
-                        <span ng-if="schedule.schedule.tuesday.hide">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</span>
+                        <a ng-if="schedule.schedule.tuesday.show && !schedule.schedule.tuesday.hide" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</a>
+                        <span ng-if="!schedule.schedule.tuesday.show && !schedule.schedule.tuesday.hide">{{schedule.schedule.tuesday.start}} - {{schedule.schedule.tuesday.end}}</span>
                     </td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.wednesday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</a>
-                        <span ng-if="schedule.schedule.wednesday.hide">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</span>
+                        <a ng-if="schedule.schedule.wednesday.show && !schedule.schedule.wednesday.hide" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</a>
+                        <span ng-if="!schedule.schedule.wednesday.show && !schedule.schedule.wednesday.hide">{{schedule.schedule.wednesday.start}} - {{schedule.schedule.wednesday.end}}</span>
                     </td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.thursday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</a>
-                        <span ng-if="schedule.schedule.thursday.hide">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</span>
+                        <a ng-if="schedule.schedule.thursday.show && !schedule.schedule.thursday.hide" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</a>
+                        <span ng-if="!schedule.schedule.thursday.show && !schedule.schedule.thursday.hide">{{schedule.schedule.thursday.start}} - {{schedule.schedule.thursday.end}}</span>
                     </td>
                     <td class="numeric" >
-                        <a ng-if="schedule.schedule.friday.show" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</a>
-                        <span ng-if="schedule.schedule.friday.hide">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</span>
+                        <a ng-if="schedule.schedule.friday.show && !schedule.schedule.friday.hide" href="#/page/schedule/session/new/{{schedule._id}}">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</a>
+                        <span ng-if="!schedule.schedule.friday.show && !schedule.schedule.friday.hide">{{schedule.schedule.friday.start}} - {{schedule.schedule.friday.end}}</span>
                     </td>
                 </tr>
                 </tbody>
