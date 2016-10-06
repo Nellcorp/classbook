@@ -32,6 +32,9 @@
                     case 'page/signin':
                     case 'page/signup':
                     case 'page/reset':
+                    case 'page/onboard/new':
+                    case 'page/onboard/success':
+                    case 'page/onboard/error':
                     case 'page/forgot-password':
                     case 'page/activate':
                     case 'page/activate-account':

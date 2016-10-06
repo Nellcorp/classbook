@@ -4,8 +4,8 @@
     angular.module('app.schedule')
         .controller('subjectScheduleCtrl', ['$scope', 'moment', '$location', 'UserService', 'SubjectService', 'ScheduleService', '$stateParams', subjectScheduleCtrl])
         .controller('schoolScheduleCtrl', ['$scope', 'moment', '$location', 'UserService', 'SubjectService', 'ScheduleService', 'SchoolService', 'StorageService', '$stateParams', schoolScheduleCtrl])
-        .controller('profScheduleCtrl', ['$scope', 'moment', '$cookies', '$location', 'UserService', 'SubjectService', 'ScheduleService', 'GroupService', 'SessionService', '$stateParams', profScheduleCtrl])
-        .controller('profScheduleCtrl_noID', ['$scope', 'moment', '$cookies', '$location', 'UserService', 'SubjectService', 'ScheduleService', 'GroupService', 'SessionService', '$stateParams', profScheduleCtrl_noID])
+        .controller('profScheduleCtrl', ['$scope', 'appConfig', 'moment', '$cookies', '$location', 'UserService', 'SubjectService', 'ScheduleService', 'GroupService', 'SessionService', '$stateParams', profScheduleCtrl])
+        .controller('profScheduleCtrl_noID', ['$scope', 'appConfig', 'moment', '$cookies', '$location', 'UserService', 'SubjectService', 'ScheduleService', 'GroupService', 'SessionService', '$stateParams', profScheduleCtrl_noID])
         .controller('scheduleCtrl', ['$scope', 'moment', '$location', 'UserService', 'SubjectService', 'ScheduleService', '$stateParams', scheduleCtrl]);
 
     function scheduleCtrl($scope, moment, $location, UserService, SubjectService, ScheduleService, $stateParams) {
@@ -118,7 +118,7 @@
 
     }
 
-    function profScheduleCtrl($scope, moment, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, SessionService, $stateParams) {
+    function profScheduleCtrl($scope, appConfig, moment, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, SessionService, $stateParams) {
         //console.log($stateParams);
         //console.log(GroupService);
         $scope.id = $stateParams.id;
@@ -136,10 +136,11 @@
         var min = $scope.d.minutes();
         $scope.weekday = $scope.weekdays[$scope.d.day()];
         //console.log($scope.weekday);
+        //console.log($scope.d);
 
 
-        $scope.late = 20;
-        $scope.early = 10;
+        $scope.late = appConfig.main.late;
+        $scope.early = appConfig.main.early;
         //$scope.late = 36000;
         //$scope.early = 36000;
 
@@ -178,6 +179,7 @@
                             }
                         }
 
+                        console.log(schedules);
                         for (i = 0; i < schedules.length; i++) {
                             if (schedules[i].show) {
                                 schedules[i].start = schedules[i].start.toDate();
@@ -187,13 +189,13 @@
                         }
                     });
                 });
-                //console.log($scope.schedules[i]);
+                //console.log($scope.schedules);
             });
         });
 
     }
 
-    function profScheduleCtrl_noID($scope, moment, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, SessionService, $stateParams) {
+    function profScheduleCtrl_noID($scope, appConfig, moment, $cookies, $location, UserService, SubjectService, ScheduleService, GroupService, SessionService, $stateParams) {
         $scope.id = $cookies.getObject('user').id;
         //$scope.user = $cookies.getObject('user');
         //console.log('User: ',$scope.id);
@@ -213,8 +215,8 @@
         //console.log($scope.weekday);
 
 
-        $scope.late = 20;
-        $scope.early = 10;
+        $scope.late = appConfig.main.late;
+        $scope.early = appConfig.main.early;
 
 
         UserService.get({

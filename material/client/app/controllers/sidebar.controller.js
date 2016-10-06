@@ -8,8 +8,36 @@
 
     function sidebarCtrl($scope, $timeout, $window, $location, $cookies, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AuthService, ContextService, $state, $stateParams, $rootScope) {
 
-        
-            //console.log('sidebar ctrl',$cookies.getObject('user'));
+        $timeout(function() {
+            if($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined'){
+                $scope.user = $rootScope.user;
+            }else{
+                $scope.user = $cookies.getObject('user');
+            }
+
+            var init_route = {
+                name: 'Ver Escolas',
+                route: '#/page/school/list'
+            };
+            
+            if ($scope.user.type != 'admin') {
+                init_route = {
+                    name: 'Minha Escola',
+                    route: '#/page/school/profile/' + $scope.user.school
+                };
+            }
+
+            $scope.items = [{
+                    name: 'Painel',
+                    route: '#/page/profile/' + $scope.user.type
+                },
+                init_route
+                //{ name: 'Meu Perfil', route: '#/page/profile/' + $scope.user.id }//,
+            ];
+        }, 100);
+
+        $rootScope.$on("$stateChangeSuccess", function(event, currentRoute, previousRoute) {
+            
             if($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined'){
                 $scope.user = $rootScope.user;
             }else{
@@ -38,7 +66,7 @@
 
             //console.log('Items',$scope.items);
 
-            $rootScope.$on("$stateChangeSuccess", function(event, currentRoute, previousRoute) {
+            
                 //console.log('success on sidebar');
                 if($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined'){
                     $scope.user = $rootScope.user;
@@ -75,6 +103,15 @@
                             }, {
                                 name: 'Ver Escolas',
                                 route: '#/page/school/list'
+                            }, {
+                                name: 'Ver Inscrições',
+                                route: '#/page/onboard/list'
+                            }, {
+                                name: 'Administradores',
+                                route: '#/page/admin/list'
+                            }, {
+                                name: 'Novo Administrador',
+                                route: '#/page/admin/new'
                             }]
                         }
 
@@ -187,9 +224,9 @@
                     //console.log('Items',$scope.items);
                 }
 
-                $scope.context = ContextService.items[currentRoute.name + '/:id'];
-
-                var no_id = ['page/import'];
+                $scope.context = ContextService.items(currentRoute.name + '/:id');
+                
+                var no_id = ['page/import', 'page/admin/list', 'page/school/list'];
 
                 //console.log('After Change Route',currentRoute.name + '/:id');
                 if (!!$scope.context) {
@@ -213,8 +250,7 @@
 
                     }
                     $scope.context = $scope.context.filter(Boolean);
-                    //console.log($scope.context);
-
+                    
                     if ($scope.context.length === 0) {
                         $scope.context = [];
                         $scope.hideOptions = true;

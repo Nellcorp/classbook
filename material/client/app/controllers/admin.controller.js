@@ -29,7 +29,7 @@
         
         $scope.submitForm = function() {
             
-            AuthService.register.save($scope.user,function(user){ $location.url('/page/profile/'+user._id); });
+            AuthService.register.save($scope.user,function(user){ $location.url('/page/admin/profile/'+user._id); });
         };           
     }
 

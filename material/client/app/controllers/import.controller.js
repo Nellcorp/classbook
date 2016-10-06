@@ -88,7 +88,7 @@
 
             $scope.ready = true;
         }, function(error) {
-            $location.url('/page/profile/' + StorageService.me().type);
+            $location.url('/page/profile/' + $scope.user.type);
         });
 
         $scope.process = function(data) {
@@ -117,8 +117,8 @@
                 $scope.button = 'A Importar: por favor aguarde.';
 
                 var imported = ImportService.save($scope.payload, function(response) {
-                    //console.log('success log', response);
-                    $location.url('/page/profile/' + StorageService.me().type);
+                    console.log('success log', response);
+                    $location.url('/page/profile/' + $scope.user.type);
                 }, function(error) {
                     //console.log('error log', error);
                     $scope.form_error = true;

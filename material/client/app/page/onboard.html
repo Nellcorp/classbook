@@ -2,8 +2,8 @@
 <section class="page-form-ele page" >
 
 
-    <div class="row ui-section" ng-controller="schoolCtrl" >
-        <div class="col-lg-8 clearfix"> <h2 class="section-header">{{school.name | ucfirst}}</h2> </div>
+    <div class="row ui-section" ng-controller="createSignupCtrl" >
+        <div class="col-lg-8 clearfix"> <h2 class="section-header">Criar Escola</h2> </div>
         <div class="col-md-12">
             <section class="panel panel-default">
                 <div class="panel-body">
@@ -15,39 +15,45 @@
                                     <form name="userForm" data-ng-submit="submitForm()">
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
-                                                <label>Nome</label>
-                                                <input name="school" ng-model="school.name" disabled>
+                                                <label>Nome do Gestor</label>
+                                                <input name="firstname" ng-model="user.firstname" required>
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Apelido do Gestor</label>
+                                                <input name="lastname" ng-model="user.lastname" required>
                                             </md-input-container>
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
-                                                <label>Gerente (Nome)</label>
-                                                <input name="school" ng-model="user.firstname" data-ng-disabled="!canSubmit()">
+                                                <label>Telefone do Gestor</label>
+                                                <input name="telephone" ng-model="user.phone" placeholder="123456789"
+                                                             required ng-pattern="/^[0-9]{9}$/" md-maxlength="9">
                                             </md-input-container>
                                             <md-input-container flex>
-                                                <label>Gerente (Apelido)</label>
-                                                <input name="lastname" ng-model="user.lastname" data-ng-disabled="!canSubmit()">
+                                                <label>Email do Gestor</label>
+                                                <input name="email" type="email" ng-model="user.email" required>
                                             </md-input-container>
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
-                                                <label>Telefone</label>
+                                                <label>Nome da Escola</label>
+                                                <input name="school" ng-model="school.name" required>
+                                            </md-input-container>
+                                            <md-input-container flex>
+                                                <label>Telefone da Escola</label>
                                                 <input name="telephone" ng-model="school.phone" placeholder="123456789"
-                                                             required ng-pattern="/^[0-9]{9}$/" md-maxlength="9" data-ng-disabled="!canSubmit()">
-                                            </md-input-container>
-                                            <md-input-container flex>
-                                                <label>Email (Gerente)</label>
-                                                <input name="email" ng-model="user.email" disabled>
+                                                             required ng-pattern="/^[0-9]{9}$/" md-maxlength="9">
                                             </md-input-container>
                                         </div>
+                                        
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
                                                 <label>Endereço da Escola</label>
-                                                <input name="address" ng-model="school.address" data-ng-disabled="!canSubmit()">
+                                                <input name="address" ng-model="school.address" required>
                                             </md-input-container>
                                             <md-input-container flex>
                                                 <label>Cidade</label>
-                                                <input name="city" ng-model="school.city" data-ng-disabled="!canSubmit()">
+                                                <input name="city" ng-model="school.city" required>
                                             </md-input-container>
                                         </div>
                                         <div layout layout-sm="column">
@@ -55,21 +61,22 @@
                                                 <label>Primeiro Semestre</label>
                                                 <input disabled>
                                             </md-input-container>
-                                            <md-datepicker ng-model="school.semesters.first.start" md-placeholder="Início" data-ng-disabled="!canSubmit()"></md-datepicker>
-                                            <md-datepicker ng-model="school.semesters.first.end" md-placeholder="Fim" data-ng-disabled="!canSubmit()"></md-datepicker>
+                                            <md-datepicker ng-model="school.semesters.first.start" md-placeholder="Início"></md-datepicker>
+                                            <md-datepicker ng-model="school.semesters.first.end" md-placeholder="Fim"></md-datepicker>
                                         </div>
                                         <div layout layout-sm="column">
                                             <md-input-container flex>
                                                 <label>Segundo Semestre</label>
                                                 <input disabled>
                                             </md-input-container>
-                                            <md-datepicker ng-model="school.semesters.second.start" md-placeholder="Início" data-ng-disabled="!canSubmit()"></md-datepicker>
-                                            <md-datepicker ng-model="school.semesters.second.end" md-placeholder="Fim" data-ng-disabled="!canSubmit()"></md-datepicker>
+                                            <md-datepicker ng-model="school.semesters.second.start" md-placeholder="Início"></md-datepicker>
+                                            <md-datepicker ng-model="school.semesters.second.end" md-placeholder="Fim"></md-datepicker>
                                         </div>
+
                                         <md-input-container class="md-block">
                                             <md-button type="submit"
                                                class="md-raised btn-w-md md-primary btn-block btn-lg"
-                                               data-ng-disabled="!canSubmit()">Update</md-button>
+                                               data-ng-disabled="!canSubmit()">Criar Escola</md-button>
                                         </md-input-container>
 
                                     </form>

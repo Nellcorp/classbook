@@ -43,10 +43,39 @@ router.get('/:id', function(req, res, next) {
 
 /* PUT /todos/:id */
 router.put('/:id', function(req, res, next) {
-  User.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-    if (err) return res.status(500).json(err);
-    res.json(post);
-  });
+  User.findById(req.user._id, function (err, caller) {
+    User.findById(req.params.id, function (err, target) {
+
+    switch(caller.type) {
+    case 'admin': //Admin can update anyone
+        User.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+          if (err) return res.status(500).json(err);
+          res.json(post);
+        });
+        break;
+    case 'manager': //Manager can update anyone in own school
+        if(caller.school == target.school){
+          User.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+          if (err) return res.status(500).json(err);
+          res.json(post);
+        });
+        }
+        break;
+    case 'professor': //Professor can update self
+        if(req.user._id == req.params.id){
+          User.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+          if (err) return res.status(500).json(err);
+          res.json(post);
+        });
+        }
+        break;
+    default:
+        //default code block
+    }
+
+    });
+
+    });
 });
 
 /* DELETE /todos/:id */

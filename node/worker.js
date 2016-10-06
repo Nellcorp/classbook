@@ -15,6 +15,7 @@ var Session = require('./models/Session.js');
 var User = require('./models/User.js');
 var moment = require('moment');
 var momentz = require('moment-timezone');
+var ucfirst = require('ucfirst');
 
 var kue = require('kue');
 var jobs = kue.createQueue({
@@ -66,71 +67,81 @@ jobs.process('absence check', function(job, done) {
 
     var locale = moment().format("D, MMM, YYYY, k:mm");
 
-    Session.find({
-        schedule: job.data.schedule,
-        start: job.data.time.start
-    }, function(err, sessions) {
-        if (err) {
-            console.log('there was an error finding a shcedule: ', err);
+    User.findById(job.data.user, function(err, user) {
+        if (err || user === null) {
             job.remove(function(error) {
                 if (error) return err;
                 console.log('Removed orphan job #%d', job.id);
             });
-            done && done(new Error('Error querying Sessions'));
+            //done && done(new Error("Couldn't find user"));
+            done && done(new Error("Couldn't find user"));
         }
 
-        if (sessions.length == 0) {
-            var sessionData = {
-                title: job.data.subject,
-                schedule: job.data.schedule,
-                summary: 'Aula não dada por falta do professor',
-                start: job.data.time.start,
-                end: job.data.time.end,
-                professor: job.data.user,
-                subject: job.data.subject,
-                course: job.data.course,
-                school: job.data.school,
-                started: job.data.time.start,
-                missing: [job.data.user]
-            };
+        Session.find({
+            schedule: job.data.schedule,
+            start: job.data.time.start
+        }, function(err, sessions) {
+            if (err) {
+                console.log('there was an error finding a schedule: ', err);
+                job.remove(function(error) {
+                    if (error) return err;
+                    console.log('Removed orphan job #%d', job.id);
+                });
+                done && done(new Error('Error querying Sessions'));
+            }
 
-            Session.create(sessionData, function(err, session) {
-                if (err) return err;
-                var absence = {
-                    user: job.data.user,
-                    phone: job.data.phone,
-                    school: job.data.school,
-                    year: job.data.year,
+            if (sessions.length === 0) {
+                var sessionData = {
+                    title: job.data.subject,
                     schedule: job.data.schedule,
-                    course: job.data.course,
+                    summary: 'Aula não dada por falta do professor',
+                    start: job.data.time.start,
+                    end: job.data.time.end,
+                    professor: job.data.user,
                     subject: job.data.subject,
-                    session: session._id,
-                    message: job.data.message,
-                    supervisor_phone: job.data.supervisor_phone,
-                    supervisor_message: job.data.supervisor_message,
-                    time: locale
+                    course: job.data.course,
+                    school: job.data.school,
+                    started: job.data.time.start,
+                    missing: [job.data.user]
                 };
 
-                Absence.create(absence, function(err, post) {
+                Session.create(sessionData, function(err, session) {
                     if (err) return err;
-                    var user_job = jobs.create('absence notification', {
-                        phone: absence.phone,
-                        message: absence.message
-                    }).removeOnComplete(true).save();
+                    var absence = {
+                        user: job.data.user,
+                        phone: job.data.phone,
+                        school: job.data.school,
+                        year: job.data.year,
+                        schedule: job.data.schedule,
+                        course: job.data.course,
+                        subject: job.data.subject,
+                        session: session._id,
+                        message: job.data.message,
+                        supervisor_phone: job.data.supervisor_phone,
+                        supervisor_message: job.data.supervisor_message,
+                        time: locale
+                    };
 
-                    var supervisor_job = jobs.create('absence notification', {
-                        phone: absence.supervisor_phone,
-                        message: absence.supervisor_message
-                    }).removeOnComplete(true).save();
+                    Absence.create(absence, function(err, post) {
+                        if (err) return err;
+                        var user_job = jobs.create('absence notification', {
+                            phone: absence.phone,
+                            message: absence.message
+                        }).removeOnComplete(true).save();
 
-                    done && done();
+                        var supervisor_job = jobs.create('absence notification', {
+                            phone: absence.supervisor_phone,
+                            message: absence.supervisor_message
+                        }).removeOnComplete(true).save();
+
+                        done && done();
+                    });
+
                 });
 
-            });
-
-        }
+            }
+        });
     });
-
 });
 
 function sendSMS(recipient, message, callback) {

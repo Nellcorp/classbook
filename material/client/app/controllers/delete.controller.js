@@ -363,6 +363,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
 
     
     function removeUserCtrl ($scope, $location, $cookies, $q, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, StorageService, $stateParams) {
+        $scope.me = $cookies.getObject('user');
         //Cannot delete if user
         //is admin
         //is professor assigned to schedule
@@ -380,9 +381,7 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
         
         $scope.canDelete = function() {
 
-            if($cookies.getObject('user').type == 'admin' || ($cookies.getObject('user').type == 'manager' && $cookies.getObject('user').school == $scope.user.school)){
-                //all good
-            }else{
+            if($scope.me.type != 'admin' && ($scope.me.type != 'manager' || $scope.me.school != $scope.user.school)){
                 $scope.form_error = true;
                 $scope.message = 'Não está autorizado a realizar esta operação';
                 return false;
@@ -393,8 +392,8 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
             console.log($scope.user);
 
             if(!$scope.user || !$scope.userForm){ $scope.form_error = true; $scope.message = 'Utilizador Inválido'; return false; }
-            if($scope.id == $cookies.getObject('user').id){ $scope.form_error = true; $scope.message = 'Contacte um adminitrador para eliminar a sua conta.'; return false; }
-            if($scope.user.type == 'admin'){ $scope.form_error = true; $scope.message = 'Apenas o administrador principal pode eliminar este utilizador.'; return false; }
+            if($scope.id == $scope.me.id){ $scope.form_error = true; $scope.message = 'Contacte um administrador para eliminar a sua conta.'; return false; }
+            if($scope.user.type == 'admin' && $scope.me.type != 'admin'){ $scope.form_error = true; $scope.message = 'Apenas um administrador pode eliminar este utilizador.'; return false; }
             if($scope.user.type == 'manager'){ $scope.button = 'Esta acção irá eliminar toda a escola'; return true; }
             if($scope.user.type == 'professor'){
                 $scope.button = 'Eliminar professor e todos os seus horários';
@@ -407,7 +406,9 @@ function removeProfessorScheduleCtrl ($scope, $location, $cookies, $q, UserServi
         $scope.delete = function() {
 
             UserService.delete({id: $scope.user._id},function(response){
-                //$location.url('/page/profile/'+$cookies.getObject('user').id);
+                if($scope.user.type == 'admin' && $scope.me.type != 'admin'){
+                    $location.url('/page/admin/list');    
+                }
                 $location.url('/page/profile/'+$cookies.getObject('user').type);
             },function(error){ 
                 $scope.form_error = true;

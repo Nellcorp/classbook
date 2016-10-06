@@ -33,7 +33,14 @@
 
         var main = {
             brand: 'Classbook',
+            images: {
+                profile: 'images/profile.jpg',
+                logo: 'images/logo.png',
+                icon: 'images/logo.png'
+            },
             user: user,
+            late: 20,
+            early: 10,
             layout: 'wide', // 'boxed', 'wide'
             menu: 'vertical', // 'horizontal', 'vertical', 'collapsed'
             fixedHeader: true, // true, false

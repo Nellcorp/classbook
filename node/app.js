@@ -48,6 +48,7 @@ var users = require('./routes/users');
 var absences = require('./routes/absences');
 var auth = require('./routes/auth');
 var schools = require('./routes/schools');
+var signups = require('./routes/signups');
 var courses = require('./routes/courses');
 var subjects = require('./routes/subjects');
 var coursenames = require('./routes/coursenames');
@@ -126,7 +127,7 @@ var restrict = function(req, res, next) {
         url = '/' + parts[1] + '/' + parts[2];
     }
 
-    var open = ['/auth/login', '/auth/valid', '/auth/register', '/auth/reset', '/auth/restore', '/auth/tokens'];
+    var open = ['/auth/login', '/auth/valid', '/auth/register', '/signup', '/auth/reset', '/auth/restore', '/auth/tokens'];
 
     if (req.user || open.indexOf(url) > -1) {
         next();
@@ -144,6 +145,7 @@ app.use('/auth', auth);
 app.use('/users', users);
 app.use('/absences', absences);
 app.use('/schools', schools);
+app.use('/signup', signups);
 app.use('/courses', courses);
 app.use('/subjects', subjects);
 app.use('/coursenames', coursenames);

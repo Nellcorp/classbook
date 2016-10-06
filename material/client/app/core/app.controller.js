@@ -39,7 +39,7 @@
 
         $scope.pageTransitionOpts = appConfig.pageTransitionOpts;
         $scope.main = appConfig.main;
-        appConfig.main.user = $cookies.getObject('user');
+        appConfig.main.user = ($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined')? $rootScope.user : $cookies.getObject('user');
         $scope.color = appConfig.color;
         
         $scope.$watch('main', function(newVal, oldVal) {

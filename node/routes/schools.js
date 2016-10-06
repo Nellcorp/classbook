@@ -2,7 +2,14 @@ var express = require('express');
 var router = express.Router();
 
 var mongoose = require('mongoose');
+var User = require('../models/User.js');
+var Session = require('../models/Session.js');
+var Schedule = require('../models/Schedule.js');
+var Subject = require('../models/Subject.js');
+var Course = require('../models/Course.js');
 var School = require('../models/School.js');
+var Group = require('../models/Group.js');
+var Absence = require('../models/Absence.js');
 
 /* GET /todos listing. */
 router.get('/', function(req, res, next) {

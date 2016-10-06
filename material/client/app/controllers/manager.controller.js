@@ -37,12 +37,12 @@
             manager: '',
             semesters: {
                 first: {
-                    start: '',
-                    end: ''
+                    start: moment().tz('Africa/Luanda').toDate(),
+                    end: moment().tz('Africa/Luanda').add(6, 'months').toDate()
                 },
                 second: {
-                    start: '',
-                    end: ''
+                    start: moment().tz('Africa/Luanda').add(7, 'months').toDate(),
+                    end: moment().tz('Africa/Luanda').add(13, 'months').toDate()
                 }
             }
         };

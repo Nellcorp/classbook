@@ -36,11 +36,39 @@ user.use('access public page', function(req) {
 user.use('check login', function(req) {
     return true;
 });
+
 user.use('list token', function(req) {
     if (req.user.type === 'manager' || req.user.type === 'professor') {
         return true;
     }
 });
+
+
+//Public Signups
+user.use('list signups', function(req) {
+    if (req.user.type === 'admin') {
+        return true;
+    }
+});
+
+user.use('get signup', function(req) {
+    if (req.user.type === 'admin') {
+        return true;
+    }
+});
+
+user.use('update signup', function(req) {
+    if (req.user.type === 'admin') {
+        return true;
+    }
+});
+
+user.use('delete signup', function(req) {
+    if (req.user.type === 'admin') {
+        return true;
+    }
+});
+
 
 //Users
 user.use('list users', function(req) {
@@ -48,6 +76,13 @@ user.use('list users', function(req) {
         return true;
     }
 });
+
+user.use('update user', function(req) {
+    if ( req.user.type === 'admin' || req.user.type === 'manager' || req.user.type === 'professor') {
+        return true;
+    }
+});
+
 user.use('create users', function(req) {
     if (req.user.type === 'admin' || req.user.type === 'manager') {
         return true;
@@ -507,5 +542,22 @@ app.post('/import', user.can('import data'), function(req, res, next) {
 
 //Export Authorization Control
 app.get('/export', user.can('export data'), function(req, res, next) {
+    next();
+});
+
+//School Signup Authorization Control
+app.get('/signup', user.can('list signups'), function(req, res, next) {
+    next();
+});
+app.post('/signup', user.can('access public page'), function(req, res, next) {
+    next();
+});
+app.get('/signup/:id', user.can('get signup'), function(req, res, next) {
+    next();
+});
+app.put('/signup/:id', user.can('update signup'), function(req, res, next) {
+    next();
+});
+app.delete('/signup/:id', user.can('delete signup'), function(req, res, next) {
     next();
 });

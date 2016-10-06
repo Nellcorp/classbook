@@ -2,11 +2,11 @@
     'use strict';
 
     angular.module('app.session')
-        .controller('createSessionCtrl', ['$scope', '$q', 'moment', '$cookies', '$location', 'UserService', 'SchoolService', 'CourseService', 'SubjectService', 'ScheduleService', 'SessionService', 'AbsenceService', '$stateParams', createSessionCtrl])
-        .controller('sessionCtrl', ['$scope', '$location', 'moment', 'UserService', 'SchoolService', 'CourseService', 'SubjectService', 'ScheduleService', 'SessionService', 'AbsenceService', '$stateParams', sessionCtrl]);
+        .controller('createSessionCtrl', ['$scope', '$q', 'appConfig', 'moment', '$cookies', '$location', 'UserService', 'SchoolService', 'CourseService', 'SubjectService', 'ScheduleService', 'SessionService', 'AbsenceService', '$stateParams', createSessionCtrl])
+        .controller('sessionCtrl', ['$scope', '$location', 'appConfig', 'moment', 'UserService', 'SchoolService', 'CourseService', 'SubjectService', 'ScheduleService', 'SessionService', 'AbsenceService', '$stateParams', sessionCtrl]);
 
 
-    function createSessionCtrl($scope, $q, moment, $cookies, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
+    function createSessionCtrl($scope, $q, appConfig, moment, $cookies, $location, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
         $scope.id = $stateParams.id;
 
         $scope.weekdays = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -64,8 +64,8 @@
                         });
 
 
-                        $scope.late = 20; //20 minutes
-                        $scope.early = 10; //10 minutes
+                        $scope.late = appConfig.main.late; //20 minutes
+                        $scope.early = appConfig.main.early; //10 minutes
                         //$scope.late = 360000;
                         //$scope.early = 36000;
                         console.log('start = ', start.format());
@@ -160,9 +160,9 @@
                             subject: $scope.subject.name,
                             type: 'student',
                             session: response._id,
-                            message: student.firstname + ', faltou à aula de ' + $scope.subject.name + ' em ' + $scope.d.format('LLLL'),
+                            message: student.firstname + ', faltou à aula de ' + $scope.subject.name + ' na ' + $scope.d.format('LLLL'),
                             supervisor_phone: student.supervisor.phone,
-                            supervisor_message: student.firstname + ', faltou à aula de ' + $scope.subject.name + ' em ' + $scope.d.format('LLLL'),
+                            supervisor_message: student.firstname + ', faltou à aula de ' + $scope.subject.name + ' na ' + $scope.d.format('LLLL'),
                             time: $scope.d.format()
                         };
 
@@ -186,7 +186,7 @@
 
     }
 
-    function sessionCtrl($scope, $location, moment, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
+    function sessionCtrl($scope, $location, appConfig, moment, UserService, SchoolService, CourseService, SubjectService, ScheduleService, SessionService, AbsenceService, $stateParams) {
         $scope.id = $stateParams.id;
         $scope.students = [];
 

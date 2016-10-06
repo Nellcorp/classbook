@@ -1,8 +1,8 @@
 <div class="page">
 
-    <div class="row ui-section" ng-controller="schoolListCtrl" >
+    <div class="row ui-section" ng-controller="signupListCtrl" >
         <div class="col-lg-8 clearfix">
-            <h2 class="section-header">Escolas</h2>
+            <h2 class="section-header">Inscrições pendentes</h2>
         </div>
         <div class="col-md-16">
             <div class="row">
@@ -11,12 +11,12 @@
                         <div class="panel-body">
                             <div class="media-list media-divider-inset">
                                 <div class="media" ng-repeat="school in schools">
-                                    <a class="media-left" href="#/page/school/profile/{{school._id}}">
+                                    <a class="media-left" href="#/page/profile/{{user._id}}">
                                         <img alt="" src="images/school.png" class="img-circle img64_64">
                                     </a>
                                     <div class="media-body">
-                                        <h4 class="media-heading"><a class="media-left" href="#/page/school/profile/{{school._id}}">{{school.name | ucfirst}}</a></h4>
-                                        <p><a class="media-left" href="#/page/manager/profile/{{school.manager._id}}">Gerente</a> <a class="media-left" href="#/page/school/professors/{{school._id}}">Professores</a> <a class="media-left" href="#/page/school/students/{{school._id}}">Estudantes</a> <a class="media-left" href="#/page/school/courses/{{school._id}}">Cursos</a> <a class="media-left" href="#/page/school/subjects/{{school._id}}">Disciplinas</a> </p>
+                                        <h4 class="media-heading"><a class="media-left" href="#/page/onboard/profile/{{school._id}}">{{school.school | ucfirst}}</a></h4>
+                                        <p><a class="media-left" ng-click="approve(school)">Aprovar</a> <a class="media-left" ng-click="delete(school)">Eliminar</a></p>
                                     </div>
                                 </div>
                             </div>

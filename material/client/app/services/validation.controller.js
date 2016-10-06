@@ -28,6 +28,11 @@
                         data: data
                     };
 
+                    if (typeof data === 'undefined' || typeof line === 'undefined') {
+                        result.message = type.toUpperCase() + ': campo inexistente ou vazio na linha' + row + ', coluna ' + keys[j];
+                        return result;
+                    }
+
                     var fallback = {
                         horarios_segunda1: '0:00',
                         horarios_segunda2: '0:00',
@@ -412,6 +417,7 @@
                         var today = moment(new Date()).tz('Africa/Luanda');
 
                         var schedule = temp_schedule.schedule;
+                        console.log('Schedule: ', schedule);
 
                         var term = subject.semester.name;
                         var start = moment(new Date(subject.semester.start)).tz('Africa/Luanda');
@@ -432,6 +438,7 @@
                         }
 
                         var locale = today.toLocaleString();
+                        console.log('Today: ', locale);
 
                         var sessions = [];
 
@@ -442,7 +449,7 @@
 
                                 var start_weekday = start.day(); //index
                                 var session_weekday = weekdays.indexOf(weekday);
-                                var diff = (start_weekday < session_weekday) ? session_weekday - start_weekday : start_weekday - session_weekday + 7;
+                                var diff = (start_weekday < session_weekday) ? session_weekday - start_weekday : 7 - start_weekday + session_weekday;
 
                                 var start_str = schedule[weekday].start.split(":");
                                 var end_str = schedule[weekday].end.split(":");
@@ -466,6 +473,16 @@
                                     supervisor_message: 'O professor ' + professor.firstname + ' ' + professor.lastname + ' faltou à aula de ' + subject.name,
                                     time: []
                                 };
+
+                                if (k == 4) {
+                                    console.log('Start Weekday: ', start_weekday);
+                                    console.log('Session Weekday: ', session_weekday);
+                                    console.log('Diff: ', diff);
+                                    console.log('session_date: ', session_date);
+                                    console.log('start date: ', current);
+                                    console.log('Next date: ', next);
+                                    console.log('Absence: ', absence);
+                                }
 
                                 while (current.isSameOrBefore(end)) {
                                     if (typeof break_start != 'undefined' && typeof break_end != 'undefined' && (current.isSameOrAfter(break_start) || current.isBefore(break_end))) {

@@ -10,6 +10,11 @@
                     'app/calendar',
                     'page/profile/admin',
                     'page/import',
+                    'page/onboard/new',
+                    'page/onboard/success',
+                    'page/onboard/error',
+                    'page/onboard/list',
+                    'page/onboard/profile/:id',
                     'page/profile/professor',
                     'page/profile/student',
                     'page/profile/manager',
@@ -107,7 +112,7 @@
                     route = route.split("/:")[0];
                     var auth = true;
 
-                    var open = ['page/404', 'page/500', 'page/signin', 'page/signup', 'page/reset', 'page/activate', 'page/forgot-password', 'page/activate-account'];
+                    var open = ['page/404', 'page/500', 'page/signin', 'page/signup','page/onboard/new','page/onboard/success', 'page/onboard/error', 'page/reset', 'page/activate', 'page/forgot-password', 'page/activate-account'];
 
                     if (open.indexOf(route) > -1) {
                         auth = false;

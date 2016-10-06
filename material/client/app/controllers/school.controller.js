@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app.school')
-        .controller('schoolCtrl', ['$scope', '$location', 'moment', 'randomString', 'UserService', 'SchoolService', '$stateParams', schoolCtrl])
+        .controller('schoolCtrl', ['$scope', '$rootScope','$cookies','$location', 'moment', 'randomString', 'UserService', 'SubjectService', 'SchoolService', '$stateParams', schoolCtrl])
         .controller('schoolListCtrl', ['$scope', '$location', 'randomString', 'SchoolService', 'UserService', '$stateParams', schoolListCtrl])
         .controller('schoolProfCtrl', ['$scope', '$location', 'randomString', 'UserService', 'SchoolService', '$stateParams', schoolProfCtrl])
         .controller('schoolCourseCtrl', ['$scope', '$location', 'randomString', 'CourseService', 'SchoolService', '$stateParams', schoolCourseCtrl])
@@ -10,7 +10,14 @@
         .controller('schoolStudentCtrl', ['$scope', '$location', 'randomString', 'UserService', 'SchoolService', '$stateParams', schoolStudentCtrl]);
 
 
-    function schoolCtrl($scope, $location, moment, randomString, UserService, SchoolService, $stateParams) {
+    function schoolCtrl($scope, $rootScope, $cookies, $location, moment, randomString, UserService, SubjectService, SchoolService, $stateParams) {
+
+        if($rootScope.hasOwnProperty('user') && typeof $rootScope.user !== 'undefined'){
+                $scope.currentuser = $rootScope.user;
+            }else{
+                $scope.currentuser = $cookies.getObject('user');
+            }
+
         $scope.id = $stateParams.id;
 
         SchoolService.get({
@@ -35,8 +42,14 @@
                 $scope.user = users[0];
                 var orig_user = angular.copy($scope.user);
                 var orig_school = angular.copy($scope.school);
+                var fstart = moment(new Date(school.semesters.first.start)).tz('Africa/Luanda');
+                var fend = moment(new Date(school.semesters.first.end)).tz('Africa/Luanda');
+                var sstart = moment(new Date(school.semesters.second.start)).tz('Africa/Luanda');
+                var send = moment(new Date(school.semesters.second.end)).tz('Africa/Luanda');
 
                 $scope.canSubmit = function() {
+
+                    if($scope.currentuser.type !== 'admin' || $scope.currentuser.type !== 'manager'){ return false; }
 
                     var validate_second = $scope.school.semesters.second.end > $scope.school.semesters.second.start;
                     var validate_first = $scope.school.semesters.first.end > $scope.school.semesters.first.start;
@@ -59,6 +72,42 @@
                     }, school, function(response) {
                         //console.log(response);
                     });
+
+                    if( !fstart.isSame($scope.school.semesters.first.start)||
+                        !fend.isSame($scope.school.semesters.first.end) ||
+                        !sstart.isSame($scope.school.semesters.second.start) ||
+                        !send.isSame($scope.school.semesters.second.end) ){
+                        
+                        SubjectService.query({ school: school._id }, function(subjects) {
+
+                            async.each(subjects, function(subject, callback) {
+
+                                // Perform operation on file here.
+                                if(subject.semester.name == 'first'){
+                                    subject.semester.start = fstart;
+                                    subject.semester.end = fend;
+                                }
+
+                                if(subject.semester.name == 'second'){
+                                    subject.semester.start = sstart;
+                                    subject.semester.end = send;
+                                }
+
+                                SubjectService.update({ id: subject._id}, subject, function(result){ callback(); },function(error){
+                                    callback('Error updating subject ID: ' + subject._id);
+                                });
+                            }, function(err) {
+                                // if any of the tasks produced an error, err would equal that error
+                                if( err ) {
+                                    // One of the iterations produced an error.
+                                    // All processing will now stop.
+                                    console.log('A task failed to process');
+                                } else {
+                                    console.log('All tasks have been processed successfully');
+                                }
+                            });
+                        });
+                    }
 
                     UserService.update({
                         id: $scope.user._id

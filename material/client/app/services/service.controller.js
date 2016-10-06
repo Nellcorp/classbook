@@ -13,6 +13,17 @@
                 });
             }
         ])
+        .factory("SignupService", ["$resource", "$state",
+            function($resource, $state) {
+                return $resource(api + "/signup/:id", {
+                    Id: "@id"
+                }, {
+                    "update": {
+                        method: "PUT"
+                    }
+                });
+            }
+        ])
         .factory("ImportService", ["$resource", "$state",
             function($resource, $state) {
                 return $resource(api + "/import/:id", {

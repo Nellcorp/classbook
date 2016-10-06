@@ -1,6 +1,7 @@
 var express = require('express');
 var passport = require('passport');
 var router = express.Router();
+var ucfirst = require('ucfirst');
 //var mandrill = require('mandrill-api/mandrill');
 //var mandrill_client = new mandrill.Mandrill(process.env.mailpass);
 var sendgrid = require('sendgrid')(process.env.sendgrid_key);
@@ -29,8 +30,8 @@ router.post('/register', function(req, res, next) {
             user: user._id
         }, function(err, token) {
             if (err) return res.status(500).json(err);
-            message.html = user.firstname + ' ' + user.lastname + '! Bem vindo/a ao Classbook! Clique no link abaixo para criar a sua senha: <br/><a href="http://www.classbook.co/#/page/activate/' + token._id + '">Activar Conta</a>';
-            message.text = user.firstname + ' ' + user.lastname + '! Bem vindo ao Classbook! Clique no link para criar a sua senha: http://www.classbook.co/#/page/activate/' + token._id;
+            message.html = ucfirst(user.firstname) + ' ' + ucfirst(user.lastname) + '! Bem vindo/a ao Classbook! Clique no link abaixo para criar a sua senha: <br/><a href="http://www.classbook.co/#/page/activate/' + token._id + '">Activar Conta</a>';
+            message.text = ucfirst(user.firstname) + ' ' + ucfirst(user.lastname) + '! Bem vindo ao Classbook! Clique no link para criar a sua senha: http://www.classbook.co/#/page/activate/' + token._id;
             message.to = user.email;
             message.toname = user.firstname + ' ' + user.lastname;
             sendgrid.send(message, function(err, result) {
