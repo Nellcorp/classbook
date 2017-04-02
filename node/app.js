@@ -32,7 +32,7 @@ mongoose.connect('mongodb://localhost/' + database, function(err) {
 
 //Remember to configure cors for all routes
 var cors = require('cors');
-var whitelist = ['http://classbook.co', 'http://classbook.co:3000', 'http://www.classbook.co', 'http://www.classbook.co:3000', 'http://classbook.nellcorp.com', 'http://classbook.nellcorp.com:3000'];
+var whitelist = ['https://classbook.co', 'https://classbook.co:3000', 'http://www.classbook.co', 'http://www.classbook.co:3000', 'https://classbook.nellcorp.com', 'https://classbook.nellcorp.com:3000'];
 
 var corsOptions = {
     origin: function(origin, callback) {
@@ -63,7 +63,7 @@ var app = express();
 app.use(compress());
 
 app.use(function(req, res, next) {
-    //res.header("Access-Control-Allow-Origin", "http://classbook.nellcorp.com:3000");
+    //res.header("Access-Control-Allow-Origin", "https://classbook.nellcorp.com:3000");
 
     var origin = req.get('origin');
 

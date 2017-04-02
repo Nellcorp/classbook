@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app.ui.form', ["ngResource"])
-        .factory("UserService", function ($resource){return $resource("http://classbook.nellcorp.com:3002/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
+        .factory("UserService", function ($resource){return $resource("https://classbook.nellcorp.com:3002/users/:id",{Id: "@id" },{"update": {method: "PUT"}});})
         .controller('InputCtrl', ['$scope','UserService', InputCtrl])
         .controller('CheckboxCtrl', ['$scope', CheckboxCtrl])
         .controller('RadioCtrl', ['$scope', RadioCtrl])

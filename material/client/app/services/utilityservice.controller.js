@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    var api = 'http://classbook.co:3002';
+    var api = 'https://classbook.co:3002';
     angular.module('app.service')
         .factory("UtilityService", ["$resource",
             function($resource) {
