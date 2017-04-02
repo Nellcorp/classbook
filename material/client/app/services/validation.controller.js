@@ -474,15 +474,17 @@
                                     time: []
                                 };
 
+                                /*
                                 if (k == 4) {
-                                    console.log('Start Weekday: ', start_weekday);
-                                    console.log('Session Weekday: ', session_weekday);
-                                    console.log('Diff: ', diff);
-                                    console.log('session_date: ', session_date);
-                                    console.log('start date: ', current);
-                                    console.log('Next date: ', next);
-                                    console.log('Absence: ', absence);
+                                    //console.log('Start Weekday: ', start_weekday);
+                                    //console.log('Session Weekday: ', session_weekday);
+                                    //console.log('Diff: ', diff);
+                                    //console.log('session_date: ', session_date);
+                                    //console.log('start date: ', current);
+                                    //console.log('Next date: ', next);
+                                    //console.log('Absence: ', absence);
                                 }
+                                */
 
                                 while (current.isSameOrBefore(end)) {
                                     if (typeof break_start != 'undefined' && typeof break_end != 'undefined' && (current.isSameOrAfter(break_start) || current.isBefore(break_end))) {
